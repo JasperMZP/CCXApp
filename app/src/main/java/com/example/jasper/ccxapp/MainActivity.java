@@ -7,15 +7,12 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONObject;
-
 import java.util.List;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
-import cn.bmob.v3.listener.QueryListener;
 import cn.bmob.v3.listener.SaveListener;
 
 public class MainActivity extends AppCompatActivity {
@@ -31,10 +28,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void CreateUser(View view) {
-        final Person person = new Person();
-        person.setUsername("Jasper");
-        person.setPassword("123456");
-        person.save(new SaveListener<String>() {
+        final User user = new User();
+        user.setUsername("Jasper");
+        user.setPassword("123456");
+        user.save(new SaveListener<String>() {
             @Override
             public void done(String objectId, BmobException e) {
                 if (e == null) {
@@ -47,15 +44,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void GetUser(View view) {
-        BmobQuery<Person> personQuery = new BmobQuery<Person>();
+        BmobQuery<User> personQuery = new BmobQuery<User>();
         personQuery.setLimit(50);
-        personQuery.findObjects(new FindListener<Person>() {
+        personQuery.findObjects(new FindListener<User>() {
             @Override
-            public void done(List<Person> object, BmobException e) {
+            public void done(List<User> object, BmobException e) {
                 if (e == null){
                     Toast.makeText(MainActivity.this, "查询成功：共"+object.size()+"条数据。", Toast.LENGTH_SHORT).show();
-                    for (Person person : object){
-                        text.append(person.getUsername()+" " +person.getPassword());
+                    for (User user : object){
+                        text.append(user.getUsername()+" " + user.getPassword()+"\n");
                     }
 
                 }else{
