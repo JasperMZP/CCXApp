@@ -1,4 +1,4 @@
-package com.example.jasper.ccxapp;
+package com.example.jasper.ccxapp.entities;
 
 import cn.bmob.v3.BmobObject;
 
