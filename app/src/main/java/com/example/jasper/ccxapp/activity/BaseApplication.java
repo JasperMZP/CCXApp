@@ -1,9 +1,8 @@
-package com.example.jasper.ccxapp.ui;
+package com.example.jasper.ccxapp.activity;
 
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.pm.PackageManager;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.hyphenate.chat.EMClient;

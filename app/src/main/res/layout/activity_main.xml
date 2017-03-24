@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.jasper.ccxapp.ui.MainActivity"
+    tools:context="com.example.jasper.ccxapp.activity.MainActivity"
     android:orientation="vertical">
 
     <!--<Button
@@ -33,7 +33,7 @@
 
 
     <EditText
-        android:id="@+id/other_username"
+        android:id="@+id/to_chat_username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="对方用户名"
