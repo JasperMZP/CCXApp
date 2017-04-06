@@ -32,6 +32,4 @@ dependencies {
     //3.5.0：请务必查看下面注释[1]
     compile 'cn.bmob.android:bmob-sdk:3.5.0'
     testCompile 'junit:junit:4.12'
-    compile project(':IMLib')
-    compile project(':IMKit')
 }

@@ -92,12 +92,12 @@
         "source": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_praise.png"
     },
     {
-        "merged": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f622.png",
-        "source": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f622.png"
-    },
-    {
         "merged": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_ic_voice_sent_play1.png",
         "source": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_ic_voice_sent_play1.png"
+    },
+    {
+        "merged": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f622.png",
+        "source": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f622.png"
     },
     {
         "merged": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f636.png",
@@ -1024,12 +1024,12 @@
         "source": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_send_voice_one.png"
     },
     {
-        "merged": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_voice_unread.png",
-        "source": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_voice_unread.png"
-    },
-    {
         "merged": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\u1f629.png",
         "source": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\src\\main\\res\\drawable-xhdpi\\u1f629.png"
+    },
+    {
+        "merged": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_voice_unread.png",
+        "source": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\src\\main\\res\\drawable-xhdpi\\rc_voice_unread.png"
     },
     {
         "merged": "C:\\Users\\Jasper\\Desktop\\CCXApp\\CCXApp\\IMKit\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\rc_menu_text_hover.png",
