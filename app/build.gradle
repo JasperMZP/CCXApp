@@ -19,11 +19,11 @@ android {
         }
     }
 
-    /*sourceSets {
+    sourceSets {
         main {
             jniLibs.srcDirs =['libs']
         }
-    }*/
+    }
 }
 
 dependencies {

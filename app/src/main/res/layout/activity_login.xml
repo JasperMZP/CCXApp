@@ -10,10 +10,10 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/login_id"
+            android:id="@+id/login_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="ID" />
+            android:hint="用户名" />
 
         <EditText
             android:id="@+id/login_password"
