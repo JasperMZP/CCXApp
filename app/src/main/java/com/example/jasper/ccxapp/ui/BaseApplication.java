@@ -1,15 +1,8 @@
 package com.example.jasper.ccxapp.ui;
 
-import android.app.ActivityManager;
+
 import android.app.Application;
-import android.content.pm.PackageManager;
-import android.util.Log;
 
-import com.hyphenate.chat.EMClient;
-import com.hyphenate.chat.EMOptions;
-
-import java.util.Iterator;
-import java.util.List;
 
 import cn.bmob.v3.Bmob;
 
