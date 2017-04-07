@@ -68,6 +68,38 @@
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="102dp"
+        android:orientation="horizontal">
+        <VideoView
+            android:id="@+id/chat_video_vv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <Button
+                android:id="@+id/send_video_btn"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="发送视频"/>
+            <Button
+                android:id="@+id/play_video_btn"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="播放视频"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <com.example.jasper.ccxapp.view.RecordButton

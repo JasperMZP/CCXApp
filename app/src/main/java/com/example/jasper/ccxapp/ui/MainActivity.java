@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.util.IOUtil;
@@ -29,6 +30,7 @@ import java.util.Locale;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
+import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.content.VoiceContent;
@@ -43,6 +45,8 @@ import cn.jpush.im.api.BasicCallback;
 public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_VIDEO_CAPTURE = 2;
+
     private EditText usernameChatToET;
     private Button beginChatBtn;
     private EditText txtMsgET;
@@ -52,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     private Button sendImgMsgBtn;
     private RecordButton sendVoiceMsgBtn;
     private Button showVoiceMsgBtn;
+    private Button sendVideoMsgBtn;
+    private Button showVideoMsgBtn;
+    private VideoView videoView;
 
     private String usernameChatTo;
     private Conversation mConversation;
@@ -92,10 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
         sendVoiceMsgBtn.setOnFinishedRecordListener(new RecordButton.OnFinishedRecordListener() {
             @Override
-            public void onFinishedRecord(String audioPath,long intervalTime) {
-                Log.i("test","录音路径"+audioPath);
-                voicePath=audioPath;
-                sendVoice(voicePath,intervalTime);
+            public void onFinishedRecord(String audioPath, long intervalTime) {
+                Log.i("test", "录音路径" + audioPath);
+                voicePath = audioPath;
+                sendVoice(voicePath, intervalTime);
             }
         });
 
@@ -103,6 +110,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 playVoice();
+            }
+        });
+
+        sendVideoMsgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(MediaStore.ACTION_VIDEO_CAPTURE), REQUEST_VIDEO_CAPTURE);
             }
         });
 
@@ -120,11 +134,14 @@ public class MainActivity extends AppCompatActivity {
         chatImageView = (ImageView) findViewById(R.id.chat_Image);
         sendImgMsgBtn = (Button) findViewById(R.id.send_Img_btn);
 
-        sendVoiceMsgBtn=(RecordButton)findViewById(R.id.send_voice_btn);
+        sendVoiceMsgBtn = (RecordButton) findViewById(R.id.send_voice_btn);
         sendVoiceMsgBtn.setMaxIntervalTime(100);
         sendVoiceMsgBtn.setSavePath("");
 
-        showVoiceMsgBtn=(Button)findViewById(R.id.show_voice_btn);
+        showVoiceMsgBtn = (Button) findViewById(R.id.show_voice_btn);
+        sendVideoMsgBtn = (Button) findViewById(R.id.send_video_btn);
+        showVideoMsgBtn = (Button) findViewById(R.id.play_video_btn);
+        videoView = (VideoView) findViewById(R.id.chat_video_vv);
     }
 
     private void beginChat() {
@@ -170,13 +187,31 @@ public class MainActivity extends AppCompatActivity {
         JMessageClient.sendMessage(message);
     }
 
-    private void sendVoice(String voicePath,long intervalTime){
+    private void sendVideo(String videopath) {
         try {
-            Message message = mConversation.createSendMessage(new VoiceContent(new File(voicePath),(int)intervalTime));
+            FileContent fileContent = new FileContent(new File(videopath));
+            Message message = mConversation.createSendMessage(fileContent);
             message.setOnSendCompleteCallback(new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("test", "语音发送"+i+s);
+                    Log.i("test", "视频发送" + i + s);
+                }
+            });
+            JMessageClient.sendMessage(message);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (JMFileSizeExceedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendVoice(String voicePath, long intervalTime) {
+        try {
+            Message message = mConversation.createSendMessage(new VoiceContent(new File(voicePath), (int) intervalTime));
+            message.setOnSendCompleteCallback(new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    Log.i("test", "语音发送" + i + s);
                 }
             });
             JMessageClient.sendMessage(message);
@@ -186,13 +221,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void playVoice(){
-        if (!mediaPlayer.isPlaying()){
+    private void playVoice() {
+        if (!mediaPlayer.isPlaying()) {
             mediaPlayer.start();
         }
     }
 
-    private void initMediaPlayer(String path){
+    private void initMediaPlayer(String path) {
         try {
             mediaPlayer.setDataSource(path);
             mediaPlayer.prepare();
@@ -200,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.i("test","初始化mediaplayer完成");
+        Log.i("test", "初始化mediaplayer完成");
     }
 
 
@@ -215,9 +250,10 @@ public class MainActivity extends AppCompatActivity {
             chatImageView.setImageBitmap(bitmap);
 
             sendImg(bitmap);
+        } else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+            Log.i("test", "video :" + data.getData().getPath());
         }
     }
-
 
 
     @Override
@@ -255,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                 imageContent.downloadOriginImage(msg, new DownloadCompletionCallback() {
                     @Override
                     public void onComplete(int i, String s, File file) {
-                        Log.i("test", "收到的图片下载完成"+i+s);
+                        Log.i("test", "收到的图片下载完成" + i + s);
                         Bitmap img = getDiskBitmap(file.getPath());//图片本地地址
                         chatImageView.setImageBitmap(img);
                     }
@@ -263,21 +299,37 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case voice:
                 Log.i("test", "收到语音消息");
-                VoiceContent voiceContent = (VoiceContent)msg.getContent();
+                VoiceContent voiceContent = (VoiceContent) msg.getContent();
                 voiceContent.downloadVoiceFile(msg, new DownloadCompletionCallback() {
                     @Override
                     public void onComplete(int i, String s, File file) {
-                        Log.i("test", "收到的语音下载完成"+i+s+file.getPath());
+                        Log.i("test", "收到的语音下载完成" + i + s + file.getPath());
                         try {
-                            IOUtil.copyFile(file,new File("/storage/sdcard/"+file.getName()+".mp3"));
+                            IOUtil.copyFile(file, new File("/storage/sdcard/" + file.getName() + ".mp3"));
                         } catch (IOException e) {
                             e.printStackTrace();
-                        }finally {
-                            initMediaPlayer("/storage/sdcard/"+file.getName()+".mp3");
+                        } finally {
+                            initMediaPlayer("/storage/sdcard/" + file.getName() + ".mp3");
                         }
                     }
                 });
                 break;
+            case file:
+                Log.i("test", "收到视频消息");
+                FileContent fileContent = (FileContent) msg.getContent();
+                fileContent.downloadFile(msg, new DownloadCompletionCallback() {
+                    @Override
+                    public void onComplete(int i, String s, File file) {
+                        Log.i("test", "收到的文件下载完成" + i + s + file.getPath());
+                        try {
+                            IOUtil.copyFile(file, new File("/storage/sdcard/" + file.getName() + ".mp4"));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            //initMediaPlayer("/storage/sdcard/" + file.getName() + ".mp3");
+                        }
+                    }
+                });
 
         }
     }
