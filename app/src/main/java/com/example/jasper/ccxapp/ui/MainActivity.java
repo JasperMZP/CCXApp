@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -16,9 +17,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
+import com.example.jasper.ccxapp.util.IOUtil;
+import com.example.jasper.ccxapp.view.RecordButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,6 +31,7 @@ import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
+import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
@@ -44,11 +50,15 @@ public class MainActivity extends AppCompatActivity {
     private TextView chatContentTV;
     private ImageView chatImageView;
     private Button sendImgMsgBtn;
+    private RecordButton sendVoiceMsgBtn;
+    private Button showVoiceMsgBtn;
 
     private String usernameChatTo;
     private Conversation mConversation;
     private String txtMsg;
     private String chatContentStr = "";
+    private MediaPlayer mediaPlayer = new MediaPlayer();
+    private String voicePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +90,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        sendVoiceMsgBtn.setOnFinishedRecordListener(new RecordButton.OnFinishedRecordListener() {
+            @Override
+            public void onFinishedRecord(String audioPath,long intervalTime) {
+                Log.i("test","录音路径"+audioPath);
+                voicePath=audioPath;
+                sendVoice(voicePath,intervalTime);
+            }
+        });
+
+        showVoiceMsgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playVoice();
+            }
+        });
+
     }
 
     private void init() {
@@ -93,6 +119,12 @@ public class MainActivity extends AppCompatActivity {
         chatContentTV = (TextView) findViewById(R.id.chat_content);
         chatImageView = (ImageView) findViewById(R.id.chat_Image);
         sendImgMsgBtn = (Button) findViewById(R.id.send_Img_btn);
+
+        sendVoiceMsgBtn=(RecordButton)findViewById(R.id.send_voice_btn);
+        sendVoiceMsgBtn.setMaxIntervalTime(100);
+        sendVoiceMsgBtn.setSavePath("");
+
+        showVoiceMsgBtn=(Button)findViewById(R.id.show_voice_btn);
     }
 
     private void beginChat() {
@@ -138,6 +170,40 @@ public class MainActivity extends AppCompatActivity {
         JMessageClient.sendMessage(message);
     }
 
+    private void sendVoice(String voicePath,long intervalTime){
+        try {
+            Message message = mConversation.createSendMessage(new VoiceContent(new File(voicePath),(int)intervalTime));
+            message.setOnSendCompleteCallback(new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    Log.i("test", "语音发送"+i+s);
+                }
+            });
+            JMessageClient.sendMessage(message);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void playVoice(){
+        if (!mediaPlayer.isPlaying()){
+            mediaPlayer.start();
+        }
+    }
+
+    private void initMediaPlayer(String path){
+        try {
+            mediaPlayer.setDataSource(path);
+            mediaPlayer.prepare();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.i("test","初始化mediaplayer完成");
+    }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -152,8 +218,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendFile() {
-    }
+
 
     @Override
     protected void onDestroy() {
@@ -190,11 +255,29 @@ public class MainActivity extends AppCompatActivity {
                 imageContent.downloadOriginImage(msg, new DownloadCompletionCallback() {
                     @Override
                     public void onComplete(int i, String s, File file) {
-                        Log.i("test", "收到的图片下载完成");
+                        Log.i("test", "收到的图片下载完成"+i+s);
                         Bitmap img = getDiskBitmap(file.getPath());//图片本地地址
                         chatImageView.setImageBitmap(img);
                     }
                 });
+                break;
+            case voice:
+                Log.i("test", "收到语音消息");
+                VoiceContent voiceContent = (VoiceContent)msg.getContent();
+                voiceContent.downloadVoiceFile(msg, new DownloadCompletionCallback() {
+                    @Override
+                    public void onComplete(int i, String s, File file) {
+                        Log.i("test", "收到的语音下载完成"+i+s+file.getPath());
+                        try {
+                            IOUtil.copyFile(file,new File("/storage/sdcard/"+file.getName()+".mp3"));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }finally {
+                            initMediaPlayer("/storage/sdcard/"+file.getName()+".mp3");
+                        }
+                    }
+                });
+                break;
 
         }
     }
