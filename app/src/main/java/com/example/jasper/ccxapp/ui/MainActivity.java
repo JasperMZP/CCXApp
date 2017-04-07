@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -24,6 +26,8 @@ import com.example.jasper.ccxapp.view.RecordButton;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
     private String chatContentStr = "";
     private MediaPlayer mediaPlayer = new MediaPlayer();
     private String voicePath;
+    private Uri fileUri;
+    private Uri recievedFileuri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +122,18 @@ public class MainActivity extends AppCompatActivity {
         sendVideoMsgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(MediaStore.ACTION_VIDEO_CAPTURE), REQUEST_VIDEO_CAPTURE);
+                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                fileUri = getOutputMediaFileUri(); // create a file Uri to save the video
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+                startActivityForResult(intent, REQUEST_VIDEO_CAPTURE);
+            }
+        });
+
+        showVideoMsgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playVideo(recievedFileuri);
             }
         });
 
@@ -227,6 +244,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void playVideo(Uri uri) {
+        videoView.setMediaController(new MediaController(this));
+        videoView.setVideoURI(uri);
+        videoView.start();
+        videoView.requestFocus();
+    }
+
     private void initMediaPlayer(String path) {
         try {
             mediaPlayer.setDataSource(path);
@@ -252,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
             sendImg(bitmap);
         } else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
             Log.i("test", "video :" + data.getData().getPath());
+            sendVideo(data.getData().getPath());
         }
     }
 
@@ -272,6 +297,14 @@ public class MainActivity extends AppCompatActivity {
             Log.e("test", "该图片不存在");
         }
         return bitmap;
+    }
+
+    public static Uri getOutputMediaFileUri() {
+        File picDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File videoFile = new File(picDir.getPath() + File.separator + "VIDEO_" + timeStamp + ".mp4");
+
+        return Uri.fromFile(videoFile);
     }
 
     public void onEventMainThread(MessageEvent event) {
@@ -323,10 +356,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("test", "收到的文件下载完成" + i + s + file.getPath());
                         try {
                             IOUtil.copyFile(file, new File("/storage/sdcard/" + file.getName() + ".mp4"));
+                            recievedFileuri=Uri.parse(file.getPath());
                         } catch (IOException e) {
                             e.printStackTrace();
-                        } finally {
-                            //initMediaPlayer("/storage/sdcard/" + file.getName() + ".mp3");
                         }
                     }
                 });
