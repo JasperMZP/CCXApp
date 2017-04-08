@@ -8,17 +8,8 @@ import cn.bmob.v3.BmobObject;
 
 public class User extends BmobObject {
 
-    private String id;
     private String username;
     private String password;
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
-        return id;
-    }
 
     public String getUsername() {
         return username;
