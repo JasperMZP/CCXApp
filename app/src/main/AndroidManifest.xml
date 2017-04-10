@@ -59,6 +59,9 @@
                 </intent-filter>
         </activity>
         <activity android:name=".ui.MainActivity"></activity>
+        <activity android:name=".ui.MainActivity2"></activity>
+        <activity android:name=".ui.SignUpActivity"></activity>
+
 
 
         <!-- Required SDK 核心功能-->
