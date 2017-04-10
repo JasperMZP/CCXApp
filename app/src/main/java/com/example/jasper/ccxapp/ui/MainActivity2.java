@@ -35,7 +35,7 @@ public class MainActivity2 extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main2);
 
         all_message = (ListView)findViewById(R.id.all_messages);
         addNewMessage = (Button)findViewById(R.id.add_new_message);

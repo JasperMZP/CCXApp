@@ -12,7 +12,7 @@
         android:id="@+id/titleLayout">
 
         <ImageView
-            android:id="@+id/back"
+            android:id="@+id/sign_up_back"
             android:src="@drawable/backimage"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -58,8 +58,9 @@
             android:layout_weight="1" />
 
         <EditText
-            android:inputType="number"
-            android:hint="请输入手机号"
+            android:id="@+id/sing_up_userName"
+            android:digits="0123456789abcdefghigklmnopqrstuvwxyz"
+            android:hint="请输入用户名"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="5" />
@@ -89,7 +90,8 @@
             android:id="@+id/psd2" />
 
         <EditText
-            android:inputType="number"
+            android:id="@+id/sing_up_password"
+            android:digits="0123456789abcdefghigklmnopqrstuvwxyz"
             android:hint="请输入密码"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -120,7 +122,8 @@
             android:id="@+id/repsd2" />
 
         <EditText
-            android:inputType="number"
+            android:id="@+id/sing_up_password2"
+            android:digits="0123456789abcdefghigklmnopqrstuvwxyz"
             android:hint="请确认密码"
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -129,8 +132,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/signup"
-        android:onClick="sign up"
+        android:id="@+id/sign_up"
         android:text="注册"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -142,15 +144,14 @@
         android:textSize="20sp"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
-        android:layout_below="@+id/signup"/>
+        android:layout_below="@+id/sign_up"/>
 
     <Button
-        android:id="@+id/loginin"
-        android:onClick="login in"
+        android:id="@+id/to_login"
         android:text="登陆"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:layout_below="@+id/signup"
+        android:layout_below="@+id/sign_up"
         android:layout_toRightOf="@+id/below"/>
 </RelativeLayout>
 
