@@ -11,10 +11,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.MessageAdapter;
@@ -130,5 +132,20 @@ public class MainActivity2 extends AppCompatActivity {
         messageAdapter.addNewMessage("","姓名",Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
                         + "DCIM" + File.separator + "Camera" + File.separator + "VID_20170405_191102.mp4"
                 ,3,a_user_comment_name_list,a_user_comment_comment);
+    }
+
+    private long exitTime = 0;
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
+            if((System.currentTimeMillis()-exitTime) > 2000){
+                Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

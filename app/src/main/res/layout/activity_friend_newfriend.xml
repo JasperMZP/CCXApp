@@ -55,12 +55,15 @@
             android:paddingLeft="35.0dip"
             android:paddingRight="10.0dip"
             android:textColor="#666666"
-            android:textSize="22sp" />
+            android:textSize="22sp"
+            android:visibility="gone"/>
 
         <View
+            android:id="@+id/a_line"
             android:layout_width="match_parent"
             android:layout_height="2.0dip"
-            android:background="#CCCCCC" />
+            android:background="#CCCCCC"
+            android:visibility="gone"/>
 
         <ListView
             android:id="@+id/all_new_friend"

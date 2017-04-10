@@ -1,6 +1,7 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -55,7 +56,7 @@ public class SendRequestActivity extends AppCompatActivity{
                     @Override
                     public void showResult(boolean result, String message) {
                         if(result){
-                            showDialog("发送好友请求成功");
+                            showDialog2("发送好友请求成功");
                         }else{
                             showDialog("发送好友请求失败");
                         }
@@ -74,6 +75,16 @@ public class SendRequestActivity extends AppCompatActivity{
     private void showDialog(String message) {
         new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
                 .setPositiveButton("确定", null).show();
+    }
+
+    private void showDialog2(String message) {
+        new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }).show();
     }
 
     public String getUserName(){

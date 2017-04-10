@@ -3,6 +3,7 @@ package com.example.jasper.ccxapp.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
@@ -92,7 +93,7 @@ public class NewFriendActivity extends Activity implements OnClickListener {
 								});
 							}
 						}).setNegativeButton("取消", null).show();
-				return false;
+				return true;
 			}
 		});
 	}
@@ -125,6 +126,7 @@ public class NewFriendActivity extends Activity implements OnClickListener {
 
 		if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
 			super.onKeyDown(keyCode, event);
+			startActivity(new Intent(NewFriendActivity.this, FriendActivity.class));
 			this.finish();
 		}
 		return false;

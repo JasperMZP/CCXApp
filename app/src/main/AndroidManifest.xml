@@ -39,7 +39,6 @@
         </activity>
         <activity android:name=".ui.MainActivity"/>
         <activity android:name=".ui.MainActivity2"/>
-        <activity android:name=".ui.ChatActivity"/>
         <activity android:name=".ui.SignUpActivity"/>
         <activity android:name=".ui.FriendActivity"/>
         <activity android:name=".ui.FriendRequestActivity"/>

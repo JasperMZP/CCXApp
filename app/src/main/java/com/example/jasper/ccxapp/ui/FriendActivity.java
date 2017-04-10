@@ -46,6 +46,7 @@ public class FriendActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(FriendActivity.this, NewFriendActivity.class));
+				finish();
 			}
 		});
 	}
