@@ -128,7 +128,7 @@ public class friendDB {
     }
 
     //查询新好友
-    public static void searchnewfriend(final String userName1, String userName2, final userBackListListener userBackListListener) {
+    public static void searchnewfriend(final String userName1, final String userName2, final userBackListListener userBackListListener) {
         BmobQuery<Friend> query = new BmobQuery<Friend>();
         query.addWhereEqualTo("friend1", userName1);
         query.setLimit(200);
@@ -143,6 +143,7 @@ public class friendDB {
                     friends[list.size()] = userName1;
                     BmobQuery<User> queryu = new BmobQuery<User>();
                     queryu.addWhereNotContainedIn("username", Arrays.asList(friends));
+                    queryu.addWhereContains("username", userName2);
                     queryu.findObjects(new FindListener<User>() {
                         @Override
                         public void done(List<User> list, BmobException e) {

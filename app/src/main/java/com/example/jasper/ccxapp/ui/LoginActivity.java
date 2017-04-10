@@ -15,6 +15,10 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.userDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Properties;
+
 /**
  * Created by Jasper on 2017/4/6.
  */
@@ -72,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
 //                        @Override
 //                        public void gotResult(int i, String s) {
 //                            Log.i("test",i+" "+s);
+                            saveUser(username, password);
                             startActivity(new Intent(LoginActivity.this, MainActivity2.class));
                             finish();
 //                        }
@@ -120,4 +125,23 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
+    private void saveUser(String username, String password) {
+        try {
+            // 使用Android上下问获取当前项目的路径
+            File file = new File(this.getFilesDir(), "info.properties");
+            // 创建输出流对象
+            FileOutputStream fos = new FileOutputStream(file);
+            // 创建属性文件对象
+            Properties pro = new Properties();
+            // 设置用户名或密码
+            pro.setProperty("userName", username);
+            pro.setProperty("password", password);
+            // 保存文件
+            pro.store(fos, "info.properties");
+            // 关闭输出流对象
+            fos.close();
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }

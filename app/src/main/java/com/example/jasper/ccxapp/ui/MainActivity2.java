@@ -1,6 +1,7 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,9 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.MessageAdapter;
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -23,6 +26,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     private ListView all_message;
     private Button addNewMessage;
+    private TextView toFriend;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
     private MessageAdapter messageAdapter;
@@ -57,6 +61,15 @@ public class MainActivity2 extends AppCompatActivity {
     private void initDrawerLayout() {
         drawerLayout = (DrawerLayout) super.findViewById(R.id.drawer_layout);
         drawerLayout.setScrimColor(Color.TRANSPARENT);
+
+        View v1 = (View)findViewById(R.id.left_drawer);
+        toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
+        toFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity2.this, FriendActivity.class));
+            }
+        });
         //v4控件 actionbar上的抽屉开关，可以实现一些开关的动态效果
 //        toggle = new ActionBarDrawerToggle(this, drawerLayout,
 //                R.drawable.star_change, R.string.drawer_open
@@ -85,8 +98,8 @@ public class MainActivity2 extends AppCompatActivity {
 //    @Override
 //    public boolean onOptionsItemSelected(MenuItem item) {
 //        switch (item.getItemId()) {
-//            case R.id.action_personal:
-//                toggleRightSliding();
+//            case R.id.tvMyFriend:
+//
 //                break;
 //        }
 //        return super.onOptionsItemSelected(item);
