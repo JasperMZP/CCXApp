@@ -7,12 +7,13 @@
         android:id="@+id/comment_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#00ff00"/>
+        android:textColor="#3366cc"
+        />
 
     <Button
         android:id="@+id/comment_audio_show"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@drawable/startaudio"
+        android:background="@drawable/startaudio2"
         android:text="" />
 </LinearLayout>

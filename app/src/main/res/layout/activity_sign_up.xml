@@ -2,37 +2,27 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/appback"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/titleLayout">
-
-        <ImageView
-            android:id="@+id/back"
-            android:src="@drawable/backimage"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/text_title"
-            android:text="   子女注册"
-            android:textSize="40sp"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="5" />
-    </LinearLayout>
+            android:id="@+id/titleLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="注册"
+            android:textColor="#C2C2C2"
+            android:textSize="40sp" />
+
 
     <ImageView
         android:id="@+id/logo"
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:layout_weight="1"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/logo"
         android:layout_below="@+id/titleLayout"/>
 
     <LinearLayout
@@ -40,26 +30,21 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/accountLayout"
-        android:layout_below="@+id/logo">
+        android:layout_below="@+id/logo"
+        android:layout_alignParentStart="true">
 
         <ImageView
             android:id="@+id/act"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/logup_1"
             android:layout_weight="1" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:text="账号"
-            android:textSize="20sp"
-            android:id="@+id/act2"
-            android:layout_weight="1" />
 
         <EditText
             android:inputType="number"
-            android:hint="请输入手机号"
+            android:hint="请输入账号"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="5" />
@@ -76,17 +61,11 @@
         <ImageView
             android:id="@+id/psd"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/logup_2"
             android:layout_weight="1" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:text="密码"
-            android:textSize="20sp"
-            android:layout_weight="1"
-            android:id="@+id/psd2" />
 
         <EditText
             android:inputType="number"
@@ -107,17 +86,11 @@
         <ImageView
             android:id="@+id/repsd"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_height="40dp"
+            android:src="@drawable/logup_2"
+            android:layout_marginTop="5dp"
             android:layout_weight="1" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:text="确认密码"
-            android:textSize="11sp"
-            android:layout_weight="1"
-            android:id="@+id/repsd2" />
 
         <EditText
             android:inputType="number"
@@ -132,26 +105,36 @@
         android:id="@+id/signup"
         android:onClick="sign up"
         android:text="注册"
-        android:layout_width="fill_parent"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:background="@drawable/button"
+        android:layout_width="360dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/repsdLayout"/>
+        android:layout_below="@+id/repsdLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp" />
 
     <TextView
         android:id="@+id/below"
         android:text="                    已有账号？"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_below="@+id/signup"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/signup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="9dp" />
 
-    <Button
+    <TextView
         android:id="@+id/loginin"
         android:onClick="login in"
-        android:text="登陆"
+        android:text="登录"
         android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_below="@+id/signup"
-        android:layout_toRightOf="@+id/below"/>
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:textColor="#B452CD"
+        android:layout_marginStart="13dp"
+        android:layout_alignBottom="@+id/below"
+        android:layout_toEndOf="@+id/below" />
 </RelativeLayout>
 
 
