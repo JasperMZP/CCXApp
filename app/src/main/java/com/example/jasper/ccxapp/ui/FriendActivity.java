@@ -25,6 +25,7 @@ public class FriendActivity extends Activity {
 
 	private TextView toNewFriend;
 	private TextView searchNewFriend;
+    private TextView to_make_new_chat;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,7 @@ public class FriendActivity extends Activity {
 
     	searchNewFriend = (TextView) findViewById(R.id.search_new_friend);
 		toNewFriend = (TextView)findViewById(R.id.to_new_friend);
+        to_make_new_chat = (TextView)findViewById(R.id.make_new_chat);
 
 		searchNewFriend.setOnClickListener(new OnClickListener() {
 			@Override
@@ -49,6 +51,12 @@ public class FriendActivity extends Activity {
 				finish();
 			}
 		});
+        to_make_new_chat.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FriendActivity.this, MakeChatroomActivity.class));
+            }
+        });
 	}
 
 	private void getFriends() {

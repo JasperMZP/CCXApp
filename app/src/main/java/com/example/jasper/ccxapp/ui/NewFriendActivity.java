@@ -35,23 +35,6 @@ public class NewFriendActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_friend_request);
 
 		getFriendRequest();
-
-//    	searchNewFriend = (TextView) findViewById(R.id.search_new_friend);
-//		toNewFriend = (TextView)findViewById(R.id.to_new_friend);
-
-//		searchNewFriend.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				startActivity(new Intent(NewFriendActivity.this, SearchNewActivity.class));
-//				finish();}
-//		});
-//		toNewFriend.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				startActivity(new Intent(NewFriendActivity.this, NewFriend.class));
-//				finish();
-//			}
-//		});
 	}
 
 	private void getFriendRequest() {
