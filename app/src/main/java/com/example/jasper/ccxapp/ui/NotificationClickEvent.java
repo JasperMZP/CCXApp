@@ -1,12 +1,5 @@
 package com.example.jasper.ccxapp.ui;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-
-import cn.jpush.im.android.api.JMessageClient;
-
 /**
  * Created by Jasper on 2017/4/6.
  */

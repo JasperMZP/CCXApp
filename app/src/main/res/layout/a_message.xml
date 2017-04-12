@@ -2,8 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    >
     <LinearLayout
+        android:layout_marginTop="10dp"
         android:id="@+id/all_message"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -14,42 +16,76 @@
             android:id="@+id/userImage"
             android:src="@mipmap/ic_launcher_round"
             />
-        <LinearLayout
-            android:orientation="vertical"
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:id="@+id/username"
-                android:text="彤儿"
-                />
-            <TextView
-                android:id="@+id/message_text"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"/>
+                android:text="彤儿"
+                android:textColor="#3366cc"
+                android:textSize="18sp"
+                android:layout_marginTop="15dp"/>
+
+            <TextView
+                android:layout_below="@+id/username"
+                android:id="@+id/message_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
             <ImageView
+                android:layout_below="@+id/username"
                 android:id="@+id/message_image"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
+                android:src="@drawable/logo"
                 android:layout_height="200dp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
+
             <VideoView
+                android:layout_below="@+id/username"
                 android:id="@+id/message_video"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="200dp"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
-        </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
-
+<RelativeLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="6dp"
+    android:layout_marginLeft="40dp"
+    android:layout_marginBottom="10dp"
+    android:id="@+id/commentlist_layout">
     <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:divider="@null"
         android:id="@+id/all_comment"/>
     <Button
-        android:layout_width="match_parent"
+        android:layout_below="@+id/all_comment"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/button"
+        android:paddingBottom="8dp"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:paddingTop="8dp"
+        android:textColor="@color/white"
+        android:textSize="13sp"
         android:text="按住说话"
         android:id="@+id/send_comment"/>
+</RelativeLayout>
+    <!--View
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/biz_pc_account_line"
+        android:layout_height="2.0dip"
+        android:layout_width="match_parent"/-->
 </LinearLayout>

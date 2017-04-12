@@ -11,7 +11,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.userDB;
@@ -30,8 +30,7 @@ public class SignUpActivity extends AppCompatActivity {
     private EditText password1;
     private EditText password2;
     private Button forRegister;
-    private Button toLogin;
-    private ImageView toLogin2;
+    private TextView toLogin;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,8 +41,8 @@ public class SignUpActivity extends AppCompatActivity {
         password1 = (EditText) findViewById(R.id.sing_up_password);
         password2 = (EditText) findViewById(R.id.sing_up_password2);
         forRegister = (Button) findViewById(R.id.sign_up);
-        toLogin = (Button) findViewById(R.id.to_login);
-        toLogin2 = (ImageView) findViewById(R.id.sign_up_back);
+        toLogin = (TextView) findViewById(R.id.to_login);
+
 
         forRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,12 +58,7 @@ public class SignUpActivity extends AppCompatActivity {
             }
         });
 
-        toLogin2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toLogin();
-            }
-        });
+
     }
 
     private void toLogin() {
@@ -76,42 +70,42 @@ public class SignUpActivity extends AppCompatActivity {
         final String username = userName.getText().toString().trim();
         final String pwd = password1.getText().toString().trim();
         String pwd2 = password2.getText().toString().trim();
-        if (!checkUserName(username)) {
+        if(!checkUserName(username)){
             return;
-        } else if (!checkpassword(pwd)) {
+        }else if(!checkpassword(pwd)){
             return;
         }
-        if (!pwd.equals(pwd2)) {
+        if(!pwd.equals(pwd2)){
             showDialog("请输入相同的密码");
         }
-        userDB.addNewUser(username, pwd, new userBackListener() {
-            @Override
-            public void showResult(boolean result, String message) {
-                if (result) {
-                    JMessageClient.register(username, pwd, new BasicCallback() {
-                        @Override
-                        public void gotResult(int i, String s) {
-                            Log.i("test", i + " " + s);
+        userDB.addNewUser(username, pwd, new userBackListener(){
+                    @Override
+                    public void showResult(boolean result, String message) {
+                        if(result){
+                            JMessageClient.register(username, pwd, new BasicCallback() {
+                                @Override
+                                public void gotResult(int i, String s) {
+                                    Log.i("test",i+" "+s);
+                                }
+                            });
+                            showDialog2("注册新用户成功！");
+                        }else{
+                            showDialog("用户名已存在!");
                         }
-                    });
-                    showDialog2("注册新用户成功！");
-                } else {
-                    showDialog("用户名已存在!");
-                }
-            }
-        });
+                    }
+                });
     }
 
-    private boolean checkUserName(String userName) {
-        if (userName.length() < 5) {
+    private boolean checkUserName(String userName){
+        if(userName.length() < 5){
             showDialog("用户名不应少于5位字符");
             return false;
         }
         return true;
     }
 
-    private boolean checkpassword(String password) {
-        if (password.length() < 6) {
+    private boolean checkpassword(String password){
+        if(password.length() < 6){
             showDialog("密码不应少于6位字符");
             return false;
         }
@@ -128,7 +122,7 @@ public class SignUpActivity extends AppCompatActivity {
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
+                        startActivity(new Intent(SignUpActivity.this,LoginActivity.class));
                         finish();
                     }
                 }).show();
@@ -136,7 +130,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+        if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
             Intent myIntent;
             myIntent = new Intent(SignUpActivity.this, LoginActivity.class);
             startActivity(myIntent);

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"     android:background="@drawable/appback2"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+	<android.support.v7.widget.Toolbar
+	android:id="@+id/toolbar"
+	android:layout_width="match_parent"
+	android:layout_height="5dp"
+	app:popupTheme="@style/AppTheme.PopupOverlay" />
+	<View
+		android:layout_width="match_parent"
+		android:layout_height="1.0dip"
+		android:layout_marginTop="8dp"
+		android:background="#CCCCCC" />
+
+    <TextView
+    android:id="@+id/to_new_friend"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:clickable="true"
+    android:drawableLeft="@mipmap/addf"
+    android:drawablePadding="10.0dip"
+    android:gravity="center_vertical"
+    android:paddingLeft="10.0dip"
+    android:paddingRight="10.0dip"
+    android:text=" 好友申请"
+    android:textColor="#666666"
+    android:textSize="16sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1.0dip"
+        android:background="#CCCCCC" />
+	<TextView
+		android:id="@+id/search_new_friend"
+		android:layout_width="383dp"
+
+		android:layout_height="50.0dip"
+		android:clickable="true"
+		android:drawableLeft="@mipmap/chatl"
+		android:text="我的群聊"
+		android:drawablePadding="15.0dip"
+		android:gravity="center_vertical"
+        android:paddingLeft="10.0dip"
+        android:paddingRight="10.0dip"
+		android:textColor="#666666"
+		android:textSize="16sp" />
+
+	<!--<TextView-->
+		<!--android:id="@+id/make_new_chat"-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="50.0dip"-->
+		<!--android:clickable="true"-->
+		<!--android:drawableLeft="@mipmap/group"-->
+		<!--android:drawablePadding="30.0dip"-->
+		<!--android:gravity="center_vertical"-->
+		<!--android:paddingLeft="20.0dip"-->
+		<!--android:paddingRight="10.0dip"-->
+		<!--android:text="创建新群聊"-->
+		<!--android:textColor="#666666"-->
+		<!--&lt;!&ndash;android:textSize="22sp" />&ndash;&gt;-->
+
+	<!--<View-->
+		<!--android:layout_width="match_parent"-->
+		<!--android:layout_height="2.0dip"-->
+		<!--android:background="#CCCCCC" />-->
+
+	<View
+		android:layout_width="match_parent"
+		android:layout_height="20.0dip"
+		android:background="#e1e5ea" />
+
+	<LinearLayout
+		android:id="@+id/showFriendsAll"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical">
+
+        <ListView
+            android:id="@+id/all_friend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical"></ListView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1.0dip"
+            android:background="#e1e5ea" />
+
+        <TextView
+			android:id="@+id/myFriendText"
+			android:layout_width="match_parent"
+			android:layout_height="30.0dip"
+			android:paddingTop="35dp"
+			android:clickable="true"
+			android:text=""
+			android:drawablePadding="1.0dip"
+			android:gravity="center_vertical"
+			android:paddingLeft="35.0dip"
+			android:paddingRight="10.0dip"
+			android:textColor="#666666"
+			android:textSize="22sp" />
+
+        <!--<View-->
+			<!--android:layout_width="match_parent"-->
+			<!--android:layout_height="1.0dip"-->
+			<!--android:background="#CCCCCC" />-->
+
+	</LinearLayout>
+</LinearLayout>
