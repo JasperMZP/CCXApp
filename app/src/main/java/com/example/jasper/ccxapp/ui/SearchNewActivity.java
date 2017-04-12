@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -29,18 +30,20 @@ import java.util.Properties;
 
 public class SearchNewActivity extends AppCompatActivity {
     private EditText name_need_search;
-    private Button btn_search_new_friend;
+    private ImageView btn_search_new_friend;
     private TextView search_new_friend;
     private ListView all_new_friend;
+    private View a_line;
 
     protected void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_newfriend);
 
         name_need_search=(EditText)findViewById(R.id.name_need_search);
-        btn_search_new_friend=(Button)findViewById(R.id.btn_search_new_friend);
-        search_new_friend = (TextView)findViewById(R.id.search_new_friend);
+        btn_search_new_friend=(ImageView)findViewById(R.id.btn_search_new_friend);
+        search_new_friend = (TextView)findViewById(R.id.Search_New_Friend);
         all_new_friend = (ListView)findViewById(R.id.all_new_friend);
+        a_line = (View)findViewById(R.id.a_line);
 
         btn_search_new_friend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,9 +66,11 @@ public class SearchNewActivity extends AppCompatActivity {
                             if(message.size()==0){
                                 search_new_friend.setText("当前没有符合条件的用户");
                                 all_new_friend.setVisibility(View.GONE);
+                                a_line.setVisibility(View.GONE);
                             }else{
                                 search_new_friend.setText("搜索结果");
                                 showNewFriends(null, message);
+                                a_line.setVisibility(View.VISIBLE);
                             }
                         }else{
                             showDialog("查询新好友失败");

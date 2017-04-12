@@ -15,7 +15,7 @@
         android:id="@+id/profile_image"
         android:layout_height="60dp"
         android:layout_width="60dp"
-        android:src="@drawable/loginout"
+        android:src="@drawable/profile"
         android:layout_gravity="center_horizontal"/>
     <TextView
         android:id="@+id/myName"
@@ -24,7 +24,7 @@
         android:paddingLeft="15.0dip"
         android:textSize="14.0sp"
         android:textColor="@color/white"
-        android:text="未登录"
+        android:text="用户1"
         android:gravity="center_vertical"
         android:layout_toRightOf="@+id/profile_image"
         android:layout_centerVertical="true"/>
@@ -61,18 +61,28 @@
         android:background="@drawable/biz_pc_account_line"
         android:layout_height="2.0dip"
         android:layout_width="match_parent"/>
-    <TextView
-        android:id="@+id/tvRing"
-        android:layout_height="50.0dip"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:paddingLeft="15.0dip"
-        android:textSize="16.0sp"
-        android:textColor="@color/white"
-        android:text="设置"
-        android:gravity="center_vertical"
-        android:paddingRight="10.0dip"
-        android:drawablePadding="1.0dip"
-        android:clickable="true"/>
+        android:layout_height="wrap_content"
+        android:clickable="true">
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/settings"
+            android:paddingLeft="5.0dip"
+            />
+        <TextView
+            android:id="@+id/tvRing"
+            android:layout_height="50.0dip"
+            android:layout_width="match_parent"
+            android:paddingLeft="5.0dip"
+            android:textSize="16.0sp"
+            android:textColor="@color/white"
+            android:text="设置"
+            android:gravity="center_vertical"
+            android:paddingRight="10.0dip"
+            android:drawablePadding="1.0dip"
+            /></LinearLayout>
     <View
         android:background="@drawable/biz_pc_account_line"
         android:layout_height="2.0dip"

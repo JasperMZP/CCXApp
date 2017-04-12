@@ -1,6 +1,7 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -11,6 +12,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -20,13 +24,18 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.MessageAdapter;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Properties;
+
+import android.support.design.widget.FloatingActionButton;
+import android.widget.Toast;
 
 public class MainActivity2 extends AppCompatActivity {
 
     private ListView all_message;
-    private Button addNewMessage;
     private TextView toFriend;
+    private TextView myName;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
     private MessageAdapter messageAdapter;
@@ -42,20 +51,14 @@ public class MainActivity2 extends AppCompatActivity {
         setContentView(R.layout.activity_main2);
 
         all_message = (ListView)findViewById(R.id.all_messages);
-        addNewMessage = (Button)findViewById(R.id.add_new_message);
-
-        addNewMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addDatas();
-            }
-        });
 
         messageAdapter = new MessageAdapter(this);
         all_message.setAdapter(messageAdapter);
 
         initDrawerLayout();
         drawerLayout.setScrimColor(Color.GRAY);
+
+
     }
 
     private void initDrawerLayout() {
@@ -64,6 +67,8 @@ public class MainActivity2 extends AppCompatActivity {
 
         View v1 = (View)findViewById(R.id.left_drawer);
         toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
+        myName = (TextView)v1.findViewById(R.id.myName);
+        myName.setText(getUserName());
         toFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,7 +90,33 @@ public class MainActivity2 extends AppCompatActivity {
 //        drawerLayout.setDrawerListener(toggle);
 
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_activity_actions, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_add) {
+           addDatas();
+
+            //return true;
+        }
+        if (id == R.id.action_send) {
+            startActivity(new Intent(MainActivity2.this,MainActivity.class));
+
+            //return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 //    //上面说到方便使用者随处调用就是这个方法，只需调用这个方法绑定id即可随处控制抽屉的拉出
 //    private void toggleRightSliding(){//该方法控制右侧边栏的显示和隐藏
 //        if(drawerLayout.isDrawerOpen(GravityCompat.END)){
@@ -130,5 +161,39 @@ public class MainActivity2 extends AppCompatActivity {
         messageAdapter.addNewMessage("","姓名",Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
                         + "DCIM" + File.separator + "Camera" + File.separator + "VID_20170405_191102.mp4"
                 ,3,a_user_comment_name_list,a_user_comment_comment);
+    }
+    private long exitTime = 0;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
+            if((System.currentTimeMillis()-exitTime) > 2000){
+                Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public String getUserName(){
+        try {
+            // 创建File对象
+            File file = new File(getFilesDir(), "info.properties");
+            // 创建FileIutputStream 对象
+            FileInputStream fis = new FileInputStream(file);
+            // 创建属性对象
+            Properties pro = new Properties();
+            // 加载文件
+            pro.load(fis);
+            // 关闭输入流对象
+            fis.close();
+            return pro.get("userName").toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }

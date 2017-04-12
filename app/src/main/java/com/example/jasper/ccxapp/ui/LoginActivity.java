@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
@@ -19,6 +21,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
+import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.api.BasicCallback;
+
 /**
  * Created by Jasper on 2017/4/6.
  */
@@ -27,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameET;
     private EditText passwordET;
     private Button signInBtn;
-    private Button signUpBtn;
+    private TextView signUpBtn;
     private String username;
     private String password;
     @Override
@@ -38,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         usernameET = (EditText)findViewById(R.id.login_username);
         passwordET = (EditText)findViewById(R.id.login_password);
         signInBtn = (Button)findViewById(R.id.btn_sign_in);
-        signUpBtn = (Button)findViewById(R.id.btn_sign_up);
+        signUpBtn = (TextView) findViewById(R.id.btn_sign_up);
 
         signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,15 +77,15 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void showResult(boolean result, String message) {
                 if(result){
-//                    JMessageClient.login(username, password, new BasicCallback() {
-//                        @Override
-//                        public void gotResult(int i, String s) {
-//                            Log.i("test",i+" "+s);
+                    JMessageClient.login(username, password, new BasicCallback() {
+                        @Override
+                        public void gotResult(int i, String s) {
+                            Log.i("test",i+" "+s);
                             saveUser(username, password);
                             startActivity(new Intent(LoginActivity.this, MainActivity2.class));
                             finish();
-//                        }
-//                    });
+                        }
+                    });
                 }else{
                     showDialog("用户名或密码错误");
                 }

@@ -64,7 +64,8 @@ public class MessageAdapter extends BaseAdapter {
 
     @SuppressLint("InflateParams")
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(int position2, View convertView, ViewGroup parent) {
+        final int position = getCount() - position2-1;
         if (convertView == null) {
             ViewHolder holder;
             convertView = mInflater.inflate(R.layout.a_message, null);

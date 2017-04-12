@@ -19,16 +19,31 @@
     <EditText
         android:id="@+id/add_friend_reason"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60.0dip"
         android:ems="10"
         android:inputType="textPersonName"
         android:hint="编辑添加理由"
         android:layout_weight="0.04" />
 
+    <TextView
+        android:id="@+id/word"
+        android:layout_width="fill_parent"
+        android:layout_height="60.0dip"
+        android:padding="8sp"
+        android:autoLink="all"
+        android:textSize="18sp"
+        android:text=" 发送验证申请，等待对方通过"
+        android:layout_below="@+id/add_friend_reason"
+        android:layout_alignStart="@+id/grass" />
+
+
     <Button
         android:id="@+id/btn_send_request_to_add"
         android:layout_width="match_parent"
+        android:layout_below="@id/word"
         android:layout_height="wrap_content"
+        android:background="@drawable/button"
+
         android:text="发送添加好友请求" />
 
 </LinearLayout>

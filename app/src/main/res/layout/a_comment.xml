@@ -7,9 +7,11 @@
         android:id="@+id/comment_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#00ff00"/>
+        android:textColor="#3366cc"
+        />
 
     <Button
+        android:layout_marginLeft="7dp"
         android:id="@+id/comment_audio_show"
         android:layout_width="30dp"
         android:layout_height="30dp"
