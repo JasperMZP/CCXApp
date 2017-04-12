@@ -46,11 +46,11 @@
     <application
         android:name=".ui.BaseApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme1">
         <activity android:name=".ui.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,9 +58,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 </intent-filter>
         </activity>
-        <activity android:name=".ui.MainActivity"></activity>
-        <activity android:name=".ui.MainActivity2"></activity>
-        <activity android:name=".ui.SignUpActivity"></activity>
+        <activity android:name=".ui.MainActivity" />
+        <activity android:name=".ui.MainActivity2" />
+        <activity
+            android:name=".ui.SignUpActivity"
+            android:label="注册"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".ui.FriendActivity"
+            android:label="我的好友"
+            android:theme="@style/AppTheme1" />
+        <activity android:name=".ui.FriendRequestActivity" />
+        <activity android:name=".ui.SendRequestActivity" />
+        <activity
+            android:name=".ui.MakeChatroomActivity"
+            android:label="创建群聊"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".ui.NewFriendActivity"
+            android:label="好友申请"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".ui.SearchNewActivity"
+            android:label="搜索好友"
+            android:theme="@style/AppTheme1" />
 
 
 

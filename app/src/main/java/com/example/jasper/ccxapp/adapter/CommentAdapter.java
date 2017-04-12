@@ -10,7 +10,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-
 import com.example.jasper.ccxapp.R;
 
 import java.util.ArrayList;

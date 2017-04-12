@@ -2,8 +2,10 @@ package com.example.jasper.ccxapp.fragment;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
+import com.example.jasper.ccxapp.ui.FriendActivity;
 
 
 public class LeftFragment extends Fragment{
@@ -57,7 +60,13 @@ public class LeftFragment extends Fragment{
 			}
 		});
 //
-//		friendView.setOnClickListener(this);
+		friendView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Log.d("aaaaa", "aaaa");
+				startActivity(new Intent(getActivity(), FriendActivity.class));
+			}
+		});
 //		ringView.setOnClickListener(this);
 	}
 

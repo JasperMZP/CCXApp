@@ -30,8 +30,8 @@ public class friendDB {
     //拒绝好友申请，删除后台中对应好友申请的部分
     public static void disagreefriend(String userName1, String userName2, final userBackListener userBackListener) {
         BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
-        query.addWhereEqualTo("requestFriend", userName1);
-        query.addWhereEqualTo("responseFriend", userName2);
+        query.addWhereEqualTo("requestFriend", userName2);
+        query.addWhereEqualTo("responseFriend", userName1);
         query.findObjects(new FindListener<NewFriend>() {
             @Override
             public void done(List<NewFriend> list, BmobException e) {
@@ -59,11 +59,10 @@ public class friendDB {
     }
 
     //同意好友申请，删去申请表中的对应信息，在好友表中添加相应好友信息
-    public static void agreenewfriend(String userName1, String userName2, userBackListener userBackListener) {
-        addnewfriend(userName1, userName2, userBackListener);
+    public static void agreenewfriend(final  String userName1,final String userName2,final userBackListener userBackListener) {
         BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
-        query.addWhereEqualTo("requestFriend", userName1);
-        query.addWhereEqualTo("responseFriend", userName2);
+        query.addWhereEqualTo("requestFriend", userName2);
+        query.addWhereEqualTo("responseFriend", userName1);
         query.findObjects(new FindListener<NewFriend>() {
             @Override
             public void done(List<NewFriend> list, BmobException e) {
@@ -73,8 +72,10 @@ public class friendDB {
                             @Override
                             public void done(BmobException e) {
                                 if(e==null){
+                                    addnewfriend(userName1, userName2, userBackListener);
                                     Log.d("friend", "删除信息成功");
                                 }else{
+                                    userBackListener.showResult(false,e.getMessage());
                                     Log.e("friend", "删除信息失败"+e.getMessage());
                                 }
                             }
@@ -128,7 +129,7 @@ public class friendDB {
     }
 
     //查询新好友
-    public static void searchnewfriend(final String userName1, String userName2, final userBackListListener userBackListListener) {
+    public static void searchnewfriend(final String userName1, final String userName2, final userBackListListener userBackListListener) {
         BmobQuery<Friend> query = new BmobQuery<Friend>();
         query.addWhereEqualTo("friend1", userName1);
         query.setLimit(200);
@@ -143,7 +144,14 @@ public class friendDB {
                     friends[list.size()] = userName1;
                     BmobQuery<User> queryu = new BmobQuery<User>();
                     queryu.addWhereNotContainedIn("username", Arrays.asList(friends));
-                    queryu.findObjects(new FindListener<User>() {
+                    BmobQuery<User> queryu2 = new BmobQuery<User>();
+                    queryu2.addWhereEqualTo("username", userName2);
+                    List<BmobQuery<User>> querys = new ArrayList<BmobQuery<User>>();
+                    querys.add(queryu);
+                    querys.add(queryu2);
+                    BmobQuery<User> mainQuery = new BmobQuery<User>();
+                    mainQuery.and(querys);
+                    mainQuery.findObjects(new FindListener<User>() {
                         @Override
                         public void done(List<User> list, BmobException e) {
                             if(e==null){

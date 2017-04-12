@@ -10,11 +10,16 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.userDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.api.BasicCallback;
@@ -27,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameET;
     private EditText passwordET;
     private Button signInBtn;
-    private Button signUpBtn;
+    private TextView signUpBtn;
     private String username;
     private String password;
     @Override
@@ -38,7 +43,7 @@ public class LoginActivity extends AppCompatActivity {
         usernameET = (EditText)findViewById(R.id.login_username);
         passwordET = (EditText)findViewById(R.id.login_password);
         signInBtn = (Button)findViewById(R.id.btn_sign_in);
-        signUpBtn = (Button)findViewById(R.id.btn_sign_up);
+        signUpBtn = (TextView) findViewById(R.id.btn_sign_up);
 
         signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,7 +81,8 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void gotResult(int i, String s) {
                             Log.i("test",i+" "+s);
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            saveUser(username, password);
+                            startActivity(new Intent(LoginActivity.this, MainActivity2.class));
                             finish();
                         }
                     });
@@ -124,4 +130,23 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
+    private void saveUser(String username, String password) {
+        try {
+            // 使用Android上下问获取当前项目的路径
+            File file = new File(this.getFilesDir(), "info.properties");
+            // 创建输出流对象
+            FileOutputStream fos = new FileOutputStream(file);
+            // 创建属性文件对象
+            Properties pro = new Properties();
+            // 设置用户名或密码
+            pro.setProperty("userName", username);
+            pro.setProperty("password", password);
+            // 保存文件
+            pro.store(fos, "info.properties");
+            // 关闭输出流对象
+            fos.close();
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
 }

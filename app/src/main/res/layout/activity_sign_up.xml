@@ -2,65 +2,40 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/appback2"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:id="@+id/titleLayout">
-
-        <ImageView
-            android:id="@+id/sign_up_back"
-            android:src="@drawable/backimage"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1" />
-
-        <TextView
-            android:id="@+id/text_title"
-            android:text="   子女注册"
-            android:textSize="40sp"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="5" />
-    </LinearLayout>
 
     <ImageView
         android:id="@+id/logo"
         android:layout_width="fill_parent"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:layout_weight="1"
-        android:src="@mipmap/ic_launcher"
-        android:layout_below="@+id/titleLayout"/>
+        android:src="@drawable/logo"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/accountLayout"
-        android:layout_below="@+id/logo">
+        android:layout_below="@+id/logo"
+        android:layout_alignParentStart="true">
 
         <ImageView
             android:id="@+id/act"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/logup_1"
             android:layout_weight="1" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:text="账号"
-            android:textSize="20sp"
-            android:id="@+id/act2"
-            android:layout_weight="1" />
 
         <EditText
             android:id="@+id/sing_up_userName"
-            android:digits="0123456789abcdefghigklmnopqrstuvwxyz"
-            android:hint="请输入用户名"
+            android:digits="0123456789abcdefghijklmnopqrstuvwxyz"
+            android:hint="请输入账号"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="5" />
@@ -77,22 +52,17 @@
         <ImageView
             android:id="@+id/psd"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/logup_2"
             android:layout_weight="1" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:text="密码"
-            android:textSize="20sp"
-            android:layout_weight="1"
-            android:id="@+id/psd2" />
 
         <EditText
             android:id="@+id/sing_up_password"
-            android:digits="0123456789abcdefghigklmnopqrstuvwxyz"
+            android:digits="0123456789abcdefghijklmnopqrstuvwxyz"
             android:hint="请输入密码"
+            android:inputType="textPassword"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="5" />
@@ -109,22 +79,17 @@
         <ImageView
             android:id="@+id/repsd"
             android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:src="@mipmap/ic_launcher"
+            android:layout_height="40dp"
+            android:src="@drawable/logup_2"
+            android:layout_marginTop="5dp"
             android:layout_weight="1" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:text="确认密码"
-            android:textSize="11sp"
-            android:layout_weight="1"
-            android:id="@+id/repsd2" />
 
         <EditText
             android:id="@+id/sing_up_password2"
-            android:digits="0123456789abcdefghigklmnopqrstuvwxyz"
+            android:digits="0123456789abcdefghijklmnopqrstuvwxyz"
             android:hint="请确认密码"
+            android:inputType="textPassword"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="5" />
@@ -133,26 +98,38 @@
 
     <Button
         android:id="@+id/sign_up"
+        android:onClick="sign up"
         android:text="注册"
-        android:layout_width="fill_parent"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:background="@drawable/button"
+        android:layout_width="330dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/repsdLayout"/>
+        android:layout_below="@+id/repsdLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp" />
 
     <TextView
         android:id="@+id/below"
         android:text="                    已有账号？"
-        android:textSize="20sp"
+        android:textSize="15sp"
         android:layout_width="wrap_content"
-        android:layout_height="60dp"
-        android:layout_below="@+id/sign_up"/>
-
-    <Button
-        android:id="@+id/to_login"
-        android:text="登陆"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/sign_up"
-        android:layout_toRightOf="@+id/below"/>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="9dp" />
+
+    <TextView
+        android:id="@+id/to_login"
+        android:onClick="login in"
+        android:text="登录"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:textColor="#B452CD"
+        android:layout_marginStart="13dp"
+        android:layout_alignBottom="@+id/below"
+        android:layout_toEndOf="@+id/below" />
 </RelativeLayout>
 
 
