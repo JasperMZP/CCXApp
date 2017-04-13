@@ -77,6 +77,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
         if(!pwd.equals(pwd2)){
             showDialog("请输入相同的密码");
+            return;
         }
         userDB.addNewUser(username, pwd, new userBackListener(){
                     @Override
