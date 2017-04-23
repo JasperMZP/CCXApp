@@ -19,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
+import com.example.jasper.ccxapp.interfaces.FileType;
+import com.example.jasper.ccxapp.interfaces.ShowType;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,7 +30,7 @@ import java.io.IOException;
 /**
  * Created by xuan on 2016/6/8.
  */
-public class RecordButton extends android.support.v7.widget.AppCompatButton {
+public class RecordButton extends android.support.v7.widget.AppCompatButton implements FileType,ShowType{
     private final int Volume_What_100 = 100;
     private final int Time_What_101 = 101;
     private final int CancelRecordWhat_102 = 102;
@@ -92,7 +94,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatButton {
     }
 
     private void setDefaultFilePath() {
-        File file = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".mp3");
+        File file = new File("/storage/sdcard/ccxfile/voicefile" + File.separator + COMMENT + "_" + VOICE + "_" +"TEMP"+ ".mp3");
         if (!file.exists()) try {
             file.createNewFile();
         } catch (IOException e) {

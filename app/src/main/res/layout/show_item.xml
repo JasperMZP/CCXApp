@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/selector_group"
+    android:orientation="vertical"
+    android:padding="15dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <ImageView
+            android:id="@+id/show_user_avatar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_launcher" />
+
+        <LinearLayout
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.92"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/show_username_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="XXX"
+                android:textColor="#3366cc"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/show_text_content_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/show_username_tv"
+                android:text="text content" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/show_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+
+            <VideoView
+                android:id="@+id/show_video_vv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/show_text_content_tv"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="20dp"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/expanded_img"
+                android:layout_width="20dp"
+                android:layout_height="84dp"
+                android:layout_gravity="start"
+                android:src="@drawable/collapse" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

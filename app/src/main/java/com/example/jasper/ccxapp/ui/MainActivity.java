@@ -1,174 +1,166 @@
 package com.example.jasper.ccxapp.ui;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.OrientationHelper;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView.LayoutParams;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.example.jasper.ccxapp.R;
-import com.example.jasper.ccxapp.util.IOUtil;
-import com.example.jasper.ccxapp.view.RecordButton;
+import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
+import com.example.jasper.ccxapp.entitiy.CommentItemModel;
+import com.example.jasper.ccxapp.entitiy.ShowItemModel;
+import com.example.jasper.ccxapp.view.PinnedHeaderExpandableListView;
+import com.example.jasper.ccxapp.view.RecyclerItemClickListener;
+import com.example.jasper.ccxapp.view.StickyLayout;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
-import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
-import cn.jpush.im.android.api.content.FileContent;
-import cn.jpush.im.android.api.content.ImageContent;
+import cn.jpush.im.android.api.callback.GetGroupMembersCallback;
+import cn.jpush.im.android.api.content.CustomContent;
+import cn.jpush.im.android.api.content.EventNotificationContent;
 import cn.jpush.im.android.api.content.TextContent;
-import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
-import cn.jpush.im.android.api.exceptions.JMFileSizeExceedException;
 import cn.jpush.im.android.api.model.Conversation;
+import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
+import cn.jpush.im.android.api.model.UserInfo;
 import cn.jpush.im.api.BasicCallback;
+import me.iwf.photopicker.PhotoPreview;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity implements
+        ExpandableListView.OnChildClickListener,
+        ExpandableListView.OnGroupClickListener,
+        PinnedHeaderExpandableListView.OnHeaderUpdateListener, StickyLayout.OnGiveUpTouchEventListener {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    static final int REQUEST_VIDEO_CAPTURE = 2;
+    //View
+    private PinnedHeaderExpandableListView expandableListView;
+    private StickyLayout stickyLayout;
+    private Button addShowBtn;
 
-    private EditText usernameChatToET;
-    private Button beginChatBtn;
-    private EditText txtMsgET;
-    private Button sendTxtMsgBtn;
-    private TextView chatContentTV;
-    private ImageView chatImageView;
-    private Button sendImgMsgBtn;
-    private RecordButton sendVoiceMsgBtn;
-    private Button showVoiceMsgBtn;
-    private Button sendVideoMsgBtn;
-    private Button showVideoMsgBtn;
-    private VideoView videoView;
+    //变量
+    private ArrayList<ShowItemModel> showList = new ArrayList<ShowItemModel>();
 
-    private String usernameChatTo;
+    private ArrayList<List<CommentItemModel>> childCommentList = new ArrayList<List<CommentItemModel>>();
+
+    private MyexpandableListAdapter adapter;
+    //private ShowPhotoAdapter showPhotoAdapter;
+    // private ArrayList<String> showPhotos = new ArrayList<>();
     private Conversation mConversation;
-    private String txtMsg;
-    private String chatContentStr = "";
-    private MediaPlayer mediaPlayer = new MediaPlayer();
-    private String voicePath;
-    private Uri fileUri;
-    private Uri recievedFileuri;
+    private final int REQUEST_SEND_MSG_ITEM = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        init();
+        initView();
+        createGroup();
+        initData();
 
-        beginChatBtn.setOnClickListener(new View.OnClickListener() {
+        adapter = new MyexpandableListAdapter(this);
+        expandableListView.setAdapter(adapter);
+
+        //showPhotoAdapter = new ShowPhotoAdapter(this, showPhotos);
+
+
+        // 展开所有group
+        for (int i = 0, count = expandableListView.getCount(); i < count; i++) {
+            expandableListView.expandGroup(i);
+        }
+
+        expandableListView.setOnHeaderUpdateListener(this);
+        expandableListView.setOnChildClickListener(this);
+        expandableListView.setOnGroupClickListener(this);
+        stickyLayout.setOnGiveUpTouchEventListener(this);
+
+        addShowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                beginChat();
+                Intent intent = new Intent(MainActivity.this, ShowMsgEditActivity.class);
+                startActivityForResult(intent, REQUEST_SEND_MSG_ITEM);
             }
         });
-
-        sendTxtMsgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendTxt();
-            }
-        });
-
-        sendImgMsgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-
-            }
-        });
-
-        sendVoiceMsgBtn.setOnFinishedRecordListener(new RecordButton.OnFinishedRecordListener() {
-            @Override
-            public void onFinishedRecord(String audioPath, long intervalTime) {
-                Log.i("test", "录音路径" + audioPath);
-                voicePath = audioPath;
-                sendVoice(voicePath, intervalTime);
-            }
-        });
-
-        showVoiceMsgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playVoice();
-            }
-        });
-
-        sendVideoMsgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                fileUri = getOutputMediaFileUri(); // create a file Uri to save the video
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-                startActivityForResult(intent, REQUEST_VIDEO_CAPTURE);
-            }
-        });
-
-        showVideoMsgBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                playVideo(recievedFileuri);
-            }
-        });
-
     }
 
-    private void init() {
+    private void createGroup() {
+        /*JMessageClient.createGroup("咱一家人", "咱一家人的描述", new CreateGroupCallback() {
+            @Override
+            public void gotResult(int i, String s, final long l) {
+                Log.i("test", "创建群聊" + "a"+i + " b" + s + " c" + l);
+                final long groupId = l;
 
-        JMessageClient.registerEventReceiver(this);
+                List<String> groupMembers = new ArrayList<String>();
+                groupMembers.add("test1");
+                groupMembers.add("test3");
+                JMessageClient.addGroupMembers(groupId, groupMembers, new BasicCallback() {
+                    @Override
+                    public void gotResult(int i, String s) {
+                        Log.i("test", "添加群成员" + i + s);
 
-        usernameChatToET = (EditText) findViewById(R.id.to_chat_username);
-        beginChatBtn = (Button) findViewById(R.id.begin_chat);
-        txtMsgET = (EditText) findViewById(R.id.text_message);
-        sendTxtMsgBtn = (Button) findViewById(R.id.send_message);
-        chatContentTV = (TextView) findViewById(R.id.chat_content);
-        chatImageView = (ImageView) findViewById(R.id.chat_Image);
-        sendImgMsgBtn = (Button) findViewById(R.id.send_Img_btn);
 
-        sendVoiceMsgBtn = (RecordButton) findViewById(R.id.send_voice_btn);
-        sendVoiceMsgBtn.setMaxIntervalTime(100);
-        sendVoiceMsgBtn.setSavePath("");
+                        JMessageClient.getGroupMembers(groupId, new GetGroupMembersCallback() {
+                            @Override
+                            public void gotResult(int i, String s, List<UserInfo> list) {
+                                Log.i("test", "获取群成员" + i + s);
+                                for (UserInfo userInfo : list) {
+                                    Log.i("test", "群成员" + userInfo.getUserName());
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });*/
 
-        showVoiceMsgBtn = (Button) findViewById(R.id.show_voice_btn);
-        sendVideoMsgBtn = (Button) findViewById(R.id.send_video_btn);
-        showVideoMsgBtn = (Button) findViewById(R.id.play_video_btn);
-        videoView = (VideoView) findViewById(R.id.chat_video_vv);
+
+        JMessageClient.getGroupMembers(22868325, new GetGroupMembersCallback() {
+            @Override
+            public void gotResult(int i, String s, List<UserInfo> list) {
+                Log.i("test", "获取群成员" + i + s);
+                for (UserInfo userInfo : list) {
+                    Log.i("test", "群成员" + userInfo.getUserName());
+                }
+            }
+        });
+        mConversation = Conversation.createGroupConversation(22868325);
+        GroupInfo groupInfo = (GroupInfo) mConversation.getTargetInfo();
+        List<UserInfo> userInfos = groupInfo.getGroupMembers();
+        for (UserInfo userInfo : userInfos) {
+            Log.i("test", "群成员" + userInfo.getUserName());
+        }
     }
 
-    private void beginChat() {
-        usernameChatTo = usernameChatToET.getText().toString().trim();
-        mConversation = Conversation.createSingleConversation(usernameChatTo);
+    private void initView() {
+        expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
+        stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
+        addShowBtn = (Button) findViewById(R.id.add_show_btn);
     }
 
-    private void sendTxt() {
-        txtMsg = txtMsgET.getText().toString().trim();
-        //Message msg = JMessageClient.createSingleTextMessage(usernameChatTo,txtMsg);
-        Message message = mConversation.createSendMessage(new TextContent(txtMsg));
+    private void sendTextMsg(String showText) {
+        Message message = mConversation.createSendMessage(new TextContent(showText));
         message.setOnSendCompleteCallback(new BasicCallback() {
             @Override
             public void gotResult(int responseCode, String responseDesc) {
@@ -185,125 +177,314 @@ public class MainActivity extends AppCompatActivity {
         JMessageClient.sendMessage(message);
     }
 
-    private void sendImg(Bitmap bitmap) {
-        Message message = mConversation.createSendMessage(new ImageContent(bitmap));
+    private void sendCustomMsg(ShowItemModel showItem) {
+        Map customMsgMap = new HashMap();
+        customMsgMap.put("showText", showItem.getShowText());
+        CustomContent customContent = new CustomContent();
+        customContent.setAllValues(customMsgMap);
+        Message message = mConversation.createSendMessage(customContent);
         message.setOnSendCompleteCallback(new BasicCallback() {
             @Override
-            public void gotResult(int responseCode, String responseDesc) {
-                if (responseCode == 0) {
-                    //消息发送成功
-                    Log.i("test", "图片发送成功");
-
-                } else {
-                    //消息发送失败
-                    Log.e("test", "图片发送失败");
-                }
+            public void gotResult(int i, String s) {
+                Log.i("test", "自定义发送" + i + s);
             }
         });
         JMessageClient.sendMessage(message);
     }
 
-    private void sendVideo(String videopath) {
-        try {
-            FileContent fileContent = new FileContent(new File(videopath));
-            Message message = mConversation.createSendMessage(fileContent);
-            message.setOnSendCompleteCallback(new BasicCallback() {
-                @Override
-                public void gotResult(int i, String s) {
-                    Log.i("test", "视频发送" + i + s);
-                }
-            });
-            JMessageClient.sendMessage(message);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (JMFileSizeExceedException e) {
-            e.printStackTrace();
+    /***
+     * InitData
+     */
+    void initData() {
+        showList = new ArrayList<ShowItemModel>();
+        ShowItemModel showItem = null;
+        for (int i = 0; i < 2; i++) {
+            showItem = new ShowItemModel();
+            showItem.setMsgKey("" + i);
+            showItem.setShowUsername("user" + i);
+            showItem.setShowText("show text" + i);
+            ArrayList<String> showImgs = new ArrayList<>();
+            showImgs.add("/storage/sdcard/Pictures/JPEG_20170421_084405.jpg");
+            showImgs.add("/storage/sdcard/Pictures/JPEG_20170421_091106.jpg");
+            showImgs.add("/storage/sdcard/Pictures/JPEG_20170421_094403.jpg");
+            showItem.setShowImagesList(showImgs);
+            showList.add(showItem);
+        }
+
+        childCommentList = new ArrayList<List<CommentItemModel>>();
+
+
+        ArrayList<CommentItemModel> commentItemList = new ArrayList<CommentItemModel>();
+        for (int j = 0; j < 19; j++) {
+            CommentItemModel commentItem = new CommentItemModel();
+            commentItem.setCommentUsername("comment User" + j);
+            commentItem.setCommentLength("" + j);
+            commentItemList.add(commentItem);
+        }
+        childCommentList.add(commentItemList);
+
+        ArrayList<CommentItemModel> commentItemList2 = new ArrayList<CommentItemModel>();
+        for (int j = 0; j < 15; j++) {
+            CommentItemModel commentItem2 = new CommentItemModel();
+            commentItem2.setCommentUsername("comment User" + j);
+            commentItem2.setCommentLength("" + j);
+            commentItemList2.add(commentItem2);
+        }
+        childCommentList.add(commentItemList2);
+
+
+    }
+
+    /***
+     * 数据源
+     *
+     * @author Administrator
+     *
+     */
+    class MyexpandableListAdapter extends BaseExpandableListAdapter {
+        private Context context;
+        private LayoutInflater inflater;
+
+        public MyexpandableListAdapter(Context context) {
+            this.context = context;
+            inflater = LayoutInflater.from(context);
+        }
+
+        // 返回父列表个数
+        @Override
+        public int getGroupCount() {
+            return showList.size();
+        }
+
+        // 返回子列表个数
+        @Override
+        public int getChildrenCount(int groupPosition) {
+            return childCommentList.get(groupPosition).size();
+        }
+
+        @Override
+        public Object getGroup(int groupPosition) {
+            return showList.get(groupPosition);
+        }
+
+        @Override
+        public Object getChild(int groupPosition, int childPosition) {
+            return childCommentList.get(groupPosition).get(childPosition);
+        }
+
+        @Override
+        public long getGroupId(int groupPosition) {
+            return groupPosition;
+        }
+
+        @Override
+        public long getChildId(int groupPosition, int childPosition) {
+            return childPosition;
+        }
+
+        @Override
+        public boolean hasStableIds() {
+
+            return true;
+        }
+
+        @Override
+        public View getGroupView(final int groupPosition, boolean isExpanded,
+                                 View convertView, ViewGroup parent) {
+            ShowHolder showHolder = null;
+            if (convertView == null) {
+                showHolder = new ShowHolder();
+                convertView = inflater.inflate(R.layout.show_item, null);
+                showHolder.showUsernameTv = (TextView) convertView.findViewById(R.id.show_username_tv);
+                showHolder.showUserAvatarIv = (ImageView) convertView.findViewById(R.id.show_user_avatar);
+                showHolder.showTextTv = (TextView) convertView.findViewById(R.id.show_text_content_tv);
+                showHolder.expandedIv = (ImageView) convertView.findViewById(R.id.expanded_img);
+                showHolder.showImageRv = (RecyclerView) convertView.findViewById(R.id.show_recycler_view);
+                convertView.setTag(showHolder);
+            } else {
+                showHolder = (ShowHolder) convertView.getTag();
+            }
+
+
+            final ShowItemModel showItem = (ShowItemModel) getGroup(groupPosition);
+            showHolder.showUsernameTv.setText(showItem.getShowUsername());
+            showHolder.showTextTv.setText(showItem.getShowText());
+            if (showItem.getShowImagesList() != null) {
+                ShowPhotoAdapter showPhotoAdapter = new ShowPhotoAdapter(MainActivity.this, showItem.getShowImagesList());
+                showHolder.showImageRv.setLayoutManager(new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL));
+                showHolder.showImageRv.setAdapter(showPhotoAdapter);
+                showHolder.showImageRv.addOnItemTouchListener(new RecyclerItemClickListener(MainActivity.this,
+                        new RecyclerItemClickListener.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                PhotoPreview.builder()
+                                        .setPhotos(showItem.getShowImagesList())
+                                        .setCurrentItem(position)
+                                        .setShowDeleteButton(false)
+                                        .start(MainActivity.this);
+                            }
+                        }));
+                showHolder.expandedIv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (expandableListView.isGroupExpanded(groupPosition)) {
+                            expandableListView.collapseGroup(groupPosition);
+                        } else {
+                            expandableListView.expandGroup(groupPosition);
+                        }
+                    }
+                });
+            }else{
+                showHolder.showImageRv.setAdapter(null);
+            }
+
+            /*if (isExpanded)// ture is Expanded or false is not isExpanded
+                showHolder.expandedIv.setImageResource(R.drawable.expanded);
+            else
+                showHolder.expandedIv.setImageResource(R.drawable.collapse);*/
+            return convertView;
+        }
+
+        @Override
+        public View getChildView(int groupPosition, final int childPosition,
+                                 boolean isLastChild, View convertView, ViewGroup parent) {
+            CommentHolder commentHolder = null;
+            if (convertView == null) {
+                commentHolder = new CommentHolder();
+                convertView = inflater.inflate(R.layout.comment_item, null);
+                commentHolder.commentUsernameTv = (TextView) convertView.findViewById(R.id.comment_username_tv);
+                commentHolder.playVoiceCommentBtn = (Button) convertView.findViewById(R.id.play_comment_audio_btn);
+                commentHolder.sendVoiceCommentBtn = (Button) convertView.findViewById(R.id.send_comment_audio_btn);
+                convertView.setTag(commentHolder);
+            } else {
+                commentHolder = (CommentHolder) convertView.getTag();
+            }
+
+            if (isLastChild) {
+                commentHolder.sendVoiceCommentBtn.setVisibility(View.VISIBLE);
+            } else {
+                commentHolder.sendVoiceCommentBtn.setVisibility(View.GONE);
+            }
+
+            CommentItemModel commentItem = (CommentItemModel) getChild(groupPosition, childPosition);
+            commentHolder.commentUsernameTv.setText(commentItem.getCommentUsername());
+            commentHolder.playVoiceCommentBtn.setText(commentItem.getCommentLength());
+            return convertView;
+        }
+
+        @Override
+        public boolean isChildSelectable(int groupPosition, int childPosition) {
+            return true;
         }
     }
 
-    private void sendVoice(String voicePath, long intervalTime) {
-        try {
-            Message message = mConversation.createSendMessage(new VoiceContent(new File(voicePath), (int) intervalTime));
-            message.setOnSendCompleteCallback(new BasicCallback() {
-                @Override
-                public void gotResult(int i, String s) {
-                    Log.i("test", "语音发送" + i + s);
-                }
-            });
-            JMessageClient.sendMessage(message);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    @Override
+    public boolean onGroupClick(final ExpandableListView parent, final View v,
+                                int groupPosition, final long id) {
+
+        return false;
+    }
+
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View v,
+                                int groupPosition, int childPosition, long id) {
+        Toast.makeText(MainActivity.this,
+                childCommentList.get(groupPosition).get(childPosition).getCommentUsername() + "的评论", Toast.LENGTH_SHORT)
+                .show();
+
+        return false;
+    }
+
+    class ShowHolder {
+
+        TextView showUsernameTv;
+        ImageView showUserAvatarIv;
+        TextView showTextTv;
+        RecyclerView showImageRv;
+        VideoView showVideoVv;
+        ImageView expandedIv;
+    }
+
+    class CommentHolder {
+
+        TextView commentUsernameTv;
+        Button playVoiceCommentBtn;
+        Button sendVoiceCommentBtn;
+
+    }
+
+    @Override
+    public View getPinnedHeader() {
+        View headerView = (ViewGroup) getLayoutInflater().inflate(R.layout.show_item, null);
+        headerView.setLayoutParams(new LayoutParams(
+                LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return headerView;
+    }
+
+    @Override
+    public void updatePinnedHeader(View headerView, int firstVisibleGroupPos) {
+        ShowItemModel firstVisibleShowItem = (ShowItemModel) adapter.getGroup(firstVisibleGroupPos);
+        TextView showUsernameTv = (TextView) headerView.findViewById(R.id.show_username_tv);
+        TextView showTextTv = (TextView) headerView.findViewById(R.id.show_text_content_tv);
+        showUsernameTv.setText(firstVisibleShowItem.getShowUsername());
+        showTextTv.setText(firstVisibleShowItem.getShowText());
+    }
+
+    @Override
+    public boolean giveUpTouchEvent(MotionEvent event) {
+        if (expandableListView.getFirstVisiblePosition() == 0) {
+            View view = expandableListView.getChildAt(0);
+            if (view != null && view.getTop() >= 0) {
+                return true;
+            }
         }
+        return false;
     }
-
-
-    private void playVoice() {
-        if (!mediaPlayer.isPlaying()) {
-            mediaPlayer.start();
-        }
-    }
-
-    private void playVideo(Uri uri) {
-        videoView.setMediaController(new MediaController(this));
-        videoView.setVideoURI(uri);
-        videoView.start();
-        videoView.requestFocus();
-    }
-
-    private void initMediaPlayer(String path) {
-        try {
-            mediaPlayer.setDataSource(path);
-            mediaPlayer.prepare();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Log.i("test", "初始化mediaplayer完成");
-    }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle bundle = data.getExtras();
-            // 获取相机返回的数据，并转换为Bitmap图片格式 ，这是缩略图
-            Bitmap bitmap = (Bitmap) bundle.get("data");
+        if (requestCode == REQUEST_SEND_MSG_ITEM && resultCode == ShowMsgEditActivity.RESULT_SEND_MSG_ITEM) {
+            ShowItemModel showItem = (ShowItemModel) data.getSerializableExtra("showItem");
+            showItem.setShowUsername(JMessageClient.getMyInfo().getUserName());
 
-            chatImageView.setImageBitmap(bitmap);
+            showList.add(0, showItem);
 
-            sendImg(bitmap);
-        } else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-            Log.i("test", "video :" + data.getData().getPath());
-            sendVideo(data.getData().getPath());
+
+
+            //test
+            CommentItemModel commentItem = new CommentItemModel();
+            commentItem.setCommentUsername("aaa");
+            commentItem.setCommentLength("30");
+            CommentItemModel commentItem2 = new CommentItemModel();
+            commentItem2.setCommentUsername("bbb");
+            commentItem2.setCommentLength("12");
+            ArrayList<CommentItemModel> commentItems = new ArrayList<CommentItemModel>();
+            commentItems.add(commentItem);
+            commentItems.add(0, commentItem2);
+            childCommentList.add(0, commentItems);
+
+            adapter.notifyDataSetChanged();
+            Log.i("test", "show内容" + showItem.getShowText());
+
+
+
+            //发送消息
+            sendCustomMsg(showItem);
+            //sendTextMsg(showItem.getShowText());
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        JMessageClient.registerEventReceiver(this);
+    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         JMessageClient.unRegisterEventReceiver(this);
-    }
-
-
-    private Bitmap getDiskBitmap(String pathString) {
-        Bitmap bitmap = null;
-        File file = new File(pathString);
-        if (file.exists()) {
-            bitmap = BitmapFactory.decodeFile(pathString);
-        } else {
-            Log.e("test", "该图片不存在");
-        }
-        return bitmap;
-    }
-
-    public static Uri getOutputMediaFileUri() {
-        File picDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File videoFile = new File(picDir.getPath() + File.separator + "VIDEO_" + timeStamp + ".mp4");
-
-        return Uri.fromFile(videoFile);
     }
 
     public void onEventMainThread(MessageEvent event) {
@@ -314,54 +495,55 @@ public class MainActivity extends AppCompatActivity {
                 //处理文字消息
                 Log.i("test", "收到文本消息");
                 TextContent textContent = (TextContent) msg.getContent();
-                chatContentStr += textContent.getText();
-                chatContentTV.setText(chatContentStr);
-                break;
-            case image:
-                Log.i("test", "收到图片消息");
-                ImageContent imageContent = (ImageContent) msg.getContent();
-                imageContent.downloadOriginImage(msg, new DownloadCompletionCallback() {
-                    @Override
-                    public void onComplete(int i, String s, File file) {
-                        Log.i("test", "收到的图片下载完成" + i + s);
-                        Bitmap img = getDiskBitmap(file.getPath());//图片本地地址
-                        chatImageView.setImageBitmap(img);
-                    }
-                });
-                break;
-            case voice:
-                Log.i("test", "收到语音消息");
-                VoiceContent voiceContent = (VoiceContent) msg.getContent();
-                voiceContent.downloadVoiceFile(msg, new DownloadCompletionCallback() {
-                    @Override
-                    public void onComplete(int i, String s, File file) {
-                        Log.i("test", "收到的语音下载完成" + i + s + file.getPath());
-                        try {
-                            IOUtil.copyFile(file, new File("/storage/sdcard/" + file.getName() + ".mp3"));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            initMediaPlayer("/storage/sdcard/" + file.getName() + ".mp3");
-                        }
-                    }
-                });
-                break;
-            case file:
-                Log.i("test", "收到视频消息");
-                FileContent fileContent = (FileContent) msg.getContent();
-                fileContent.downloadFile(msg, new DownloadCompletionCallback() {
-                    @Override
-                    public void onComplete(int i, String s, File file) {
-                        Log.i("test", "收到的文件下载完成" + i + s + file.getPath());
-                        try {
-                            IOUtil.copyFile(file, new File("/storage/sdcard/" + file.getName() + ".mp4"));
-                            recievedFileuri=Uri.parse(file.getPath());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
+                Log.i("test", "收到文本消息" + textContent.getText());
 
+                UserInfo tUserInfo = msg.getFromUser();
+                ShowItemModel textShowItem = new ShowItemModel();
+                textShowItem.setShowUsername(tUserInfo.getUserName());
+                textShowItem.setShowText(textContent.getText());
+                showList.add(0, textShowItem);
+                adapter.notifyDataSetChanged();
+                break;
+            case custom:
+                //处理自定义消息
+                Log.i("test", "收到自定义消息");
+                CustomContent customContent = (CustomContent) msg.getContent();
+                Map customMsgMap = customContent.getAllStringValues();
+                UserInfo cUserInfo = msg.getFromUser();
+                ShowItemModel customShowItem = new ShowItemModel();
+                customShowItem.setShowUsername(cUserInfo.getUserName());
+                customShowItem.setShowText((String) customMsgMap.get("showText"));
+                Log.i("test", "收到自定义消息" + cUserInfo.getUserName() + customMsgMap.get("showText"));
+                showList.add(0, customShowItem);
+
+                //test
+                CommentItemModel commentItem = new CommentItemModel();
+                commentItem.setCommentUsername("aaa");
+                commentItem.setCommentLength("30");
+                CommentItemModel commentItem2 = new CommentItemModel();
+                commentItem2.setCommentUsername("bbb");
+                commentItem2.setCommentLength("12");
+                ArrayList<CommentItemModel> commentItems = new ArrayList<CommentItemModel>();
+                commentItems.add(commentItem);
+                commentItems.add(0, commentItem2);
+                childCommentList.add(0, commentItems);
+
+                adapter.notifyDataSetChanged();
+            case eventNotification:
+                //处理事件提醒消息
+                EventNotificationContent eventNotificationContent = (EventNotificationContent) msg.getContent();
+                switch (eventNotificationContent.getEventNotificationType()) {
+                    case group_member_added:
+                        //群成员加群事件
+                        break;
+                    case group_member_removed:
+                        //群成员被踢事件
+                        break;
+                    case group_member_exit:
+                        //群成员退群事件
+                        break;
+                }
+                break;
         }
     }
 
@@ -391,14 +573,4 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("事件发生的原因 : " + reason);
     }
 
-
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-        if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
-            super.onKeyDown(keyCode, event);
-            this.finish();
-        }
-        return false;
-    }
 }
-
