@@ -20,7 +20,7 @@ public class BaseApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Bmob.initialize(this, "31f4f13611f6d6904ee94ab4ff3095aa");//初始化Bmob
+        Bmob.initialize(this, "11c7be8b5fad9ba573d2641f495dbc48");//初始化Bmob
 
         // You can enable debug mode in developing state. You should close debug mode when release.
         JMessageClient.setDebugMode(true);

@@ -1,10 +1,12 @@
 package com.example.jasper.ccxapp.ui;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
@@ -13,19 +15,19 @@ import android.widget.TextView;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.FriendAdapter;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListListener;
+import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 
-public class FriendActivity extends Activity {
+public class FriendActivity extends AppCompatActivity {
 
 	private TextView toNewFriend;
-	private TextView searchNewFriend;
-    private TextView to_make_new_chat;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,16 +36,8 @@ public class FriendActivity extends Activity {
 
 		getFriends();
 
-    	searchNewFriend = (TextView) findViewById(R.id.search_new_friend);
-		toNewFriend = (TextView)findViewById(R.id.to_new_friend);
-        to_make_new_chat = (TextView)findViewById(R.id.make_new_chat);
 
-		searchNewFriend.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(FriendActivity.this, SearchNewActivity.class));
-			}
-		});
+		toNewFriend = (TextView)findViewById(R.id.to_new_friend);
 		toNewFriend.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -51,22 +45,46 @@ public class FriendActivity extends Activity {
 				finish();
 			}
 		});
-        to_make_new_chat.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(FriendActivity.this, MakeChatroomActivity.class));
-            }
-        });
 	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.friend_actions, menu);
+		return true;
+	}
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
 
+		//noinspection SimplifiableIfStatement
+		if (id == R.id.action_addFriend) {
+			startActivity(new Intent(FriendActivity.this, SearchNewActivity.class));
+
+			//return true;
+		}
+		if (id == R.id.action_CreateGroup) {
+			startActivity(new Intent(FriendActivity.this, MakeChatroomActivity.class));
+
+			//return true;
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
 	private void getFriends() {
 		String userName = getUserName();
 
-		friendDB.searchfriend(userName, new userBackListListener() {
+		friendDB.searchfriend(userName, new userBackListUserInfo() {
 			@Override
-			public void showResult(boolean result, ArrayList<String> message) {
+			public void showResult(boolean result, List<cn.jpush.im.android.api.model.UserInfo> message) {
 				if(result){
-					showFriends(null, message);
+					ArrayList<String> message2 = new ArrayList<String>();
+					for(int i=0;i<message.size();i++){
+						message2.add(message.get(i).getUserName());
+					}
+					showFriends(null, message2);
 				}else{
 					showDialog("查询好友出错");
 				}
@@ -79,16 +97,6 @@ public class FriendActivity extends Activity {
 
 		FriendAdapter adapter = new FriendAdapter(FriendActivity.this, imgPath, message);
 		lv.setAdapter(adapter);
-//		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//			@Override
-//			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-//				Intent intent = new Intent();
-//				intent.setClass(FriendActivity.this, AddNewActivity.class);
-//				intent.putExtra("newFriendName", newFriends.getString(arg2));
-//				FriendActivity.this.startActivity(intent);
-//				FriendActivity.this.finish();
-//			}
-//		});
 	}
 
 	public String getUserName(){

@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
@@ -16,6 +17,7 @@ import com.example.jasper.ccxapp.db.userDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Properties;
 
@@ -27,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameET;
     private EditText passwordET;
     private Button signInBtn;
-    private Button signUpBtn;
+    private TextView signUpBtn;
     private String username;
     private String password;
     @Override
@@ -35,10 +37,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        ifLogin();
+
         usernameET = (EditText)findViewById(R.id.login_username);
         passwordET = (EditText)findViewById(R.id.login_password);
         signInBtn = (Button)findViewById(R.id.btn_sign_in);
-        signUpBtn = (Button)findViewById(R.id.btn_sign_up);
+        signUpBtn = (TextView) findViewById(R.id.btn_sign_up);
 
         signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +57,24 @@ public class LoginActivity extends AppCompatActivity {
                 toRegister();
             }
         });
+    }
+
+    private void ifLogin() {
+        try {
+            File file = new File(getFilesDir(), "info.properties");
+            FileInputStream fis = new FileInputStream(file);
+            Properties pro = new Properties();
+            pro.load(fis);
+            fis.close();
+            if(pro.get("userName").toString().equals("") || pro.get("userName") == null){
+                return;
+            }else{
+                startActivity(new Intent(LoginActivity.this, MainActivity2.class));
+                this.finish();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void toRegister() {
@@ -72,15 +94,9 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void showResult(boolean result, String message) {
                 if(result){
-//                    JMessageClient.login(username, password, new BasicCallback() {
-//                        @Override
-//                        public void gotResult(int i, String s) {
-//                            Log.i("test",i+" "+s);
-                            saveUser(username, password);
-                            startActivity(new Intent(LoginActivity.this, MainActivity2.class));
-                            finish();
-//                        }
-//                    });
+                    saveUser(username, password);
+                    startActivity(new Intent(LoginActivity.this, MainActivity2.class));
+                    finish();
                 }else{
                     showDialog("用户名或密码错误");
                 }
@@ -140,6 +156,20 @@ public class LoginActivity extends AppCompatActivity {
             pro.store(fos, "info.properties");
             // 关闭输出流对象
             fos.close();
+            // 使用Android上下问获取当前项目的路径
+            File file2 = new File(this.getFilesDir(), "infoRequest.properties");
+            // 创建输出流对象
+            FileOutputStream fos2 = new FileOutputStream(file);
+            // 创建属性文件对象
+            Properties pro2 = new Properties();
+            // 设置用户名或密码
+            pro2.setProperty("userName", username);
+            pro2.setProperty("requestName", "");
+            pro2.setProperty("reason","");
+            // 保存文件
+            pro2.store(fos, "infoRequest.properties");
+            // 关闭输出流对象
+            fos2.close();
         } catch (Exception e) {
             throw new RuntimeException();
         }

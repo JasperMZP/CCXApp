@@ -311,6 +311,6 @@ public class RecordButton extends android.support.v7.widget.AppCompatButton {
      * 完成录音回调
      */
     public interface OnFinishedRecordListener {
-        public void onFinishedRecord(String audioPath, long intervalTime);
+        public void onFinishedRecord(String audioPath,long intervalTime);
     }
 }

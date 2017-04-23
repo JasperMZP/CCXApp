@@ -59,6 +59,8 @@ public class MakeChatroomActivity extends AppCompatActivity {
             public void showResult(boolean result, String message) {
                 if(result){
                     showDialog2("添加新群聊成功");
+                }else{
+                    showDialog("添加新群聊失败");
                 }
             }
         });
