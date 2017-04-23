@@ -14,7 +14,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
-import com.example.jasper.ccxapp.db.userDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import cn.jpush.im.android.api.JMessageClient;
@@ -79,22 +78,18 @@ public class SignUpActivity extends AppCompatActivity {
             showDialog("请输入相同的密码");
             return;
         }
-        userDB.addNewUser(username, pwd, new userBackListener(){
-                    @Override
-                    public void showResult(boolean result, String message) {
-                        if(result){
-                            JMessageClient.register(username, pwd, new BasicCallback() {
-                                @Override
-                                public void gotResult(int i, String s) {
-                                    Log.i("test",i+" "+s);
-                                }
-                            });
-                            showDialog2("注册新用户成功！");
-                        }else{
-                            showDialog("用户名已存在!");
-                        }
-                    }
-                });
+
+        JMessageClient.register(username, pwd, new BasicCallback() {
+            @Override
+            public void gotResult(int i, String s) {
+                Log.i("test",i+" "+s);
+                if (0==i){
+                    showDialog2("注册新用户成功！");
+                }else{
+                    showDialog("用户名已存在!");
+                }
+            }
+        });
     }
 
     private boolean checkUserName(String userName){

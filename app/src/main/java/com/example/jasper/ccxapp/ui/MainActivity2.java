@@ -20,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
-import com.example.jasper.ccxapp.adapter.MessageAdapter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +33,7 @@ public class MainActivity2 extends AppCompatActivity {
     private TextView myName;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle toggle;
-    private MessageAdapter messageAdapter;
+    //private MessageAdapter messageAdapter;
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -49,8 +48,8 @@ public class MainActivity2 extends AppCompatActivity {
 
         all_message = (ListView)findViewById(R.id.all_messages);
 
-        messageAdapter = new MessageAdapter(this);
-        all_message.setAdapter(messageAdapter);
+       /* messageAdapter = new MessageAdapter(this);
+        all_message.setAdapter(messageAdapter);*/
 
         initDrawerLayout();
         drawerLayout.setScrimColor(Color.GRAY);
@@ -69,7 +68,7 @@ public class MainActivity2 extends AppCompatActivity {
         toFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity2.this, FriendActivity.class));
+                //startActivity(new Intent(MainActivity2.this, FriendActivity.class));
             }
         });
         //v4控件 actionbar上的抽屉开关，可以实现一些开关的动态效果
@@ -101,16 +100,16 @@ public class MainActivity2 extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_add) {
+        /*if (id == R.id.action_add) {
            addDatas();
 
             //return true;
         }
         if (id == R.id.action_send) {
-            startActivity(new Intent(MainActivity2.this,MainActivity.class));
+            startActivity(new Intent(MainActivity2.this,MainActivity3.class));
 
             //return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -148,7 +147,7 @@ public class MainActivity2 extends AppCompatActivity {
         a_user_comment_name_list.add("回复1");
         a_user_comment_comment.add(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
                 + "CCXApp" + File.separator + "voices" + File.separator + "1491389314764.amr");
-        if(num%2 == 0) {
+        /*if(num%2 == 0) {
             num++;
             //添加文本消息
             messageAdapter.addNewMessage("", "姓名", "文本消息", 1, a_user_comment_name_list, a_user_comment_comment);
@@ -158,7 +157,7 @@ public class MainActivity2 extends AppCompatActivity {
             messageAdapter.addNewMessage("", "姓名", Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
                             + "DCIM" + File.separator + "Camera" + File.separator + "IMG_20170405_183626.jpg"
                     , 2, a_user_comment_name_list, a_user_comment_comment);
-        }
+        }*/
 //        //添加视频信息
 //        messageAdapter.addNewMessage("","姓名",Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator
 //                        + "DCIM" + File.separator + "Camera" + File.separator + "VID_20170405_191102.mp4"

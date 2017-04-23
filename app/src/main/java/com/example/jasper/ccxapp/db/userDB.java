@@ -2,7 +2,7 @@ package com.example.jasper.ccxapp.db;
 
 import android.util.Log;
 
-import com.example.jasper.ccxapp.entities.User;
+import com.example.jasper.ccxapp.entitiy.User;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.util.List;

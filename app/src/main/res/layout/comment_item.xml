@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/selector_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/comment_username_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#3366cc"
+        android:text="username:"
+        android:layout_marginLeft="15dp"/>
+
+    <Button
+        android:layout_marginLeft="10dp"
+        android:id="@+id/play_comment_audio_btn"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/startaudio"
+        android:text="13'" />
+
+    <Button
+        android:id="@+id/send_comment_audio_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:text="  按住 说话  "
+        android:visibility="invisible"/>
+</LinearLayout>
