@@ -14,13 +14,15 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.FriendChatAdapter;
 import com.example.jasper.ccxapp.db.chatDB;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListListener;
+import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+
+import cn.jpush.im.android.api.model.UserInfo;
 
 public class MakeChatroomActivity extends AppCompatActivity {
 
@@ -69,11 +71,11 @@ public class MakeChatroomActivity extends AppCompatActivity {
     private void getFriendList() {
         String userName = getUserName();
 
-        friendDB.searchfriend(userName, new userBackListListener() {
+        friendDB.searchfriend(userName, new userBackListUserInfo() {
             @Override
-            public void showResult(boolean result, ArrayList<String> message) {
+            public void showResult(boolean result, List<UserInfo> message) {
                 if(result){
-                    showFriends(null, message);
+                    showFriends(message);
                 }else{
                     showDialog("查询好友出错");
                 }
@@ -81,9 +83,9 @@ public class MakeChatroomActivity extends AppCompatActivity {
         });
     }
 
-    private void showFriends(ArrayList<String> imgPath, ArrayList<String> message) {
-        adapter = new FriendChatAdapter(MakeChatroomActivity.this, message);
-        showFriendsChat.setAdapter(adapter);
+    private void showFriends(List<UserInfo> message) {
+//        adapter = new FriendChatAdapter(MakeChatroomActivity.this, message);
+//        showFriendsChat.setAdapter(adapter);
     }
 
     private boolean checkUserName(String userName) {

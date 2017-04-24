@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.MessageAdapter;
+import com.example.jasper.ccxapp.util.showMessage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -247,7 +248,8 @@ public class MainActivity2 extends AppCompatActivity {
 
         switch (event.getType()) {
             case invite_received://收到好友邀请
-                saveRequest(fromUsername, reason);
+                showMessage.showNewFriend(MainActivity2.this, fromUsername+"请求添加您为好友", "点击查看详细信息");
+//                saveRequest(fromUsername, reason);
                 break;
             case invite_accepted://对方接收了你的好友邀请
                 //...

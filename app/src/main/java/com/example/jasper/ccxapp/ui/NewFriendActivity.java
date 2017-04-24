@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.NewFriendAdapter;
 import com.example.jasper.ccxapp.db.friendDB;
+import com.example.jasper.ccxapp.interfaces.userBackListListener;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.io.File;
@@ -39,34 +40,34 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 
 	private void getFriendRequest() {
 		String userName = getUserName();
-		try {
-			File file = new File(getFilesDir(), "infoRequest.properties");
-			FileInputStream fis = new FileInputStream(file);
-			Properties pro = new Properties();
-			pro.load(fis);
-			fis.close();
-			ArrayList<String> message = new ArrayList<String>();
-            String[] names = pro.getProperty("requestName").toString().split("|");
-            String[] reasons = pro.getProperty("reason").toString().split("|");
-            for(int i=0;i<names.length;i++){
-                message.add(names[i]);
-                message.add(reasons[i]);
-            }
-            showFriendRequest(null, message);
-		} catch (Exception e) {
-			e.printStackTrace();
-            showDialog("查询好友请求出错");
-		}
-//		friendDB.searchRequestList(userName, new userBackListListener() {
-//			@Override
-//			public void showResult(boolean result, ArrayList<String> message) {
-//				if(result){
-//					showFriendRequest(null, message);
-//				}else{
-//					showDialog("查询好友请求出错");
-//				}
-//			}
-//		});
+//		try {
+////			File file = new File(getFilesDir(), "infoRequest.properties");
+////			FileInputStream fis = new FileInputStream(file);
+////			Properties pro = new Properties();
+////			pro.load(fis);
+////			fis.close();
+////			ArrayList<String> message = new ArrayList<String>();
+////            String[] names = pro.getProperty("requestName").toString().split("|");
+////            String[] reasons = pro.getProperty("reason").toString().split("|");
+////            for(int i=0;i<names.length;i++){
+////                message.add(names[i]);
+////                message.add(reasons[i]);
+////            }
+////            showFriendRequest(null, message);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//            showDialog("查询好友请求出错");
+//		}
+		friendDB.searchRequestList(userName, new userBackListListener() {
+			@Override
+			public void showResult(boolean result, ArrayList<String> message) {
+				if(result){
+					showFriendRequest(null, message);
+				}else{
+					showDialog("查询好友请求出错");
+				}
+			}
+		});
 	}
 
 	private void showFriendRequest(ArrayList<String> imgPath, final ArrayList<String> message) {

@@ -62,7 +62,7 @@ public class FriendActivity extends AppCompatActivity {
 		//noinspection SimplifiableIfStatement
 		if (id == R.id.action_addFriend) {
 			startActivity(new Intent(FriendActivity.this, SearchNewActivity.class));
-
+			finish();
 			//return true;
 		}
 		if (id == R.id.action_CreateGroup) {

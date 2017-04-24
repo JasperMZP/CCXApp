@@ -19,6 +19,7 @@ import com.example.jasper.ccxapp.interfaces.userBackListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 /**
@@ -60,12 +61,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void ifLogin() {
+        FileInputStream fis = null;
         try {
             File file = new File(getFilesDir(), "info.properties");
-            FileInputStream fis = new FileInputStream(file);
+            if(!file.exists()){
+                return;
+            }
+            fis = new FileInputStream(file);
             Properties pro = new Properties();
             pro.load(fis);
-            fis.close();
             if(pro.get("userName").toString().equals("") || pro.get("userName") == null){
                 return;
             }else{
@@ -74,6 +78,14 @@ public class LoginActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if(fis != null){
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -156,20 +168,20 @@ public class LoginActivity extends AppCompatActivity {
             pro.store(fos, "info.properties");
             // 关闭输出流对象
             fos.close();
-            // 使用Android上下问获取当前项目的路径
-            File file2 = new File(this.getFilesDir(), "infoRequest.properties");
-            // 创建输出流对象
-            FileOutputStream fos2 = new FileOutputStream(file);
-            // 创建属性文件对象
-            Properties pro2 = new Properties();
-            // 设置用户名或密码
-            pro2.setProperty("userName", username);
-            pro2.setProperty("requestName", "");
-            pro2.setProperty("reason","");
-            // 保存文件
-            pro2.store(fos, "infoRequest.properties");
-            // 关闭输出流对象
-            fos2.close();
+//            // 使用Android上下问获取当前项目的路径
+//            File file2 = new File(this.getFilesDir(), "infoRequest.properties");
+//            // 创建输出流对象
+//            FileOutputStream fos2 = new FileOutputStream(file2);
+//            // 创建属性文件对象
+//            Properties pro2 = new Properties();
+//            // 设置用户名或密码
+//            pro2.setProperty("userName", username);
+//            pro2.setProperty("requestName", "");
+//            pro2.setProperty("reason","");
+//            // 保存文件
+//            pro2.store(fos, "infoRequest.properties");
+//            // 关闭输出流对象
+//            fos2.close();
         } catch (Exception e) {
             throw new RuntimeException();
         }

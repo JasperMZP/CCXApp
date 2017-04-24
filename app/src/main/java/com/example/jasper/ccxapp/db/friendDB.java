@@ -15,6 +15,8 @@ import java.util.List;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import cn.jpush.im.android.api.ContactManager;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetUserInfoCallback;
@@ -28,14 +30,39 @@ import cn.jpush.im.api.BasicCallback;
 
 public class friendDB {
     //拒绝好友申请，删除后台中对应好友申请的部分
-    public static void disagreefriend(String userName1, String userName2, final userBackListener userBackListener) {
-        ContactManager.declineInvitation(userName2, null, "", new BasicCallback() {
+    public static void disagreefriend(String userName1, final String userName2, final userBackListener userBackListener) {
+        BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
+        query.addWhereEqualTo("requestFriend", userName2);
+        query.addWhereEqualTo("responseFriend", userName1);
+        query.findObjects(new FindListener<NewFriend>() {
             @Override
-            public void gotResult(int i, String s) {
-                if(0 == i){
-                    userBackListener.showResult(true, "");
-                }else {
-                    userBackListener.showResult(false, s);
+            public void done(List<NewFriend> list, BmobException e) {
+                if(e==null){
+                    for(NewFriend friend : list){
+                        friend.delete(new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if(e==null){
+                                    ContactManager.declineInvitation(userName2, null, "", new BasicCallback() {
+                                        @Override
+                                        public void gotResult(int i, String s) {
+                                            if(0 == i){
+                                                userBackListener.showResult(true, "");
+                                            }else {
+                                                userBackListener.showResult(false, s);
+                                            }
+                                        }
+                                    });
+                                    Log.d("friend", "删除信息成功");
+                                }else{
+                                    Log.e("friend", "删除信息失败"+e.getMessage());
+                                }
+                            }
+                        });
+                    }
+                }else{
+                    userBackListener.showResult(false, e.getMessage());
+                    Log.e("friend", "删除信息失败"+e.getMessage());
                 }
             }
         });
@@ -43,27 +70,64 @@ public class friendDB {
 
     //同意好友申请，删去申请表中的对应信息，在好友表中添加相应好友信息
     public static void agreenewfriend(final  String userName1,final String userName2,final userBackListener userBackListener) {
-        ContactManager.acceptInvitation(userName2, null, new BasicCallback() {
+        BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
+        query.addWhereEqualTo("requestFriend", userName2);
+        query.addWhereEqualTo("responseFriend", userName1);
+        query.findObjects(new FindListener<NewFriend>() {
             @Override
-            public void gotResult(int i, String s) {
-                if(0 == i){
-                    userBackListener.showResult(true, "");
-                }else {
-                    userBackListener.showResult(false, s);
+            public void done(List<NewFriend> list, BmobException e) {
+                if(e==null){
+                    for(NewFriend friend : list){
+                        friend.delete(new UpdateListener() {
+                            @Override
+                            public void done(BmobException e) {
+                                if(e==null){
+                                    ContactManager.acceptInvitation(userName2, null, new BasicCallback() {
+                                        @Override
+                                        public void gotResult(int i, String s) {
+                                            if(0 == i){
+                                                userBackListener.showResult(true, "");
+                                            }else {
+                                                userBackListener.showResult(false, s);
+                                            }
+                                        }
+                                    });
+                                    Log.d("friend", "删除信息成功");
+                                }else{
+                                    Log.e("friend", "删除信息失败"+e.getMessage());
+                                }
+                            }
+                        });
+                    }
+                }else{
+                    userBackListener.showResult(false, e.getMessage());
+                    Log.e("friend", "删除信息失败"+e.getMessage());
                 }
             }
         });
     }
 
     //发送好友请求,userName1为发送人，userName2为接受请求人
-    public static void sendfriendrequest(String userName1, String userName2, String message, final userBackListener userBackListener) {
-        ContactManager.sendInvitationRequest(userName2, null, message, new BasicCallback() {
+    public static void sendfriendrequest(String userName1, final String userName2, final String message, final userBackListener userBackListener) {
+        NewFriend friend = getNewFriend(userName1, userName2, message);
+        friend.save(new SaveListener<String>() {
             @Override
-            public void gotResult(int i, String s) {
-                if(0 == i){
-                    userBackListener.showResult(true, "");
-                }else {
-                    userBackListener.showResult(false, s);
+            public void done(String s, BmobException e) {
+                if(e==null){
+                    ContactManager.sendInvitationRequest(userName2, null, message, new BasicCallback() {
+                        @Override
+                        public void gotResult(int i, String s) {
+                            if(0 == i){
+                                userBackListener.showResult(true, "");
+                            }else {
+                                userBackListener.showResult(false, s);
+                            }
+                        }
+                    });
+                    Log.d("friend", "发送好友请求成功");
+                }else{
+                    userBackListener.showResult(false, e.getMessage());
+                    Log.e("friend", "发送好友请求失败：" + e.getMessage());
                 }
             }
         });

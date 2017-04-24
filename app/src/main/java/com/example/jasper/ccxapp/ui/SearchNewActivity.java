@@ -128,6 +128,7 @@ public class SearchNewActivity extends AppCompatActivity {
 
         if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
             super.onKeyDown(keyCode, event);
+            Intent intent = new Intent(SearchNewActivity.this, FriendActivity.class);
             this.finish();
         }
         return false;
