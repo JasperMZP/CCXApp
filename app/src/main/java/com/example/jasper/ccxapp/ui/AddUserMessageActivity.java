@@ -1,12 +1,18 @@
 package com.example.jasper.ccxapp.ui;
 
+import android.Manifest;
 import android.content.ContentResolver;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,6 +28,8 @@ import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.io.FileNotFoundException;
 
+import cn.jpush.im.android.api.JMessageClient;
+
 public class AddUserMessageActivity extends AppCompatActivity {
 
     private ImageView message_image;
@@ -32,8 +40,19 @@ public class AddUserMessageActivity extends AppCompatActivity {
     private EditText message_birthday;
     private EditText message_address;
     private EditText message_explain;
-    private String image_path;
     private Button add_message;
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    private String image_path = "/storage/emulated/0/headimage.jpg";
+    private String oriNickName;
+    private String oriSex;
+    private String oriBirthday;
+    private String oriAddress;
+    private String oriExplain;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +69,9 @@ public class AddUserMessageActivity extends AppCompatActivity {
         message_birthday = (EditText)findViewById(R.id.message_birthday);
         message_address = (EditText)findViewById(R.id.message_address);
         message_explain = (EditText)findViewById(R.id.message_explain);
-        add_message = (Button)findViewById(R.id.add_message_image_btn);
+        add_message = (Button)findViewById(R.id.add_message_btn);
 
+        userName.setText(getIntent().getStringExtra("userName"));
         btn_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,12 +84,49 @@ public class AddUserMessageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 saveUserMessage();
+                showDialog("正在添加信息");
+//                startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+//                finish();
+            }
+        });
+
+        addOriMessage();
+    }
+
+    private void addOriMessage() {
+        //获得读取本地数据权限
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+        }
+        oriNickName = getIntent().getStringExtra("userName");
+        oriSex = "male";
+        oriBirthday = "19900101";
+        oriAddress = "北京";
+        oriExplain = "";
+        String password = getIntent().getStringExtra("password");
+        userDB.forUserLogin(oriNickName, password, new userBackListener() {
+            @Override
+            public void showResult(boolean result, String message) {
+                if(!result){
+                    showDialog("联网错误！");
+                }else{
+                    userDB.addUserMessage(image_path, oriNickName, oriSex, oriBirthday, oriAddress,
+                            oriExplain, new userBackListener() {
+                                @Override
+                                public void showResult(boolean result, String message) {
+                                    if(!result){
+                                        showDialog("联网错误！");
+                                    }
+                                }
+                            });
+                }
             }
         });
     }
 
     private void saveUserMessage() {
-        String username = userName.getText().toString().trim();
+        String imagePath = "/storage/emulated/0/headimage.jpg";
         String nickname = nickName.getText().toString().trim();
         int sexid = message_sex.getCheckedRadioButtonId();
         String sex;
@@ -82,7 +139,25 @@ public class AddUserMessageActivity extends AppCompatActivity {
         String address = message_address.getText().toString().trim();
         String explain = message_explain.getText().toString().trim();
 
-        userDB.addUserMessage(username, nickname, sex, birthday, address, explain, new userBackListener() {
+        if(imagePath.equals(image_path)){
+            imagePath = null;
+        }
+        if(nickname.equals(oriNickName) || nickname.equals("")){
+            nickname = null;
+        }
+        if(oriSex.equals(sex)){
+            sex = null;
+        }
+        if(birthday.equals(oriBirthday)){
+            birthday = null;
+        }
+        if(address.equals(oriAddress)){
+            address = null;
+        }
+        if(explain.equals(oriExplain)){
+            explain = null;
+        }
+        userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
             @Override
             public void showResult(boolean result,String message) {
                 if(result){
@@ -144,9 +219,21 @@ public class AddUserMessageActivity extends AppCompatActivity {
 
     }
 
+    private void showDialog(String message) {
+        new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+                        finish();
+                    }
+                }).show();
+    }
+
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
+            JMessageClient.logout();
             Intent myIntent;
             myIntent = new Intent(AddUserMessageActivity.this, LoginActivity.class);
             startActivity(myIntent);

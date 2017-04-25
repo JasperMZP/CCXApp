@@ -25,7 +25,6 @@ public class showMessage {
         builder1.setDefaults(Notification.DEFAULT_ALL); //设置默认的提示音，振动方式，灯光
         builder1.setAutoCancel(true);//打开程序后图标消失
         Intent intent =new Intent (activity, NewFriendActivity.class);
-        activity.finish();
         PendingIntent pendingIntent =PendingIntent.getActivity(activity, 0, intent, 0);
         builder1.setContentIntent(pendingIntent);
         Notification notification1 = builder1.build();

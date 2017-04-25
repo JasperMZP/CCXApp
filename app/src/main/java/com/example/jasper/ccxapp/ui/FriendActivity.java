@@ -19,9 +19,10 @@ import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import cn.jpush.im.android.api.model.UserInfo;
 
 
 public class FriendActivity extends AppCompatActivity {
@@ -80,11 +81,7 @@ public class FriendActivity extends AppCompatActivity {
 			@Override
 			public void showResult(boolean result, List<cn.jpush.im.android.api.model.UserInfo> message) {
 				if(result){
-					ArrayList<String> message2 = new ArrayList<String>();
-					for(int i=0;i<message.size();i++){
-						message2.add(message.get(i).getUserName());
-					}
-					showFriends(null, message2);
+					showFriends(message);
 				}else{
 					showDialog("查询好友出错");
 				}
@@ -92,10 +89,10 @@ public class FriendActivity extends AppCompatActivity {
 		});
 	}
 
-	private void showFriends(ArrayList<String> imgPath, ArrayList<String> message) {
+	private void showFriends(List<UserInfo> message) {
 		ListView lv = (ListView) findViewById(R.id.all_friend);
 
-		FriendAdapter adapter = new FriendAdapter(FriendActivity.this, imgPath, message);
+		FriendAdapter adapter = new FriendAdapter(FriendActivity.this, message);
 		lv.setAdapter(adapter);
 	}
 

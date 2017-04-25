@@ -80,7 +80,10 @@ public class SignUpActivity extends AppCompatActivity {
                     @Override
                     public void showResult(boolean result, String message) {
                         if(result){
-                            startActivity(new Intent(SignUpActivity.this,AddUserMessageActivity.class));
+                            Intent myIntent = new Intent(SignUpActivity.this,AddUserMessageActivity.class);
+                            myIntent.putExtra("userName", userName.getText().toString().trim());
+                            myIntent.putExtra("password", password1.getText().toString().trim());
+                            startActivity(myIntent);
                             finish();
                         }else{
                             showDialog("用户名已存在!");

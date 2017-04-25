@@ -2,6 +2,7 @@ package com.example.jasper.ccxapp.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,30 +12,31 @@ import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
+import cn.jpush.im.android.api.model.UserInfo;
 
 public class FriendAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
     private Context context;
-    private ArrayList<String> imgPath;
-    private ArrayList<String> userName;
+    private List<UserInfo> userInfos;
 
     public FriendAdapter(Context context) {
     	this.mInflater = LayoutInflater.from(context);
     	this.context = context;
     }
 
-    public FriendAdapter(Context context, ArrayList<String> imgPath, ArrayList<String> userName) {
+    public FriendAdapter(Context context, List<UserInfo> userInfos) {
     	this.mInflater = LayoutInflater.from(context);
     	this.context = context;
-    	this.imgPath = imgPath;
-    	this.userName = userName;
+    	this.userInfos = userInfos;
     }
 
     @Override
     public int getCount() {
-    	return userName.size();
+    	return userInfos.size();
     }
 
     @Override
@@ -63,8 +65,17 @@ public class FriendAdapter extends BaseAdapter {
     	}
 		holder = (ViewHolder)convertView.getTag();//取出ViewHolder对象                  }
     		/*设置TextView显示的内容，即我们存放在动态数组中的数据*/
-//		holder.a_friend_image.setImageBitmap(BitmapFactory.decodeFile(imgPath.get(position)));
-		holder.a_friend_name.setText(userName.get(position).toString());
+		final ViewHolder finalHolder = holder;
+		userInfos.get(position).getAvatarBitmap(new GetAvatarBitmapCallback() {
+			@Override
+			public void gotResult(int i, String s, Bitmap bitmap) {
+				if(i == 0) {
+					finalHolder.a_friend_image.setImageBitmap(bitmap);
+				}
+			}
+		});
+
+		finalHolder.a_friend_name.setText(userInfos.get(position).getUserName());
 		return convertView;
     }
 

@@ -63,8 +63,6 @@ public class MainActivity2 extends AppCompatActivity {
 
         initDrawerLayout();
         drawerLayout.setScrimColor(Color.GRAY);
-
-
     }
 
     private void initDrawerLayout() {
@@ -94,20 +92,6 @@ public class MainActivity2 extends AppCompatActivity {
                         }).show();
             }
         });
-        //v4控件 actionbar上的抽屉开关，可以实现一些开关的动态效果
-//        toggle = new ActionBarDrawerToggle(this, drawerLayout,
-//                R.drawable.star_change, R.string.drawer_open
-//                , R.string.drawer_close) {
-//            public void onDrawerClosed(View drawerView) {
-//                super.onDrawerClosed(drawerView);//抽屉关闭后
-//            }
-//
-//            public void onDrawerOpened(View drawerView) {
-//                super.onDrawerOpened(drawerView);//抽屉打开后
-//            }
-//        };
-//        drawerLayout.setDrawerListener(toggle);
-
     }
 
     private void loginOut() {
@@ -119,6 +103,7 @@ public class MainActivity2 extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        JMessageClient.logout();
         startActivity(new Intent(MainActivity2.this, LoginActivity.class));
         this.finish();
     }
@@ -150,25 +135,6 @@ public class MainActivity2 extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-//    //上面说到方便使用者随处调用就是这个方法，只需调用这个方法绑定id即可随处控制抽屉的拉出
-//    private void toggleRightSliding(){//该方法控制右侧边栏的显示和隐藏
-//        if(drawerLayout.isDrawerOpen(GravityCompat.END)){
-//            drawerLayout.closeDrawer(GravityCompat.END);//关闭抽屉
-//        }else{
-//            drawerLayout.openDrawer(GravityCompat.END);//打开抽屉
-//        }
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.tvMyFriend:
-//
-//                break;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-
 
     //添加一条新信息，需要在addNewMessage中依次输入图片路径，用户名，信息内容，信息格式，评论中用户列表，评论中音频列表
     //信息格式1为文字，2为图片路径，3为视频路径

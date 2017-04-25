@@ -48,7 +48,7 @@
         android:id="@+id/message_birthday"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="1990-01-01"/>
+        android:text="19900101"/>
     <EditText
         android:id="@+id/message_address"
         android:layout_width="match_parent"

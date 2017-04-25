@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,11 @@ import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.util.ArrayList;
+
+import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
+import cn.jpush.im.android.api.callback.GetUserInfoCallback;
+import cn.jpush.im.android.api.model.UserInfo;
 
 public class NewFriendAdapter extends BaseAdapter {
 
@@ -70,12 +76,26 @@ public class NewFriendAdapter extends BaseAdapter {
             holder.btn_agree = (Button)convertView.findViewById(R.id.a_new_friend_agree);
             convertView.setTag(holder);//绑定ViewHolder对象
         }
-        holder = (ViewHolder)convertView.getTag();//取出ViewHolder对象                  }
+        final ViewHolder finalHolder = (ViewHolder)convertView.getTag();//取出ViewHolder对象                  }
     		/*设置TextView显示的内容，即我们存放在动态数组中的数据*/
-//		holder.a_friend_image.setImageBitmap(BitmapFactory.decodeFile(imgPath.get(position)));
-        holder.a_friend_name.setText(userName.get(position*2).toString());
-        holder.a_friend_request.setText(userName.get(position*2+1).toString());
-        holder.btn_agree.setOnClickListener(new View.OnClickListener() {
+        JMessageClient.getUserInfo(userName.get(position*2).toString(), new GetUserInfoCallback(){
+            @Override
+            public void gotResult(int i, String s, UserInfo userInfo) {
+                if(i == 0){
+                    userInfo.getAvatarBitmap(new GetAvatarBitmapCallback() {
+                        @Override
+                        public void gotResult(int i, String s, Bitmap bitmap) {
+                            if(i == 0){
+                                finalHolder.a_friend_image.setImageBitmap(bitmap);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        finalHolder.a_friend_name.setText(userName.get(position*2).toString());
+        finalHolder.a_friend_request.setText(userName.get(position*2+1).toString());
+        finalHolder.btn_agree.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(context).setTitle("系统提示").setMessage("确认添加"+userName.get(position*2).toString()+"为好友？")
