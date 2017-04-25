@@ -1,3 +1,4 @@
+/*
 package com.example.jasper.ccxapp.ui;
 
 import android.content.Intent;
@@ -17,7 +18,6 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.example.jasper.ccxapp.R;
-import com.example.jasper.ccxapp.interfaces.FileType;
 import com.example.jasper.ccxapp.interfaces.ShowType;
 import com.example.jasper.ccxapp.util.IOUtil;
 import com.example.jasper.ccxapp.view.RecordButton;
@@ -37,6 +37,7 @@ import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
 import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.FileContent;
+import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
@@ -99,7 +100,8 @@ public class MainActivity3 extends AppCompatActivity implements FileType, ShowTy
         sendTxtMsgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendTxt();
+                //sendTxt();
+                sendImageTest();
             }
         });
 
@@ -233,6 +235,21 @@ public class MainActivity3 extends AppCompatActivity implements FileType, ShowTy
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (JMFileSizeExceedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendImageTest(){
+        try {
+            Message message = mConversation.createSendMessage(new ImageContent(new File("/storage/sdcard/1.jpg")));
+            message.setOnSendCompleteCallback(new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    Log.i("test", "图片发送" + i + s);
+                }
+            });
+            JMessageClient.sendMessage(message);
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -445,13 +462,19 @@ public class MainActivity3 extends AppCompatActivity implements FileType, ShowTy
 
                 chatContentStr += (String) otherMap.get("show");
                 chatContentTV.setText(chatContentStr);
+                break;
+            case image:
+                Log.i("test", "收到图片消息");
+                break;
         }
     }
 
-    /**
+    */
+/**
      * 类似MessageEvent事件的接收，上层在需要的地方增加OfflineMessageEvent事件的接收
      * 即可实现离线消息的接收。
-     **/
+     **//*
+
     public void onEvent(OfflineMessageEvent event) {
         //获取事件发生的会话对象
         Conversation conversation = event.getConversation();
@@ -460,10 +483,12 @@ public class MainActivity3 extends AppCompatActivity implements FileType, ShowTy
     }
 
 
-    /**
+    */
+/**
      * 如果在JMessageClient.init时启用了消息漫游功能，则每当一个会话的漫游消息同步完成时
      * sdk会发送此事件通知上层。
-     **/
+     **//*
+
     public void onEvent(ConversationRefreshEvent event) {
         //获取事件发生的会话对象
         Conversation conversation = event.getConversation();
@@ -485,3 +510,4 @@ public class MainActivity3 extends AppCompatActivity implements FileType, ShowTy
     }
 }
 
+*/

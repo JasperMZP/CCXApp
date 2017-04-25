@@ -13,7 +13,16 @@ public class ShowItemModel implements Serializable{
     private String showUsername;
     private String showText;
     private ArrayList<String> showImagesList;
+    private ArrayList<String> showOriginImagesList;
     private String showVideo;
+
+    public ArrayList<String> getShowOriginImagesList() {
+        return showOriginImagesList;
+    }
+
+    public void setShowOriginImagesList(ArrayList<String> showOriginImagesList) {
+        this.showOriginImagesList = showOriginImagesList;
+    }
 
     public ArrayList<String> getShowImagesList() {
         return showImagesList;

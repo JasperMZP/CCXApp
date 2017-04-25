@@ -24,7 +24,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-package com.example.jasper.ccxapp.view;
+package com.example.jasper.ccxapp.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

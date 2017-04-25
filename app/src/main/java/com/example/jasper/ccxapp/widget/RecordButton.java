@@ -1,10 +1,9 @@
-package com.example.jasper.ccxapp.view;
+package com.example.jasper.ccxapp.widget;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.MediaRecorder;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -19,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
-import com.example.jasper.ccxapp.interfaces.FileType;
 import com.example.jasper.ccxapp.interfaces.ShowType;
 
 import java.io.File;
@@ -30,7 +28,7 @@ import java.io.IOException;
 /**
  * Created by xuan on 2016/6/8.
  */
-public class RecordButton extends android.support.v7.widget.AppCompatButton implements FileType,ShowType{
+public class RecordButton extends android.support.v7.widget.AppCompatButton implements ShowType{
     private final int Volume_What_100 = 100;
     private final int Time_What_101 = 101;
     private final int CancelRecordWhat_102 = 102;
@@ -94,7 +92,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatButton impl
     }
 
     private void setDefaultFilePath() {
-        File file = new File("/storage/sdcard/ccxfile/voicefile" + File.separator + COMMENT + "_" + VOICE + "_" +"TEMP"+ ".mp3");
+        File file = new File("/storage/sdcard/ccxfile/voicefile" + File.separator + COMMENT + "_"  + "_" +"TEMP"+ ".mp3");
         if (!file.exists()) try {
             file.createNewFile();
         } catch (IOException e) {

@@ -66,10 +66,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void forLogin() {
-        JMessageClient.login(username, password, new BasicCallback() {
+        JMessageClient.login(usernameET.getText().toString().trim(), passwordET.getText().toString().trim(), new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
-                Log.i("test", i + " " + s);
+                Log.i("test","登陆"+ i + " " + s);
                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 finish();
             }

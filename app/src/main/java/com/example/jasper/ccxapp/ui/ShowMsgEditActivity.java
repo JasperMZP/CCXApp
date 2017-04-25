@@ -16,13 +16,12 @@ import android.widget.TextView;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.PhotoAdapter;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
-import com.example.jasper.ccxapp.interfaces.FileType;
 import com.example.jasper.ccxapp.interfaces.ShowType;
 import com.example.jasper.ccxapp.interfaces.SourceFolder;
-import com.example.jasper.ccxapp.view.RecyclerItemClickListener;
+import com.example.jasper.ccxapp.util.UUIDKeyUtil;
+import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import me.iwf.photopicker.PhotoPicker;
 import me.iwf.photopicker.PhotoPreview;
@@ -32,7 +31,7 @@ import me.iwf.photopicker.PhotoPreview;
  * Created by Jasper on 2017/4/20.
  */
 
-public class ShowMsgEditActivity extends AppCompatActivity implements FileType, ShowType, SourceFolder {
+public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, SourceFolder {
 
     public static final int RESULT_SEND_MSG_ITEM = 1;
 
@@ -96,6 +95,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements FileType, 
 
     private void BackShowMsgItemToSend() {
         showItem = new ShowItemModel();
+        showItem.setMsgKey(UUIDKeyUtil.getUUIDKey());
         showItem.setShowText(textEditEt.getText().toString().trim());
         if (photosPath != null) {//有图片
                 showItem.setShowImagesList(photosPath);

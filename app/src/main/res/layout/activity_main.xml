@@ -11,7 +11,7 @@
      android:childDivider="@drawable/child_bg" 这个直接引color,或者图片会导致整个孩子背景都为这个颜色
     -->
 
-    <com.example.jasper.ccxapp.view.StickyLayout
+    <com.example.jasper.ccxapp.widget.StickyLayout
         android:id="@+id/sticky_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -71,7 +71,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.example.jasper.ccxapp.view.PinnedHeaderExpandableListView
+            <com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView
                 android:id="@+id/expandablelist"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -83,6 +83,6 @@
                 android:groupIndicator="@null"
                 android:scrollbarAlwaysDrawHorizontalTrack="false"></com.example.jasper.ccxapp.view.PinnedHeaderExpandableListView>
         </LinearLayout>
-    </com.example.jasper.ccxapp.view.StickyLayout>
+    </com.example.jasper.ccxapp.widget.StickyLayout>
 
 </RelativeLayout>
