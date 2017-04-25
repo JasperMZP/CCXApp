@@ -361,7 +361,7 @@ public class MainActivity extends Activity implements
                             @Override
                             public void onItemClick(View view, int position) {
                                 PhotoPreview.builder()
-                                        .setPhotos(showItem.getShowImagesList())
+                                        .setPhotos(((ShowItemModel) getGroup(groupPosition)).getShowImagesList())
                                         .setCurrentItem(position)
                                         .setShowDeleteButton(false)
                                         .start(MainActivity.this);

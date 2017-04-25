@@ -81,7 +81,7 @@
                 android:divider="@color/Grey"
                 android:dividerHeight="1dp"
                 android:groupIndicator="@null"
-                android:scrollbarAlwaysDrawHorizontalTrack="false"></com.example.jasper.ccxapp.view.PinnedHeaderExpandableListView>
+                android:scrollbarAlwaysDrawHorizontalTrack="false"></com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView>
         </LinearLayout>
     </com.example.jasper.ccxapp.widget.StickyLayout>
 
