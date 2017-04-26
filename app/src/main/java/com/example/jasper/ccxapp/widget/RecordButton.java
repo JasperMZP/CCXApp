@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.interfaces.ShowType;
+import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,7 +93,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatButton impl
     }
 
     private void setDefaultFilePath() {
-        File file = new File("/storage/sdcard/ccxfile/voicefile" + File.separator + COMMENT + "_"  + "_" +"TEMP"+ ".mp3");
+        File file = new File("/storage/sdcard/ccxfile/voicefile" + File.separator + COMMENT +"_"+ UUIDKeyUtil.getUUIDKey()+ ".mp3");
         if (!file.exists()) try {
             file.createNewFile();
         } catch (IOException e) {

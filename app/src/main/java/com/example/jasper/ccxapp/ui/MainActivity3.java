@@ -469,11 +469,10 @@ public class MainActivity3 extends AppCompatActivity implements FileType, ShowTy
         }
     }
 
-    */
-/**
+*
      * 类似MessageEvent事件的接收，上层在需要的地方增加OfflineMessageEvent事件的接收
      * 即可实现离线消息的接收。
-     **//*
+     *
 
     public void onEvent(OfflineMessageEvent event) {
         //获取事件发生的会话对象
@@ -483,11 +482,10 @@ public class MainActivity3 extends AppCompatActivity implements FileType, ShowTy
     }
 
 
-    */
-/**
+*
      * 如果在JMessageClient.init时启用了消息漫游功能，则每当一个会话的漫游消息同步完成时
      * sdk会发送此事件通知上层。
-     **//*
+     *
 
     public void onEvent(ConversationRefreshEvent event) {
         //获取事件发生的会话对象

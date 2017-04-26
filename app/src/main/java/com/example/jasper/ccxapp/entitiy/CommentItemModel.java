@@ -8,13 +8,14 @@ public class CommentItemModel {
     private String msgKey;
     private String commentUsername;
     private String commentVoice;
-    private String commentLength;
+    private int commentLength;
 
-    public String getCommentLength() {
+
+    public int getCommentLength() {
         return commentLength;
     }
 
-    public void setCommentLength(String commentLength) {
+    public void setCommentLength(int commentLength) {
         this.commentLength = commentLength;
     }
 

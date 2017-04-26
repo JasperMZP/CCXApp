@@ -26,12 +26,15 @@ import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
 
+import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 import com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView;
+import com.example.jasper.ccxapp.widget.RecordButton;
 import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
 import com.example.jasper.ccxapp.widget.StickyLayout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,13 +42,17 @@ import java.util.Locale;
 import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
 import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.EventNotificationContent;
+import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
+import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
+import cn.jpush.im.android.api.exceptions.JMFileSizeExceedException;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.model.UserInfo;
@@ -191,21 +198,6 @@ public class MainActivity extends Activity implements
         JMessageClient.sendMessage(message);
     }
 
-    private void sendCustomMsg(ShowItemModel showItemForSend) {
-        Map customMsgMap = new HashMap();
-        customMsgMap.put("showKey", showItemForSend.getMsgKey());
-        customMsgMap.put("showText", showItemForSend.getShowText());
-        CustomContent customContent = new CustomContent();
-        customContent.setAllValues(customMsgMap);
-        Message message = mConversation.createSendMessage(customContent);
-        message.setOnSendCompleteCallback(new BasicCallback() {
-            @Override
-            public void gotResult(int i, String s) {
-                Log.i("test", "自定义发送" + i + s);
-            }
-        });
-        JMessageClient.sendMessage(message);
-    }
 
     private void sendImageMsg(ShowItemModel showItemForSend) {
         ArrayList<String> imgPaths = showItemForSend.getShowImagesList();
@@ -235,6 +227,27 @@ public class MainActivity extends Activity implements
 
     }
 
+    private void sendVoice(CommentItemModel commentItemForSend) {
+        try {
+            VoiceContent voiceContent = new VoiceContent(new File(commentItemForSend.getCommentVoice()), commentItemForSend.getCommentLength());
+            Map extrasMap = new HashMap();
+            extrasMap.put("showKey", commentItemForSend.getMsgKey());
+            extrasMap.put("voiceLength", ""+commentItemForSend.getCommentLength());
+            voiceContent.setExtras(extrasMap);
+            Message message = mConversation.createSendMessage(voiceContent);
+            message.setOnSendCompleteCallback(new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    Log.i("test", "发送语音消息" + i + s);
+                }
+            });
+            JMessageClient.sendMessage(message);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     /***
      * InitData
      */
@@ -259,21 +272,17 @@ public class MainActivity extends Activity implements
 
 
         ArrayList<CommentItemModel> commentItemList = new ArrayList<CommentItemModel>();
-        for (int j = 0; j < 19; j++) {
-            CommentItemModel commentItem = new CommentItemModel();
-            commentItem.setCommentUsername("comment User" + j);
-            commentItem.setCommentLength("" + j);
-            commentItemList.add(commentItem);
-        }
+        CommentItemModel noneCommentItem1 = new CommentItemModel();
+        noneCommentItem1.setMsgKey("-1");
+        commentItemList.add(noneCommentItem1);
+
         childCommentList.add(commentItemList);
 
         ArrayList<CommentItemModel> commentItemList2 = new ArrayList<CommentItemModel>();
-        for (int j = 0; j < 15; j++) {
-            CommentItemModel commentItem2 = new CommentItemModel();
-            commentItem2.setCommentUsername("comment User" + j);
-            commentItem2.setCommentLength("" + j);
-            commentItemList2.add(commentItem2);
-        }
+        CommentItemModel noneCommentItem2 = new CommentItemModel();
+        noneCommentItem2.setMsgKey("-1");
+        commentItemList2.add(noneCommentItem2);
+
         childCommentList.add(commentItemList2);
 
     }
@@ -381,15 +390,11 @@ public class MainActivity extends Activity implements
                 showHolder.showImageRv.setAdapter(null);
             }
 
-            /*if (isExpanded)// ture is Expanded or false is not isExpanded
-                showHolder.expandedIv.setImageResource(R.drawable.expanded);
-            else
-                showHolder.expandedIv.setImageResource(R.drawable.collapse);*/
             return convertView;
         }
 
         @Override
-        public View getChildView(int groupPosition, final int childPosition,
+        public View getChildView(final int groupPosition, final int childPosition,
                                  boolean isLastChild, View convertView, ViewGroup parent) {
             CommentHolder commentHolder = null;
             if (convertView == null) {
@@ -397,21 +402,44 @@ public class MainActivity extends Activity implements
                 convertView = inflater.inflate(R.layout.comment_item, null);
                 commentHolder.commentUsernameTv = (TextView) convertView.findViewById(R.id.comment_username_tv);
                 commentHolder.playVoiceCommentBtn = (Button) convertView.findViewById(R.id.play_comment_audio_btn);
-                commentHolder.sendVoiceCommentBtn = (Button) convertView.findViewById(R.id.send_comment_audio_btn);
+                commentHolder.sendVoiceCommentBtn = (RecordButton) convertView.findViewById(R.id.send_comment_audio_btn);
                 convertView.setTag(commentHolder);
             } else {
                 commentHolder = (CommentHolder) convertView.getTag();
             }
 
-            if (isLastChild) {
-                commentHolder.sendVoiceCommentBtn.setVisibility(View.VISIBLE);
-            } else {
-                commentHolder.sendVoiceCommentBtn.setVisibility(View.GONE);
-            }
 
             CommentItemModel commentItem = (CommentItemModel) getChild(groupPosition, childPosition);
-            commentHolder.commentUsernameTv.setText(commentItem.getCommentUsername());
-            commentHolder.playVoiceCommentBtn.setText(commentItem.getCommentLength());
+            if (commentItem.getMsgKey().equals("-1")){
+                commentHolder.commentUsernameTv.setVisibility(View.GONE);
+                commentHolder.playVoiceCommentBtn.setVisibility(View.GONE);
+                commentHolder.sendVoiceCommentBtn.setVisibility(View.VISIBLE);
+                commentHolder.sendVoiceCommentBtn.setOnFinishedRecordListener(new RecordButton.OnFinishedRecordListener() {
+                    @Override
+                    public void onFinishedRecord(String audioPath, long intervalTime) {
+                        CommentItemModel commentItemForSend = new CommentItemModel();
+                        commentItemForSend.setMsgKey(((ShowItemModel) getGroup(groupPosition)).getMsgKey());
+                        commentItemForSend.setCommentUsername(JMessageClient.getMyInfo().getUserName());
+                        commentItemForSend.setCommentVoice(audioPath);
+                        Log.i("test","audioPath："+audioPath);
+                        commentItemForSend.setCommentLength((int) (intervalTime / 1000));
+
+                        childCommentList.get(groupPosition).add(getChildrenCount(groupPosition)-1,commentItemForSend);
+                        sendVoice(commentItemForSend);
+
+                        adapter.notifyDataSetChanged();
+
+
+                    }
+                });
+            }else {
+                commentHolder.commentUsernameTv.setVisibility(View.VISIBLE);
+                commentHolder.playVoiceCommentBtn.setVisibility(View.VISIBLE);
+                commentHolder.sendVoiceCommentBtn.setVisibility(View.GONE);
+                commentHolder.commentUsernameTv.setText(commentItem.getCommentUsername());
+                commentHolder.playVoiceCommentBtn.setText("" + commentItem.getCommentLength());
+            }
+
             return convertView;
         }
 
@@ -452,7 +480,7 @@ public class MainActivity extends Activity implements
 
         TextView commentUsernameTv;
         Button playVoiceCommentBtn;
-        Button sendVoiceCommentBtn;
+        RecordButton sendVoiceCommentBtn;
 
     }
 
@@ -493,16 +521,11 @@ public class MainActivity extends Activity implements
             showList.add(0, showItem);
 
             //test
-            CommentItemModel commentItem = new CommentItemModel();
-            commentItem.setCommentUsername("aaa");
-            commentItem.setCommentLength("30");
-            CommentItemModel commentItem2 = new CommentItemModel();
-            commentItem2.setCommentUsername("bbb");
-            commentItem2.setCommentLength("12");
-            ArrayList<CommentItemModel> commentItems = new ArrayList<CommentItemModel>();
-            commentItems.add(commentItem);
-            commentItems.add(0, commentItem2);
-            childCommentList.add(0, commentItems);
+            ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+            CommentItemModel noneComment = new CommentItemModel();
+            noneComment.setMsgKey("-1");
+            commentItemModels.add(noneComment);
+            childCommentList.add(commentItemModels);
 
             adapter.notifyDataSetChanged();
             Log.i("test", "show内容" + showItem.getShowText());
@@ -554,48 +577,14 @@ public class MainActivity extends Activity implements
                 showList.add(0, textShowItem);
 
                 //test
-                CommentItemModel tcommentItem = new CommentItemModel();
-                tcommentItem.setCommentUsername("aaa");
-                tcommentItem.setCommentLength("30");
-                CommentItemModel tcommentItem2 = new CommentItemModel();
-                tcommentItem2.setCommentUsername("bbb");
-                tcommentItem2.setCommentLength("12");
-                ArrayList<CommentItemModel> tcommentItems = new ArrayList<CommentItemModel>();
-                tcommentItems.add(tcommentItem);
-                tcommentItems.add(0, tcommentItem2);
-                childCommentList.add(0, tcommentItems);
+                ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+                CommentItemModel noneComment=new CommentItemModel();
+                noneComment.setMsgKey("-1");
+                commentItemModels.add(noneComment);
+                childCommentList.add(0,commentItemModels);
 
                 adapter.notifyDataSetChanged();
                 break;
-
-
-           /* case custom:
-                //处理自定义消息
-                Log.i("test", "收到自定义消息");
-                CustomContent customContent = (CustomContent) msg.getContent();
-                Map customMsgMap = customContent.getAllStringValues();
-                UserInfo cUserInfo = msg.getFromUser();
-                ShowItemModel customShowItem = new ShowItemModel();
-                customShowItem.setMsgKey((String) customMsgMap.get("showKey"));
-                customShowItem.setShowUsername(cUserInfo.getUserName());
-                customShowItem.setShowText((String) customMsgMap.get("showText"));
-                Log.i("test", "收到自定义消息" + cUserInfo.getUserName() + customMsgMap.get("showText"));
-                showList.add(0, customShowItem);
-
-                //test
-                CommentItemModel commentItem = new CommentItemModel();
-                commentItem.setCommentUsername("aaa");
-                commentItem.setCommentLength("30");
-                CommentItemModel commentItem2 = new CommentItemModel();
-                commentItem2.setCommentUsername("bbb");
-                commentItem2.setCommentLength("12");
-                ArrayList<CommentItemModel> commentItems = new ArrayList<CommentItemModel>();
-                commentItems.add(commentItem);
-                commentItems.add(0, commentItem2);
-                childCommentList.add(0, commentItems);
-
-                adapter.notifyDataSetChanged();
-                break;*/
             case file:
                 Log.i("test", "收到文件消息");
                 break;
@@ -623,6 +612,42 @@ public class MainActivity extends Activity implements
         Message msg = event.getMessage();
 
         switch (msg.getContentType()) {
+            case voice:
+                //处理语音消息
+                Log.i("test", "收到语音消息");
+                VoiceContent voiceContent = (VoiceContent)msg.getContent();
+                UserInfo vUserInfo = msg.getFromUser();
+                Map vMsgMap = voiceContent.getStringExtras();
+                CommentItemModel commentItem = new CommentItemModel();
+                commentItem.setMsgKey((String) vMsgMap.get("showKey"));
+                commentItem.setCommentUsername(vUserInfo.getUserName());
+                commentItem.setCommentLength(Integer.parseInt((String) vMsgMap.get("voiceLength")));
+
+                Log.i("test","voiceContent.getLocalPath"+voiceContent.getLocalPath());
+                commentItem.setCommentVoice(voiceContent.getLocalPath());
+
+                for (int j=0;j<showList.size();j++){
+                    if (showList.get(j).getMsgKey().equals(commentItem.getMsgKey())){
+                        List<CommentItemModel> commentItemModels = childCommentList.get(j);
+                        //防止重复消息
+                        boolean flag = true;
+                        for (CommentItemModel commentTemp:commentItemModels){
+                            if (commentItem.getCommentVoice().equals(commentTemp.getCommentVoice())){
+                                flag=false;
+                            }
+                        }
+                        if (flag){
+                            commentItemModels.add(commentItemModels.size()-1,commentItem);
+                            childCommentList.remove(j);
+                            childCommentList.add(j,commentItemModels);
+                            Log.i("test", "添加一条语音消息");
+                            adapter.notifyDataSetChanged();
+                        }
+
+                    }
+                }
+
+                break;
             case image:
                 //处理图片消息
                 Log.i("test", "收到图片消息");
@@ -652,17 +677,12 @@ public class MainActivity extends Activity implements
 
                             showList.add(0, recieveImageShowItem);
 
-                            //test
-                            CommentItemModel icommentItem = new CommentItemModel();
-                            icommentItem.setCommentUsername("aaa");
-                            icommentItem.setCommentLength("30");
-                            CommentItemModel icommentItem2 = new CommentItemModel();
-                            icommentItem2.setCommentUsername("bbb");
-                            icommentItem2.setCommentLength("12");
-                            ArrayList<CommentItemModel> icommentItems = new ArrayList<CommentItemModel>();
-                            icommentItems.add(icommentItem);
-                            icommentItems.add(0, icommentItem2);
-                            childCommentList.add(0, icommentItems);
+
+                            ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+                            CommentItemModel noneComment=new CommentItemModel();
+                            noneComment.setMsgKey("-1");
+                            commentItemModels.add(noneComment);
+                            childCommentList.add(0,commentItemModels);
 
                             adapter.notifyDataSetChanged();
                         }
@@ -690,17 +710,11 @@ public class MainActivity extends Activity implements
 
                     showList.add(0, recieveImageShowItem);
 
-                    //test
-                    CommentItemModel icommentItem = new CommentItemModel();
-                    icommentItem.setCommentUsername("aaa");
-                    icommentItem.setCommentLength("30");
-                    CommentItemModel icommentItem2 = new CommentItemModel();
-                    icommentItem2.setCommentUsername("bbb");
-                    icommentItem2.setCommentLength("12");
-                    ArrayList<CommentItemModel> icommentItems = new ArrayList<CommentItemModel>();
-                    icommentItems.add(icommentItem);
-                    icommentItems.add(0, icommentItem2);
-                    childCommentList.add(0, icommentItems);
+                    ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+                    CommentItemModel noneComment=new CommentItemModel();
+                    noneComment.setMsgKey("-1");
+                    commentItemModels.add(noneComment);
+                    childCommentList.add(0,commentItemModels);
 
                     adapter.notifyDataSetChanged();
                 }

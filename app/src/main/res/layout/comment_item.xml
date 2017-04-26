@@ -23,7 +23,7 @@
         android:background="@drawable/startaudio"
         android:text="13'" />
 
-    <Button
+    <com.example.jasper.ccxapp.widget.RecordButton
         android:id="@+id/send_comment_audio_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
