@@ -1,6 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Search, should appear as action button -->
-
+    <item android:id="@+id/action_addFriend"
+        android:icon="@drawable/add"
+        android:title="添加好友"
+        />
+    <item android:id="@+id/action_CreateGroup"
+        android:icon="@drawable/add"
+        android:title="新建群聊"
+        />
 
 </menu>
