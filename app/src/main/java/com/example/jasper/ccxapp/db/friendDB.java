@@ -2,8 +2,7 @@ package com.example.jasper.ccxapp.db;
 
 import android.util.Log;
 
-import com.example.jasper.ccxapp.entities.Friend;
-import com.example.jasper.ccxapp.entities.NewFriend;
+import com.example.jasper.ccxapp.entitiy.NewFriend;
 import com.example.jasper.ccxapp.interfaces.userBackListListener;
 import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
@@ -134,7 +133,7 @@ public class friendDB {
     }
 
     //查询当前好友
-    public static void searchfriend(String userName1, final userBackListUserInfo userBackListUserInfo) {
+    public static void searchfriend(final userBackListUserInfo userBackListUserInfo) {
         ContactManager.getFriendList(new GetUserInfoListCallback() {
             @Override
             public void gotResult(int responseCode, String responseMessage, List<UserInfo> userInfoList) {
@@ -148,11 +147,12 @@ public class friendDB {
     }
 
     //查询新好友
-    public static void searchnewfriend(final String userName1, final String userName2, final userBackUserInfo userBackUserInfo) {
-        JMessageClient.getUserInfo(userName2, null, new GetUserInfoCallback(){
+    public static void searchnewfriend(final String userName2, final userBackUserInfo userBackUserInfo) {
+        JMessageClient.getUserInfo(userName2,new GetUserInfoCallback(){
             @Override
             public void gotResult(int i, String s, UserInfo userInfo) {
                 if(i == 0){
+                    Log.i("test","用户信息获取成功");
                     if(userInfo.isFriend()){
                         userBackUserInfo.showResult(false, "已加该用户为好友", null);
                     }else{
@@ -167,7 +167,7 @@ public class friendDB {
 
     //删除已有好友输入值为好友双方
     public static void deletefriend(String userName1, String userName2, final userBackListener userBackListener) {
-        com.example.jasper.ccxapp.entities.UserInfo userinfo = null;
+        com.example.jasper.ccxapp.entitiy.UserInfo userinfo = null;
         userinfo.removeFromFriendList(new BasicCallback() {
             @Override
             public void gotResult(int responseCode, String responseMessage) {
@@ -204,13 +204,6 @@ public class friendDB {
         });
     }
 
-    //构建Friend类
-    private static Friend getFriend(String userName1, String userName2) {
-        Friend friend = new Friend();
-        friend.setFriend1(userName1);
-        friend.setFriend2(userName2);
-        return friend;
-    }
 
     //构建NewFriend类
     private static NewFriend getNewFriend(String userName1, String userName2, String message) {

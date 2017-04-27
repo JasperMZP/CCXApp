@@ -56,7 +56,7 @@ public class MakeChatroomActivity extends AppCompatActivity {
             showDialog("请输入群聊名称！");
             return;
         }
-        chatDB.addnewchatroom(getUserName(), chatName, adapter.getUserNameList(), new userBackListener() {
+        chatDB.addnewchatroom(null, chatName, adapter.getUserNameList(), new userBackListener() {
             @Override
             public void showResult(boolean result, String message) {
                 if(result){
@@ -69,9 +69,7 @@ public class MakeChatroomActivity extends AppCompatActivity {
     }
 
     private void getFriendList() {
-        String userName = getUserName();
-
-        friendDB.searchfriend(userName, new userBackListUserInfo() {
+        friendDB.searchfriend(new userBackListUserInfo() {
             @Override
             public void showResult(boolean result, List<UserInfo> message) {
                 if(result){
@@ -84,17 +82,10 @@ public class MakeChatroomActivity extends AppCompatActivity {
     }
 
     private void showFriends(List<UserInfo> message) {
-//        adapter = new FriendChatAdapter(MakeChatroomActivity.this, message);
-//        showFriendsChat.setAdapter(adapter);
+        adapter = new FriendChatAdapter(MakeChatroomActivity.this, message);
+        showFriendsChat.setAdapter(adapter);
     }
 
-    private boolean checkUserName(String userName) {
-        if(userName.length() < 5){
-            showDialog("用户名不应少于5位字符");
-            return false;
-        }
-        return true;
-    }
 
     private void showDialog(String message) {
         new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
@@ -109,25 +100,6 @@ public class MakeChatroomActivity extends AppCompatActivity {
                         finish();
                     }
                 }).show();
-    }
-
-    public String getUserName(){
-        try {
-            // 创建File对象
-            File file = new File(getFilesDir(), "info.properties");
-            // 创建FileIutputStream 对象
-            FileInputStream fis = new FileInputStream(file);
-            // 创建属性对象
-            Properties pro = new Properties();
-            // 加载文件
-            pro.load(fis);
-            // 关闭输入流对象
-            fis.close();
-            return pro.get("userName").toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {

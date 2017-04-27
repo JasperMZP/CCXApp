@@ -2,8 +2,7 @@ package com.example.jasper.ccxapp.db;
 
 import android.util.Log;
 
-import com.example.jasper.ccxapp.entities.User;
-import com.example.jasper.ccxapp.entities.UserInfo;
+import com.example.jasper.ccxapp.entitiy.UserInfo;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.io.File;
@@ -131,10 +130,4 @@ public class userDB {
         }
     }
 
-    private static User getUser(String userName, String password) {
-        User user = new User();
-        user.setUsername(userName);
-        user.setPassword(password);
-        return user;
-    }
 }

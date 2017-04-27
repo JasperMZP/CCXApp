@@ -75,11 +75,9 @@ public class FriendActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	private void getFriends() {
-		String userName = getUserName();
-
-		friendDB.searchfriend(userName, new userBackListUserInfo() {
+		friendDB.searchfriend(new userBackListUserInfo() {
 			@Override
-			public void showResult(boolean result, List<cn.jpush.im.android.api.model.UserInfo> message) {
+			public void showResult(boolean result, List<UserInfo> message) {
 				if(result){
 					showFriends(message);
 				}else{

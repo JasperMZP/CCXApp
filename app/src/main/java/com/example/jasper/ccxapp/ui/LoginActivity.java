@@ -73,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
             if(pro.get("userName").toString().equals("") || pro.get("userName") == null){
                 return;
             }else{
-                startActivity(new Intent(LoginActivity.this, MainActivity2.class));
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
                 this.finish();
             }
         } catch (Exception e) {
@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
             public void showResult(boolean result, String message) {
                 if(result){
                     saveUser(username, password);
-                    startActivity(new Intent(LoginActivity.this, MainActivity2.class));
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
                 }else{
                     showDialog("用户名或密码错误");

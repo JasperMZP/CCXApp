@@ -1,13 +1,20 @@
 package com.example.jasper.ccxapp.ui;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,6 +24,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -27,6 +35,7 @@ import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
 
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
+import com.example.jasper.ccxapp.util.showMessage;
 import com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView;
 import com.example.jasper.ccxapp.widget.RecordButton;
 import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
@@ -49,6 +58,7 @@ import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.content.VoiceContent;
+import cn.jpush.im.android.api.event.ContactNotifyEvent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
@@ -82,6 +92,13 @@ public class MainActivity extends Activity implements
 
     //收到的图片消息
     private ShowItemModel recieveImageShowItem = new ShowItemModel();
+
+
+    private TextView toFriend;
+    private TextView myName;
+    private TextView loginout;
+    private DrawerLayout drawerLayout;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -176,6 +193,53 @@ public class MainActivity extends Activity implements
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
         addShowBtn = (Button) findViewById(R.id.add_show_btn);
+
+
+        initDrawerLayout();
+        drawerLayout.setScrimColor(Color.GRAY);
+    }
+
+    private void initDrawerLayout() {
+        drawerLayout = (DrawerLayout) super.findViewById(R.id.drawer_layout);
+        drawerLayout.setScrimColor(Color.TRANSPARENT);
+
+        View v1 = (View)findViewById(R.id.left_drawer);
+        toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
+        myName = (TextView)v1.findViewById(R.id.myName);
+        loginout = (TextView)v1.findViewById(R.id.loginout);
+        myName.setText(JMessageClient.getMyInfo().getNickname());
+        toFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, FriendActivity.class));
+            }
+        });
+        loginout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(MainActivity.this).setTitle("系统提示").setMessage("是否确认退出登录？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                loginOut();
+                            }
+                        }).show();
+            }
+        });
+    }
+
+    private void loginOut() {
+        try {
+            File file = new File(getFilesDir(), "info.properties");
+            file.delete();
+            File file2 = new File(getFilesDir(), "infoRequest.properties");
+            file2.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JMessageClient.logout();
+        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        this.finish();
     }
 
     private void sendTextMsg(ShowItemModel showItemForSend) {
@@ -723,6 +787,29 @@ public class MainActivity extends Activity implements
         }
     }
 
+    public void onEvent(ContactNotifyEvent event) {
+        String reason = event.getReason();
+        String fromUsername = event.getFromUsername();
+        String appkey = event.getfromUserAppKey();
+
+        switch (event.getType()) {
+            case invite_received://收到好友邀请
+                showMessage.showNewFriend(MainActivity.this, fromUsername + "请求添加您为好友", "点击查看详细信息");
+//                saveRequest(fromUsername, reason);
+                break;
+            case invite_accepted://对方接收了你的好友邀请
+                //...
+                break;
+            case invite_declined://对方拒绝了你的好友邀请
+                //...
+                break;
+            case contact_deleted://对方将你从好友中删除
+                //...
+                break;
+            default:
+                break;
+        }
+    }
 
     /**
      * 类似MessageEvent事件的接收，上层在需要的地方增加OfflineMessageEvent事件的接收
@@ -750,4 +837,20 @@ public class MainActivity extends Activity implements
         System.out.println("事件发生的原因 : " + reason);
     }
 
+
+    private long exitTime = 0;
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN){
+            if((System.currentTimeMillis()-exitTime) > 2000){
+                Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }

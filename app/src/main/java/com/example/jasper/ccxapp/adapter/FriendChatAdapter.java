@@ -2,22 +2,28 @@ package com.example.jasper.ccxapp.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
+import cn.jpush.im.android.api.model.UserInfo;
 
 public class FriendChatAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
     private Context context;
-    private ArrayList<String> userName;
+    List<UserInfo> userInfos;
     private boolean[] selects;
 
     public FriendChatAdapter(Context context) {
@@ -25,19 +31,19 @@ public class FriendChatAdapter extends BaseAdapter {
     	this.context = context;
     }
 
-    public FriendChatAdapter(Context context, ArrayList<String> userName) {
+    public FriendChatAdapter(Context context, List<UserInfo> userInfos) {
     	this.mInflater = LayoutInflater.from(context);
     	this.context = context;
-    	this.userName = userName;
-        this.selects = new boolean[userName.size()];
-        for(int i=0;i<userName.size();i++){
+    	this.userInfos = userInfos;
+        this.selects = new boolean[userInfos.size()];
+        for(int i=0;i<userInfos.size();i++){
             selects[i] = false;
         }
     }
 
     @Override
     public int getCount() {
-    	return userName.size();
+    	return userInfos.size();
     }
 
     @Override
@@ -60,15 +66,23 @@ public class FriendChatAdapter extends BaseAdapter {
     		convertView = mInflater.inflate(R.layout.a_friend_chat, null);
     		holder =new ViewHolder();
     		/*得到各个控件的对象*/
+    		holder.a_friend_chat_imageview = (ImageView)convertView.findViewById(R.id.a_friend_chat_imageView);
     		holder.a_friend_chat_name = (TextView) convertView.findViewById(R.id.a_friend_chat_name);
 			holder.a_friend_chat_checkbox = (CheckBox)convertView.findViewById(R.id.a_friend_chat_checkbox);
     		convertView.setTag(holder);//绑定ViewHolder对象
     	}
-		holder = (ViewHolder)convertView.getTag();//取出ViewHolder对象                  }
+		final ViewHolder finalholder = (ViewHolder)convertView.getTag();
     		/*设置TextView显示的内容，即我们存放在动态数组中的数据*/
-//		holder.a_friend_image.setImageBitmap(BitmapFactory.decodeFile(imgPath.get(position)));
-		holder.a_friend_chat_name.setText(userName.get(position).toString());
-        holder.a_friend_chat_checkbox.setOnClickListener(new View.OnClickListener() {
+        userInfos.get(position).getAvatarBitmap(new GetAvatarBitmapCallback() {
+            @Override
+            public void gotResult(int i, String s, Bitmap bitmap) {
+                if(i == 0){
+                    finalholder.a_friend_chat_imageview.setImageBitmap(bitmap);
+                }
+            }
+        });
+        finalholder.a_friend_chat_name.setText(userInfos.get(position).getNickname());
+        finalholder.a_friend_chat_checkbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selects[position] = !selects[position];
@@ -80,13 +94,14 @@ public class FriendChatAdapter extends BaseAdapter {
     public final class ViewHolder{
 		public TextView a_friend_chat_name;
     	public CheckBox a_friend_chat_checkbox;
+        public ImageView a_friend_chat_imageview;
     }
 
     public ArrayList<String> getUserNameList(){
         ArrayList<String> userNames = new ArrayList<String>();
-        for (int i=0;i<userName.size();i++){
+        for (int i=0;i<userInfos.size();i++){
             if(selects[i]){
-                userNames.add(userName.get(i));
+                userNames.add(userInfos.get(i).getUserName());
             }
         }
         return userNames;

@@ -1,3 +1,4 @@
+/*
 package com.example.jasper.ccxapp.ui;
 
 import android.Manifest;
@@ -251,3 +252,4 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 }
+*/

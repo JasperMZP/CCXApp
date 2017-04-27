@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 
@@ -63,7 +64,7 @@ public class SearchNewActivity extends AppCompatActivity {
             showDialog("请输入关键词！");
             return;
         }
-        friendDB.searchnewfriend(getUserName(), NameNeedSearch, new userBackUserInfo() {
+        friendDB.searchnewfriend(NameNeedSearch, new userBackUserInfo() {
             @Override
             public void showResult(boolean result, String s, UserInfo message) {
                 if (result) {
@@ -100,24 +101,6 @@ public class SearchNewActivity extends AppCompatActivity {
 		});
     }
 
-    public String getUserName(){
-        try {
-            // 创建File对象
-            File file = new File(getFilesDir(), "info.properties");
-            // 创建FileIutputStream 对象
-            FileInputStream fis = new FileInputStream(file);
-            // 创建属性对象
-            Properties pro = new Properties();
-            // 加载文件
-            pro.load(fis);
-            // 关闭输入流对象
-            fis.close();
-            return pro.get("userName").toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
 
     private void showDialog(String message) {
         new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
