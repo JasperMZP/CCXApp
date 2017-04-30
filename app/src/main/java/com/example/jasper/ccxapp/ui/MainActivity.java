@@ -690,6 +690,8 @@ public class MainActivity extends Activity implements
         //获取事件发生的原因，对于漫游完成触发的事件，此处的reason应该是
         //MSG_ROAMING_COMPLETE
         ConversationRefreshEvent.Reason reason = event.getReason();
+        Log.i("test",String.format(Locale.SIMPLIFIED_CHINESE, "收到ConversationRefreshEvent事件,待刷新的会话是%s.\n", conversation.getTargetId()));
+        Log.i("test","事件发生的原因 : " + reason);
         System.out.println(String.format(Locale.SIMPLIFIED_CHINESE, "收到ConversationRefreshEvent事件,待刷新的会话是%s.\n", conversation.getTargetId()));
         System.out.println("事件发生的原因 : " + reason);
     }
