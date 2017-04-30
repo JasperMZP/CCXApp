@@ -2,12 +2,18 @@ package com.example.jasper.ccxapp.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,10 +31,16 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
-import com.example.jasper.ccxapp.view.PinnedHeaderExpandableListView;
-import com.example.jasper.ccxapp.view.RecyclerItemClickListener;
-import com.example.jasper.ccxapp.view.StickyLayout;
 
+import com.example.jasper.ccxapp.util.UUIDKeyUtil;
+import com.example.jasper.ccxapp.util.showMessage;
+import com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView;
+import com.example.jasper.ccxapp.widget.RecordButton;
+import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
+import com.example.jasper.ccxapp.widget.StickyLayout;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,10 +48,11 @@ import java.util.Locale;
 import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
-import cn.jpush.im.android.api.callback.GetGroupMembersCallback;
-import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.content.EventNotificationContent;
+import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
+import cn.jpush.im.android.api.content.VoiceContent;
+import cn.jpush.im.android.api.event.ContactNotifyEvent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
@@ -65,11 +78,23 @@ public class MainActivity extends Activity implements
 
     private ArrayList<List<CommentItemModel>> childCommentList = new ArrayList<List<CommentItemModel>>();
 
+
     private MyexpandableListAdapter adapter;
-    //private ShowPhotoAdapter showPhotoAdapter;
-    // private ArrayList<String> showPhotos = new ArrayList<>();
+
     private Conversation mConversation;
     private final int REQUEST_SEND_MSG_ITEM = 0;
+
+    //收到的图片消息
+    private ShowItemModel CheckRecievedShowItem = new ShowItemModel();
+    private String imgRecieveFlag = "";
+    private String checkShowKey = "";
+    private String checkCommKey = "";
+
+    private TextView toFriend;
+    private TextView myName;
+    private TextView loginout;
+    private DrawerLayout drawerLayout;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,13 +102,10 @@ public class MainActivity extends Activity implements
         setContentView(R.layout.activity_main);
 
         initView();
-        createGroup();
         initData();
 
         adapter = new MyexpandableListAdapter(this);
         expandableListView.setAdapter(adapter);
-
-        //showPhotoAdapter = new ShowPhotoAdapter(this, showPhotos);
 
 
         // 展开所有group
@@ -105,62 +127,68 @@ public class MainActivity extends Activity implements
         });
     }
 
-    private void createGroup() {
-        /*JMessageClient.createGroup("咱一家人", "咱一家人的描述", new CreateGroupCallback() {
-            @Override
-            public void gotResult(int i, String s, final long l) {
-                Log.i("test", "创建群聊" + "a"+i + " b" + s + " c" + l);
-                final long groupId = l;
-
-                List<String> groupMembers = new ArrayList<String>();
-                groupMembers.add("test1");
-                groupMembers.add("test3");
-                JMessageClient.addGroupMembers(groupId, groupMembers, new BasicCallback() {
-                    @Override
-                    public void gotResult(int i, String s) {
-                        Log.i("test", "添加群成员" + i + s);
-
-
-                        JMessageClient.getGroupMembers(groupId, new GetGroupMembersCallback() {
-                            @Override
-                            public void gotResult(int i, String s, List<UserInfo> list) {
-                                Log.i("test", "获取群成员" + i + s);
-                                for (UserInfo userInfo : list) {
-                                    Log.i("test", "群成员" + userInfo.getUserName());
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        });*/
-
-
-        JMessageClient.getGroupMembers(22868325, new GetGroupMembersCallback() {
-            @Override
-            public void gotResult(int i, String s, List<UserInfo> list) {
-                Log.i("test", "获取群成员" + i + s);
-                for (UserInfo userInfo : list) {
-                    Log.i("test", "群成员" + userInfo.getUserName());
-                }
-            }
-        });
-        mConversation = Conversation.createGroupConversation(22868325);
-        GroupInfo groupInfo = (GroupInfo) mConversation.getTargetInfo();
-        List<UserInfo> userInfos = groupInfo.getGroupMembers();
-        for (UserInfo userInfo : userInfos) {
-            Log.i("test", "群成员" + userInfo.getUserName());
-        }
-    }
-
     private void initView() {
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
         addShowBtn = (Button) findViewById(R.id.add_show_btn);
+
+
+        initDrawerLayout();
+        drawerLayout.setScrimColor(Color.GRAY);
     }
 
-    private void sendTextMsg(String showText) {
-        Message message = mConversation.createSendMessage(new TextContent(showText));
+    private void initDrawerLayout() {
+        drawerLayout = (DrawerLayout) super.findViewById(R.id.drawer_layout);
+        drawerLayout.setScrimColor(Color.TRANSPARENT);
+
+        View v1 = (View) findViewById(R.id.left_drawer);
+        toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
+        myName = (TextView) v1.findViewById(R.id.myName);
+        loginout = (TextView) v1.findViewById(R.id.loginout);
+        myName.setText(JMessageClient.getMyInfo().getNickname());
+        toFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, FriendActivity.class));
+            }
+        });
+        loginout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(MainActivity.this).setTitle("系统提示").setMessage("是否确认退出登录？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                loginOut();
+                            }
+                        }).show();
+            }
+        });
+    }
+
+    private void loginOut() {
+        try {
+            File file = new File(getFilesDir(), "info.properties");
+            file.delete();
+            File file2 = new File(getFilesDir(), "infoRequest.properties");
+            file2.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JMessageClient.logout();
+        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        this.finish();
+    }
+
+    private void sendTextMsg(ShowItemModel showItemForSend) {
+        TextContent textContent = new TextContent(showItemForSend.getShowText());
+        textContent.setStringExtra("showKey", showItemForSend.getMsgKey());
+        String groupIds = "";
+        for (long groupId : showItemForSend.getGroupBelongToList()) {
+            groupIds += groupId + ",";
+        }
+        textContent.setStringExtra("groupBelongTo", groupIds);
+        Message message = mConversation.createSendMessage(textContent);
         message.setOnSendCompleteCallback(new BasicCallback() {
             @Override
             public void gotResult(int responseCode, String responseDesc) {
@@ -177,25 +205,71 @@ public class MainActivity extends Activity implements
         JMessageClient.sendMessage(message);
     }
 
-    private void sendCustomMsg(ShowItemModel showItem) {
-        Map customMsgMap = new HashMap();
-        customMsgMap.put("showText", showItem.getShowText());
-        CustomContent customContent = new CustomContent();
-        customContent.setAllValues(customMsgMap);
-        Message message = mConversation.createSendMessage(customContent);
-        message.setOnSendCompleteCallback(new BasicCallback() {
-            @Override
-            public void gotResult(int i, String s) {
-                Log.i("test", "自定义发送" + i + s);
+
+    private void sendImageMsg(ShowItemModel showItemForSend) {
+        ArrayList<String> imgPaths = showItemForSend.getShowImagesList();
+        String recieveFlag = UUIDKeyUtil.getUUIDKey();
+        for (int i = 0; i < imgPaths.size(); i++) {
+            try {
+                ImageContent imageContent = new ImageContent(new File(imgPaths.get(i)));
+                Map extrasMap = new HashMap();
+                extrasMap.put("showKey", showItemForSend.getMsgKey());
+                if (i == 0 && showItemForSend.getShowText() != null) {
+                    extrasMap.put("showText", showItemForSend.getShowText());
+                }
+                String groupIds = "";
+                for (long groupId : showItemForSend.getGroupBelongToList()) {
+                    groupIds += groupId + ",";
+                }
+                Log.i("test", "传递groupIds" + groupIds);
+                //imageContent.setStringExtra("groupBelongTo",groupIds);
+                extrasMap.put("groupBelongTo", groupIds);
+                imageContent.setExtras(extrasMap);
+                imageContent.setNumberExtra("imageNum", imgPaths.size());
+                imageContent.setNumberExtra("imageCount", i + 1);
+                imageContent.setStringExtra("recieveFlag", recieveFlag);
+                Message message = mConversation.createSendMessage(imageContent);
+                message.setOnSendCompleteCallback(new BasicCallback() {
+                    @Override
+                    public void gotResult(int i, String s) {
+                        Log.i("test", "发送图片消息" + i + s);
+                    }
+                });
+                JMessageClient.sendMessage(message);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
             }
-        });
-        JMessageClient.sendMessage(message);
+        }
+
     }
+
+    private void sendVoice(CommentItemModel commentItemForSend) {
+        try {
+            VoiceContent voiceContent = new VoiceContent(new File(commentItemForSend.getCommentVoice()), commentItemForSend.getCommentLength());
+            Map extrasMap = new HashMap();
+            extrasMap.put("showKey", commentItemForSend.getMsgKey());
+            extrasMap.put("commKey", commentItemForSend.getCommKey());
+            extrasMap.put("voiceLength", "" + commentItemForSend.getCommentLength());
+            voiceContent.setExtras(extrasMap);
+            Message message = mConversation.createSendMessage(voiceContent);
+            message.setOnSendCompleteCallback(new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    Log.i("test", "发送语音消息" + i + s);
+                }
+            });
+            JMessageClient.sendMessage(message);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /***
      * InitData
      */
     void initData() {
+
         showList = new ArrayList<ShowItemModel>();
         ShowItemModel showItem = null;
         for (int i = 0; i < 2; i++) {
@@ -215,24 +289,49 @@ public class MainActivity extends Activity implements
 
 
         ArrayList<CommentItemModel> commentItemList = new ArrayList<CommentItemModel>();
-        for (int j = 0; j < 19; j++) {
-            CommentItemModel commentItem = new CommentItemModel();
-            commentItem.setCommentUsername("comment User" + j);
-            commentItem.setCommentLength("" + j);
-            commentItemList.add(commentItem);
-        }
+        CommentItemModel noneCommentItem1 = new CommentItemModel();
+        noneCommentItem1.setMsgKey("-1");
+        commentItemList.add(noneCommentItem1);
+
         childCommentList.add(commentItemList);
 
         ArrayList<CommentItemModel> commentItemList2 = new ArrayList<CommentItemModel>();
-        for (int j = 0; j < 15; j++) {
-            CommentItemModel commentItem2 = new CommentItemModel();
-            commentItem2.setCommentUsername("comment User" + j);
-            commentItem2.setCommentLength("" + j);
-            commentItemList2.add(commentItem2);
-        }
+        CommentItemModel noneCommentItem2 = new CommentItemModel();
+        noneCommentItem2.setMsgKey("-1");
+        commentItemList2.add(noneCommentItem2);
+
         childCommentList.add(commentItemList2);
 
+    }
 
+    private boolean createConversation(long groupId) {
+        mConversation = Conversation.createGroupConversation(groupId);
+        GroupInfo groupInfo = (GroupInfo) mConversation.getTargetInfo();
+        List<UserInfo> userInfos = groupInfo.getGroupMembers();
+        for (UserInfo userInfo : userInfos) {
+            Log.i("test", "群成员" + userInfo.getNickname());
+            if (userInfo.getUserName().equals(JMessageClient.getMyInfo().getUserName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void sendToGroup(ShowItemModel showItem) {
+        //发送的消息体设置
+        ShowItemModel showItemForSend = new ShowItemModel();
+        showItemForSend.setShowText(showItem.getShowText());
+        showItemForSend.setMsgKey(showItem.getMsgKey());
+        showItemForSend.setGroupBelongToList(showItem.getGroupBelongToList());
+
+        //有图片
+        if (showItem.getShowImagesList() != null) {
+            showItemForSend.setShowImagesList(showItem.getShowImagesList());
+            //发送带图片的消息
+            sendImageMsg(showItemForSend);
+        } else {//发送文字信息
+            sendTextMsg(showItemForSend);
+        }
     }
 
     /***
@@ -318,7 +417,7 @@ public class MainActivity extends Activity implements
                             @Override
                             public void onItemClick(View view, int position) {
                                 PhotoPreview.builder()
-                                        .setPhotos(showItem.getShowImagesList())
+                                        .setPhotos(((ShowItemModel) getGroup(groupPosition)).getShowImagesList())
                                         .setCurrentItem(position)
                                         .setShowDeleteButton(false)
                                         .start(MainActivity.this);
@@ -334,19 +433,15 @@ public class MainActivity extends Activity implements
                         }
                     }
                 });
-            }else{
+            } else {
                 showHolder.showImageRv.setAdapter(null);
             }
 
-            /*if (isExpanded)// ture is Expanded or false is not isExpanded
-                showHolder.expandedIv.setImageResource(R.drawable.expanded);
-            else
-                showHolder.expandedIv.setImageResource(R.drawable.collapse);*/
             return convertView;
         }
 
         @Override
-        public View getChildView(int groupPosition, final int childPosition,
+        public View getChildView(final int groupPosition, final int childPosition,
                                  boolean isLastChild, View convertView, ViewGroup parent) {
             CommentHolder commentHolder = null;
             if (convertView == null) {
@@ -354,21 +449,56 @@ public class MainActivity extends Activity implements
                 convertView = inflater.inflate(R.layout.comment_item, null);
                 commentHolder.commentUsernameTv = (TextView) convertView.findViewById(R.id.comment_username_tv);
                 commentHolder.playVoiceCommentBtn = (Button) convertView.findViewById(R.id.play_comment_audio_btn);
-                commentHolder.sendVoiceCommentBtn = (Button) convertView.findViewById(R.id.send_comment_audio_btn);
+                commentHolder.sendVoiceCommentBtn = (RecordButton) convertView.findViewById(R.id.send_comment_audio_btn);
                 convertView.setTag(commentHolder);
             } else {
                 commentHolder = (CommentHolder) convertView.getTag();
             }
 
-            if (isLastChild) {
+
+            final CommentItemModel commentItem = (CommentItemModel) getChild(groupPosition, childPosition);
+            if (commentItem.getMsgKey().equals("-1")) {
+                commentHolder.commentUsernameTv.setVisibility(View.GONE);
+                commentHolder.playVoiceCommentBtn.setVisibility(View.GONE);
                 commentHolder.sendVoiceCommentBtn.setVisibility(View.VISIBLE);
+                commentHolder.sendVoiceCommentBtn.setOnFinishedRecordListener(new RecordButton.OnFinishedRecordListener() {
+                    @Override
+                    public void onFinishedRecord(String audioPath, long intervalTime) {
+                        CommentItemModel commentItemForSend = new CommentItemModel();
+                        commentItemForSend.setMsgKey(((ShowItemModel) getGroup(groupPosition)).getMsgKey());
+                        commentItemForSend.setCommentUsername(JMessageClient.getMyInfo().getNickname());
+                        commentItemForSend.setCommentVoice(audioPath);
+                        Log.i("test", "audioPath：" + audioPath);
+                        commentItemForSend.setCommentLength((int) (intervalTime / 1000));
+                        commentItemForSend.setCommKey(UUIDKeyUtil.getUUIDKey());
+
+                        childCommentList.get(groupPosition).add(getChildrenCount(groupPosition) - 1, commentItemForSend);
+                        adapter.notifyDataSetChanged();
+
+                        List<Long> groupBelongtoList = ((ShowItemModel) getGroup(groupPosition)).getGroupBelongToList();
+                        if (groupBelongtoList != null) {
+                            Log.i("test", "要发送的群id不为空");
+                            for (long groupId : groupBelongtoList) {
+                                Log.i("test", "要发送的群id：" + groupId);
+                                if (createConversation(groupId)) {
+                                    sendVoice(commentItemForSend);
+                                } else {
+                                    Log.i("test", "不属于那个群");
+                                }
+                            }
+                        }
+
+
+                    }
+                });
             } else {
+                commentHolder.commentUsernameTv.setVisibility(View.VISIBLE);
+                commentHolder.playVoiceCommentBtn.setVisibility(View.VISIBLE);
                 commentHolder.sendVoiceCommentBtn.setVisibility(View.GONE);
+                commentHolder.commentUsernameTv.setText(commentItem.getCommentUsername());
+                commentHolder.playVoiceCommentBtn.setText("" + commentItem.getCommentLength());
             }
 
-            CommentItemModel commentItem = (CommentItemModel) getChild(groupPosition, childPosition);
-            commentHolder.commentUsernameTv.setText(commentItem.getCommentUsername());
-            commentHolder.playVoiceCommentBtn.setText(commentItem.getCommentLength());
             return convertView;
         }
 
@@ -409,7 +539,7 @@ public class MainActivity extends Activity implements
 
         TextView commentUsernameTv;
         Button playVoiceCommentBtn;
-        Button sendVoiceCommentBtn;
+        RecordButton sendVoiceCommentBtn;
 
     }
 
@@ -446,32 +576,26 @@ public class MainActivity extends Activity implements
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_SEND_MSG_ITEM && resultCode == ShowMsgEditActivity.RESULT_SEND_MSG_ITEM) {
             ShowItemModel showItem = (ShowItemModel) data.getSerializableExtra("showItem");
-            showItem.setShowUsername(JMessageClient.getMyInfo().getUserName());
+            List<Long> groupBelongtoList = showItem.getGroupBelongToList();
 
+            for (int i = 0; i < groupBelongtoList.size(); i++) {
+                Log.i("test", "要发送的群id：" + groupBelongtoList.get(i));
+                createConversation(groupBelongtoList.get(i));
+                sendToGroup(showItem);
+            }
+
+            showItem.setShowUsername(JMessageClient.getMyInfo().getNickname());
             showList.add(0, showItem);
 
-
-
-            //test
-            CommentItemModel commentItem = new CommentItemModel();
-            commentItem.setCommentUsername("aaa");
-            commentItem.setCommentLength("30");
-            CommentItemModel commentItem2 = new CommentItemModel();
-            commentItem2.setCommentUsername("bbb");
-            commentItem2.setCommentLength("12");
-            ArrayList<CommentItemModel> commentItems = new ArrayList<CommentItemModel>();
-            commentItems.add(commentItem);
-            commentItems.add(0, commentItem2);
-            childCommentList.add(0, commentItems);
+            ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+            CommentItemModel noneComment = new CommentItemModel();
+            noneComment.setMsgKey("-1");
+            commentItemModels.add(noneComment);
+            childCommentList.add(0, commentItemModels);
 
             adapter.notifyDataSetChanged();
             Log.i("test", "show内容" + showItem.getShowText());
 
-
-
-            //发送消息
-            sendCustomMsg(showItem);
-            //sendTextMsg(showItem.getShowText());
         }
     }
 
@@ -488,61 +612,58 @@ public class MainActivity extends Activity implements
     }
 
     public void onEventMainThread(MessageEvent event) {
-        Message msg = event.getMessage();
 
+        Message msg = event.getMessage();
         switch (msg.getContentType()) {
             case text:
                 //处理文字消息
-                Log.i("test", "收到文本消息");
-                TextContent textContent = (TextContent) msg.getContent();
-                Log.i("test", "收到文本消息" + textContent.getText());
-
-                UserInfo tUserInfo = msg.getFromUser();
-                ShowItemModel textShowItem = new ShowItemModel();
-                textShowItem.setShowUsername(tUserInfo.getUserName());
-                textShowItem.setShowText(textContent.getText());
-                showList.add(0, textShowItem);
-                adapter.notifyDataSetChanged();
+                RecieveTextTask recieveTextTask = new RecieveTextTask();
+                recieveTextTask.execute(msg);
                 break;
-            case custom:
-                //处理自定义消息
-                Log.i("test", "收到自定义消息");
-                CustomContent customContent = (CustomContent) msg.getContent();
-                Map customMsgMap = customContent.getAllStringValues();
-                UserInfo cUserInfo = msg.getFromUser();
-                ShowItemModel customShowItem = new ShowItemModel();
-                customShowItem.setShowUsername(cUserInfo.getUserName());
-                customShowItem.setShowText((String) customMsgMap.get("showText"));
-                Log.i("test", "收到自定义消息" + cUserInfo.getUserName() + customMsgMap.get("showText"));
-                showList.add(0, customShowItem);
+        }
 
-                //test
-                CommentItemModel commentItem = new CommentItemModel();
-                commentItem.setCommentUsername("aaa");
-                commentItem.setCommentLength("30");
-                CommentItemModel commentItem2 = new CommentItemModel();
-                commentItem2.setCommentUsername("bbb");
-                commentItem2.setCommentLength("12");
-                ArrayList<CommentItemModel> commentItems = new ArrayList<CommentItemModel>();
-                commentItems.add(commentItem);
-                commentItems.add(0, commentItem2);
-                childCommentList.add(0, commentItems);
 
-                adapter.notifyDataSetChanged();
-            case eventNotification:
-                //处理事件提醒消息
-                EventNotificationContent eventNotificationContent = (EventNotificationContent) msg.getContent();
-                switch (eventNotificationContent.getEventNotificationType()) {
-                    case group_member_added:
-                        //群成员加群事件
-                        break;
-                    case group_member_removed:
-                        //群成员被踢事件
-                        break;
-                    case group_member_exit:
-                        //群成员退群事件
-                        break;
-                }
+    }
+
+    public void onEvent(MessageEvent event) {
+        Message msg = event.getMessage();
+
+        switch (msg.getContentType()) {
+            case voice:
+                //处理语音消息
+                new RecieveVoiceTask().execute(msg);
+
+                break;
+            case image:
+                //处理图片消息
+
+                RecieveImageTask recieveImageTask = new RecieveImageTask();
+                recieveImageTask.execute(msg);
+
+                break;
+        }
+    }
+
+    public void onEvent(ContactNotifyEvent event) {
+        String reason = event.getReason();
+        String fromUsername = event.getFromUsername();
+        String appkey = event.getfromUserAppKey();
+
+        switch (event.getType()) {
+            case invite_received://收到好友邀请
+                showMessage.showNewFriend(MainActivity.this, fromUsername + "请求添加您为好友", "点击查看详细信息");
+//                saveRequest(fromUsername, reason);
+                break;
+            case invite_accepted://对方接收了你的好友邀请
+                //...
+                break;
+            case invite_declined://对方拒绝了你的好友邀请
+                //...
+                break;
+            case contact_deleted://对方将你从好友中删除
+                //...
+                break;
+            default:
                 break;
         }
     }
@@ -573,4 +694,233 @@ public class MainActivity extends Activity implements
         System.out.println("事件发生的原因 : " + reason);
     }
 
+
+    private long exitTime = 0;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            if ((System.currentTimeMillis() - exitTime) > 2000) {
+                Toast.makeText(getApplicationContext(), "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                exitTime = System.currentTimeMillis();
+            } else {
+                finish();
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    class RecieveTextTask extends AsyncTask<Message, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Message... params) {
+            Message msg = params[0];
+            TextContent textContent = (TextContent) msg.getContent();
+            Log.i("test", "收到文本消息" + textContent.getText() + "  showKey " + textContent.getStringExtra("showKey"));
+            //跳过群重复消息
+            String tShowKey = textContent.getStringExtra("showKey");
+            if (tShowKey.equals(checkShowKey)) {
+                Log.i("test", "同一个文本消息，跳过");
+                return false;
+            }
+            checkShowKey = tShowKey;
+
+            UserInfo tUserInfo = msg.getFromUser();
+            ShowItemModel textShowItem = new ShowItemModel();
+            textShowItem.setShowUsername(tUserInfo.getNickname());
+            textShowItem.setShowText(textContent.getText());
+            textShowItem.setMsgKey(tShowKey);
+            String[] groupIds = textContent.getStringExtra("groupBelongTo").split(",");
+            List<Long> groupIdBelongTo = new ArrayList<Long>();
+            for (int i = 0; i < groupIds.length; i++) {
+                groupIdBelongTo.add(Long.parseLong(groupIds[i]));
+                Log.i("test", "解析出群:" + groupIds[i]);
+            }
+            textShowItem.setGroupBelongToList(groupIdBelongTo);
+            showList.add(0, textShowItem);
+
+            ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+            CommentItemModel noneComment = new CommentItemModel();
+            noneComment.setMsgKey("-1");
+            commentItemModels.add(noneComment);
+            childCommentList.add(0, commentItemModels);
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if (aBoolean) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    class RecieveImageTask extends AsyncTask<Message, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Message... params) {
+            Message msg = params[0];
+            Log.i("test", "收到图片消息");
+            ImageContent imageContent = (ImageContent) msg.getContent();
+            UserInfo iUserInfo = msg.getFromUser();
+            Map iMsgMap = imageContent.getStringExtras();
+
+            //如果收到的图片key和上一次的一样说明是一个showItem
+            if (CheckRecievedShowItem.getMsgKey() != null) {
+                if ((iMsgMap.get("showKey")).equals(CheckRecievedShowItem.getMsgKey())) {
+                    Log.i("test", "收到多图片消息之一");
+                    if (!imageContent.getStringExtra("recieveFlag").equals(imgRecieveFlag)) {
+                        Log.i("test", "跳过多余群图片之一");
+                        return false;
+                    }
+                    if (iMsgMap.containsKey("showText")) {
+                        CheckRecievedShowItem.setShowText((String) iMsgMap.get("showText"));
+                    }
+                    ArrayList<String> imgPaths = CheckRecievedShowItem.getShowImagesList();
+                    if (imgPaths.contains(imageContent.getLocalThumbnailPath())) {
+                        Log.i("test", "跳过重复图片消息");
+                        return false;
+                    }
+                    imgPaths.add(imageContent.getLocalThumbnailPath());
+
+                    Log.i("test", "图片path:" + imageContent.getLocalThumbnailPath());
+
+                    if (imageContent.getNumberExtra("imageNum").equals(imageContent.getNumberExtra("imageCount"))) {
+
+                        Log.i("test", "多图片添加到ListView");
+
+                        String[] iGroupIds = ((String) iMsgMap.get("groupBelongTo")).split(",");
+                        Log.i("test", "解析出群");
+                        List<Long> iGroupIdBelongTo = new ArrayList<Long>();
+                        for (int i = 0; i < iGroupIds.length; i++) {
+                            iGroupIdBelongTo.add(Long.parseLong(iGroupIds[i]));
+                            Log.i("test", "解析出群:" + iGroupIds[i]);
+                        }
+                        CheckRecievedShowItem.setGroupBelongToList(iGroupIdBelongTo);
+
+                        showList.add(0, CheckRecievedShowItem);
+
+
+                        ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+                        CommentItemModel noneComment = new CommentItemModel();
+                        noneComment.setMsgKey("-1");
+                        commentItemModels.add(noneComment);
+                        childCommentList.add(0, commentItemModels);
+
+                    }
+
+                    return true;
+                }
+            }
+
+            Log.i("test", "收到新图片消息");
+            imgRecieveFlag = imageContent.getStringExtra("recieveFlag");
+            CheckRecievedShowItem = new ShowItemModel();
+            CheckRecievedShowItem.setMsgKey((String) iMsgMap.get("showKey"));
+            CheckRecievedShowItem.setShowUsername(iUserInfo.getNickname());
+            CheckRecievedShowItem.setShowText("");
+            if (iMsgMap.containsKey("showText")) {
+                CheckRecievedShowItem.setShowText((String) iMsgMap.get("showText"));
+            }
+            ArrayList<String> newImagepaths = new ArrayList<String>();
+            newImagepaths.add(imageContent.getLocalThumbnailPath());
+            CheckRecievedShowItem.setShowImagesList(newImagepaths);
+            Log.i("test", "图片path:" + imageContent.getLocalThumbnailPath());
+
+            if (imageContent.getNumberExtra("imageNum").equals(imageContent.getNumberExtra("imageCount"))) {
+
+                Log.i("test", "新图片添加到ListView 只有一张图片");
+
+                String[] iGroupIds = ((String) iMsgMap.get("groupBelongTo")).split(",");
+                Log.i("test", "解析出群");
+                List<Long> iGroupIdBelongTo = new ArrayList<Long>();
+                for (int i = 0; i < iGroupIds.length; i++) {
+                    iGroupIdBelongTo.add(Long.parseLong(iGroupIds[i]));
+                    Log.i("test", "解析出群:" + iGroupIds[i]);
+                }
+                CheckRecievedShowItem.setGroupBelongToList(iGroupIdBelongTo);
+
+                showList.add(0, CheckRecievedShowItem);
+
+                ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+                CommentItemModel noneComment = new CommentItemModel();
+                noneComment.setMsgKey("-1");
+                commentItemModels.add(noneComment);
+                childCommentList.add(0, commentItemModels);
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if (aBoolean) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
+    class RecieveVoiceTask extends AsyncTask<Message, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Message... params) {
+            Message msg = params[0];
+            Log.i("test", "收到语音消息");
+            VoiceContent voiceContent = (VoiceContent) msg.getContent();
+            UserInfo vUserInfo = msg.getFromUser();
+            Map vMsgMap = voiceContent.getStringExtras();
+
+            //跳过群重复消息
+            String vCommKey = (String) vMsgMap.get("commKey");
+            if (vCommKey.equals(checkCommKey)) {
+                Log.i("test", "同一个语音消息，跳过");
+                return false;
+            }
+            checkCommKey = vCommKey;
+
+            CommentItemModel commentItem = new CommentItemModel();
+            commentItem.setMsgKey((String) vMsgMap.get("showKey"));
+            commentItem.setCommentUsername(vUserInfo.getNickname());
+            commentItem.setCommentLength(Integer.parseInt((String) vMsgMap.get("voiceLength")));
+
+            Log.i("test", "voiceContent.getLocalPath" + voiceContent.getLocalPath());
+            commentItem.setCommentVoice(voiceContent.getLocalPath());
+
+            for (int j = 0; j < showList.size(); j++) {
+                if (showList.get(j).getMsgKey().equals(commentItem.getMsgKey())) {
+                    List<CommentItemModel> commentItemModels = childCommentList.get(j);
+                    //防止重复消息
+                    boolean flag = true;
+                    for (CommentItemModel commentTemp : commentItemModels) {
+                        if (commentItem.getCommentVoice().equals(commentTemp.getCommentVoice())) {
+                            flag = false;
+                        }
+                    }
+                    if (flag) {
+                        commentItemModels.add(commentItemModels.size() - 1, commentItem);
+                        childCommentList.remove(j);
+                        childCommentList.add(j, commentItemModels);
+                        Log.i("test", "添加一条语音消息");
+                        return true;
+
+                    }
+
+                }
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if (aBoolean){
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
 }

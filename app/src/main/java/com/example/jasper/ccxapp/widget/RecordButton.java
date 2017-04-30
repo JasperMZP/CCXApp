@@ -1,4 +1,4 @@
-package com.example.jasper.ccxapp.view;
+package com.example.jasper.ccxapp.widget;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,8 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
-import com.example.jasper.ccxapp.interfaces.FileType;
 import com.example.jasper.ccxapp.interfaces.ShowType;
+import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,7 @@ import java.io.IOException;
 /**
  * Created by xuan on 2016/6/8.
  */
-public class RecordButton extends android.support.v7.widget.AppCompatButton implements FileType,ShowType{
+public class RecordButton extends android.support.v7.widget.AppCompatButton implements ShowType{
     private final int Volume_What_100 = 100;
     private final int Time_What_101 = 101;
     private final int CancelRecordWhat_102 = 102;
@@ -94,7 +95,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatButton impl
     }
 
     private void setDefaultFilePath() {
-        File file = new File("/storage/sdcard/ccxfile/voicefile" + File.separator + COMMENT + "_" + VOICE + "_" +"TEMP"+ ".mp3");
+        File file = new File(Environment.getExternalStorageDirectory()+File.separator+"ccxfile/voicefile" + File.separator + COMMENT +"_"+ UUIDKeyUtil.getUUIDKey()+ ".mp3");
         if (!file.exists()) try {
             file.createNewFile();
         } catch (IOException e) {
@@ -201,11 +202,13 @@ public class RecordButton extends android.support.v7.widget.AppCompatButton impl
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         mRecorder.setOutputFile(mFilePath);
+
         try {
             mRecorder.prepare();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Log.i("test","mRecorder.prepare");
         mRecorder.start();
         mthread = new ObtainDecibelThread();
         mthread.start();

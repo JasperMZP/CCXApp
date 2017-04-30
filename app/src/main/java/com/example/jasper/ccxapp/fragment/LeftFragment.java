@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
+import com.example.jasper.ccxapp.ui.FriendActivity;
 
 
 public class LeftFragment extends Fragment{
@@ -63,7 +64,7 @@ public class LeftFragment extends Fragment{
 			@Override
 			public void onClick(View v) {
 				Log.d("aaaaa", "aaaa");
-				//startActivity(new Intent(getActivity(), FriendActivity.class));
+				startActivity(new Intent(getActivity(), FriendActivity.class));
 			}
 		});
 //		ringView.setOnClickListener(this);

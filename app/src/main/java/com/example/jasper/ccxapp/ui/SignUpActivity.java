@@ -1,12 +1,10 @@
 package com.example.jasper.ccxapp.ui;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -14,10 +12,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
+import com.example.jasper.ccxapp.db.userDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
-import cn.jpush.im.android.api.JMessageClient;
-import cn.jpush.im.api.BasicCallback;
+import java.util.regex.Pattern;
 
 /**
  * Created by Jasper on 2017/4/7.
@@ -78,23 +76,26 @@ public class SignUpActivity extends AppCompatActivity {
             showDialog("请输入相同的密码");
             return;
         }
-
-        JMessageClient.register(username, pwd, new BasicCallback() {
-            @Override
-            public void gotResult(int i, String s) {
-                Log.i("test",i+" "+s);
-                if (0==i){
-                    showDialog2("注册新用户成功！");
-                }else{
-                    showDialog("用户名已存在!");
-                }
-            }
-        });
+        userDB.addNewUser(username, pwd, new userBackListener(){
+                    @Override
+                    public void showResult(boolean result, String message) {
+                        if(result){
+                            Intent myIntent = new Intent(SignUpActivity.this,AddUserMessageActivity.class);
+                            myIntent.putExtra("userName", userName.getText().toString().trim());
+                            myIntent.putExtra("password", password1.getText().toString().trim());
+                            startActivity(myIntent);
+                            finish();
+                        }else{
+                            showDialog("用户名已存在!");
+                        }
+                    }
+                });
     }
 
     private boolean checkUserName(String userName){
-        if(userName.length() < 5){
-            showDialog("用户名不应少于5位字符");
+        boolean isPhone = Pattern.compile("^1\\d{10}$").matcher(userName).matches();
+        if(!isPhone){
+            showDialog("请输入手机号码");
             return false;
         }
         return true;
@@ -113,16 +114,16 @@ public class SignUpActivity extends AppCompatActivity {
                 .setPositiveButton("确定", null).show();
     }
 
-    private void showDialog2(String message) {
-        new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(SignUpActivity.this,LoginActivity.class));
-                        finish();
-                    }
-                }).show();
-    }
+//    private void showDialog2(String message) {
+//        new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
+//                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        startActivity(new Intent(SignUpActivity.this,LoginActivity.class));
+//                        finish();
+//                    }
+//                }).show();
+//    }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 

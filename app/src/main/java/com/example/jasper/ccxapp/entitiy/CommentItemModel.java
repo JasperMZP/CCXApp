@@ -6,15 +6,24 @@ package com.example.jasper.ccxapp.entitiy;
 
 public class CommentItemModel {
     private String msgKey;
+    private String commKey;
     private String commentUsername;
     private String commentVoice;
-    private String commentLength;
+    private int commentLength;
 
-    public String getCommentLength() {
+    public String getCommKey() {
+        return commKey;
+    }
+
+    public void setCommKey(String commKey) {
+        this.commKey = commKey;
+    }
+
+    public int getCommentLength() {
         return commentLength;
     }
 
-    public void setCommentLength(String commentLength) {
+    public void setCommentLength(int commentLength) {
         this.commentLength = commentLength;
     }
 

@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+    android:background="@drawable/appback2"
+    android:id="@+id/drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.MainActivity" >
 
     <!--
      android:groupIndicator="@null" 取消默认图片
@@ -11,7 +16,7 @@
      android:childDivider="@drawable/child_bg" 这个直接引color,或者图片会导致整个孩子背景都为这个颜色
     -->
 
-    <com.example.jasper.ccxapp.view.StickyLayout
+    <com.example.jasper.ccxapp.widget.StickyLayout
         android:id="@+id/sticky_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -71,7 +76,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.example.jasper.ccxapp.view.PinnedHeaderExpandableListView
+            <com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView
                 android:id="@+id/expandablelist"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -81,8 +86,18 @@
                 android:divider="@color/Grey"
                 android:dividerHeight="1dp"
                 android:groupIndicator="@null"
-                android:scrollbarAlwaysDrawHorizontalTrack="false"></com.example.jasper.ccxapp.view.PinnedHeaderExpandableListView>
+                android:scrollbarAlwaysDrawHorizontalTrack="false"></com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView>
         </LinearLayout>
-    </com.example.jasper.ccxapp.view.StickyLayout>
+    </com.example.jasper.ccxapp.widget.StickyLayout>
 
-</RelativeLayout>
+    <include
+        layout="@layout/activity_main_left"
+        android:id="@+id/left_drawer"
+        android:layout_width="240dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:gravity="center_horizontal" >
+
+    </include>
+
+</android.support.v4.widget.DrawerLayout>

@@ -59,24 +59,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.MainActivity3" />
-        <activity android:name=".ui.MainActivity2" />
-        <activity android:name=".ui.MainActivity" />
+        <activity android:name=".ui.MainActivity" ></activity>
         <activity android:name=".ui.ShowMsgEditActivity" />
-        <activity
-            android:name=".ui.SignUpActivity"
-            android:label="注册"
-            android:theme="@style/AppTheme1" />
-        <activity
-            android:name=".ui.FriendActivity"
-            android:label="我的好友"
-            android:theme="@style/AppTheme1" />
         <activity android:name=".ui.FriendRequestActivity" />
         <activity android:name=".ui.SendRequestActivity" />
-        <activity
-            android:name=".ui.MakeChatroomActivity"
-            android:label="创建群聊"
-            android:theme="@style/AppTheme1" />
+        <activity android:name=".ui.MakeChatroomActivity"/>
         <activity
             android:name=".ui.NewFriendActivity"
             android:label="好友申请"
@@ -84,6 +71,14 @@
         <activity
             android:name=".ui.SearchNewActivity"
             android:label="搜索好友"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".ui.FriendActivity"
+            android:label="我的好友"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".ui.SignUpActivity"
+            android:label="注册"
             android:theme="@style/AppTheme1" />
 
         <!--图片选择组件-->

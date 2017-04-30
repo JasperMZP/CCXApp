@@ -1,6 +1,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Search, should appear as action button -->
-
+    <item android:id="@+id/action_add"
+        android:title="添加信息"
+         />
+    <item android:id="@+id/action_send"
+        android:title="发送界面"
+        />
 
 </menu>

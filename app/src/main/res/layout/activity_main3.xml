@@ -102,7 +102,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <com.example.jasper.ccxapp.view.RecordButton
+        <com.example.jasper.ccxapp.widget.RecordButton
             android:id="@+id/send_voice_btn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
