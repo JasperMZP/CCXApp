@@ -4,10 +4,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.media.MediaRecorder;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -93,7 +95,7 @@ public class RecordButton extends android.support.v7.widget.AppCompatButton impl
     }
 
     private void setDefaultFilePath() {
-        File file = new File("/storage/sdcard/ccxfile/voicefile" + File.separator + COMMENT +"_"+ UUIDKeyUtil.getUUIDKey()+ ".mp3");
+        File file = new File(Environment.getExternalStorageDirectory()+File.separator+"ccxfile/voicefile" + File.separator + COMMENT +"_"+ UUIDKeyUtil.getUUIDKey()+ ".mp3");
         if (!file.exists()) try {
             file.createNewFile();
         } catch (IOException e) {
@@ -200,11 +202,13 @@ public class RecordButton extends android.support.v7.widget.AppCompatButton impl
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
         mRecorder.setOutputFile(mFilePath);
+
         try {
             mRecorder.prepare();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        Log.i("test","mRecorder.prepare");
         mRecorder.start();
         mthread = new ObtainDecibelThread();
         mthread.start();

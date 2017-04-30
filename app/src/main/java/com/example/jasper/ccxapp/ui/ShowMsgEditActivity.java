@@ -8,10 +8,13 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.PhotoAdapter;
@@ -20,9 +23,19 @@ import com.example.jasper.ccxapp.interfaces.ShowType;
 import com.example.jasper.ccxapp.interfaces.SourceFolder;
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
+import com.zhy.view.flowlayout.FlowLayout;
+import com.zhy.view.flowlayout.TagAdapter;
+import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
+import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.GetGroupIDListCallback;
+import cn.jpush.im.android.api.callback.GetGroupInfoCallback;
+import cn.jpush.im.android.api.model.GroupInfo;
 import me.iwf.photopicker.PhotoPicker;
 import me.iwf.photopicker.PhotoPreview;
 
@@ -45,6 +58,11 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
     private PhotoAdapter photoAdapter;
     private ArrayList<String> selectedPhotos = new ArrayList<>();
 
+    private TagFlowLayout mFlowLayout;
+    private List<GroupInfo> groupInfoList = new ArrayList<GroupInfo>();
+    private List<String> groupTag = new ArrayList<String>();
+    private List<Long> selectedGroupId = new ArrayList<Long>();
+    private TagAdapter<String> mAdapter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,6 +71,74 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
 
         initView();
 
+        getAllGroupList();
+
+        selectPhotoAndPreview();
+
+
+    }
+
+
+    private void initView() {
+        textEditEt = (EditText) findViewById(R.id.text_edit_et);
+        msgSendBtn = (Button) findViewById(R.id.msg_send_btn);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mFlowLayout = (TagFlowLayout) findViewById(R.id.id_flowlayout);
+    }
+
+    private void getAllGroupList() {
+        final LayoutInflater mInflater = LayoutInflater.from(ShowMsgEditActivity.this);
+
+        mAdapter = new TagAdapter<String>(groupTag) {
+            @Override
+            public View getView(FlowLayout parent, int position, String s) {
+                TextView tv = (TextView) mInflater.inflate(R.layout.tv,
+                        mFlowLayout, false);
+                tv.setText(s);
+                return tv;
+            }
+        };
+        mFlowLayout.setAdapter(mAdapter);
+
+        JMessageClient.getGroupIDList(new GetGroupIDListCallback() {
+            @Override
+            public void gotResult(int i, String s, List<Long> list) {
+                if (i == 0) {
+                    if (!list.isEmpty()) {
+                        Log.i("test", "有群");
+                        for (long groupId : list) {
+                            JMessageClient.getGroupInfo(groupId, new GetGroupInfoCallback() {
+                                @Override
+                                public void gotResult(int i, String s, GroupInfo groupInfo) {
+                                    if (i == 0) {
+                                        groupInfoList.add(groupInfo);
+                                        groupTag.add(groupInfo.getGroupName());
+                                        mAdapter.notifyDataChanged();
+                                        Log.i("test", "获取群" + i + s + groupInfo.getGroupName());
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+                }
+            }
+        });
+
+        mFlowLayout.setOnSelectListener(new TagFlowLayout.OnSelectListener() {
+
+            @Override
+            public void onSelected(Set<Integer> selectPosSet) {
+                Toast.makeText(ShowMsgEditActivity.this, "选择群：" + selectPosSet.toString(), Toast.LENGTH_SHORT).show();
+                selectedGroupId.clear();
+                for (int pos : selectPosSet) {
+                    selectedGroupId.add(groupInfoList.get(pos).getGroupID());
+                }
+            }
+        });
+    }
+
+    private void selectPhotoAndPreview() {
         photoAdapter = new PhotoAdapter(this, selectedPhotos);
 
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL));
@@ -86,27 +172,23 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
                 }));
     }
 
-
-    private void initView() {
-        textEditEt = (EditText) findViewById(R.id.text_edit_et);
-        msgSendBtn = (Button) findViewById(R.id.msg_send_btn);
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-    }
-
     private void BackShowMsgItemToSend() {
-        showItem = new ShowItemModel();
-        showItem.setMsgKey(UUIDKeyUtil.getUUIDKey());
-        showItem.setShowText(textEditEt.getText().toString().trim());
-        if (photosPath != null) {//有图片
+        if (selectedGroupId != null && selectedGroupId.size() > 0) {
+            showItem = new ShowItemModel();
+            showItem.setGroupBelongToList(selectedGroupId);
+            showItem.setMsgKey(UUIDKeyUtil.getUUIDKey());
+            showItem.setShowText(textEditEt.getText().toString().trim());
+            if (photosPath != null) {//有图片
                 showItem.setShowImagesList(photosPath);
-        }
-        Intent intent = new Intent();
-        intent.putExtra("showItem", showItem);
-        setResult(RESULT_SEND_MSG_ITEM, intent);
+            }
+            Intent intent = new Intent();
+            intent.putExtra("showItem", showItem);
+            setResult(RESULT_SEND_MSG_ITEM, intent);
 
-        selectedPhotos=null;
-        showItem=null;
-        photosPath=null;
+        }
+        selectedPhotos = null;
+        showItem = null;
+        photosPath = null;
         finish();
     }
 

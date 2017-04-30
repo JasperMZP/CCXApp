@@ -8,20 +8,20 @@ import java.util.List;
  * Created by Jasper on 2017/4/19.
  */
 
-public class ShowItemModel implements Serializable{
+public class ShowItemModel implements Serializable {
+    private List<Long> groupBelongToList;
     private String msgKey;
     private String showUsername;
     private String showText;
     private ArrayList<String> showImagesList;
-    private ArrayList<String> showOriginImagesList;
     private String showVideo;
 
-    public ArrayList<String> getShowOriginImagesList() {
-        return showOriginImagesList;
+    public List<Long> getGroupBelongToList() {
+        return groupBelongToList;
     }
 
-    public void setShowOriginImagesList(ArrayList<String> showOriginImagesList) {
-        this.showOriginImagesList = showOriginImagesList;
+    public void setGroupBelongToList(List<Long> groupBelongToList) {
+        this.groupBelongToList = groupBelongToList;
     }
 
     public ArrayList<String> getShowImagesList() {
