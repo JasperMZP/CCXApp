@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,14 +27,12 @@ import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetGroupIDListCallback;
 import cn.jpush.im.android.api.callback.GetGroupInfoCallback;
-import cn.jpush.im.android.api.content.EventNotificationContent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
@@ -97,7 +94,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         mAdapter = new TagAdapter<String>(groupTag) {
             @Override
             public View getView(FlowLayout parent, int position, String s) {
-                TextView tv = (TextView) mInflater.inflate(R.layout.tv,
+                TextView tv = (TextView) mInflater.inflate(R.layout.show_groups_tag_tv,
                         mFlowLayout, false);
                 tv.setText(s);
                 return tv;
