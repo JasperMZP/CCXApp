@@ -466,7 +466,7 @@ public class MainActivity extends Activity implements
                     public void onFinishedRecord(String audioPath, long intervalTime) {
                         CommentItemModel commentItemForSend = new CommentItemModel();
                         commentItemForSend.setMsgKey(((ShowItemModel) getGroup(groupPosition)).getMsgKey());
-                        commentItemForSend.setCommentUsername(JMessageClient.getMyInfo().getUserName());
+                        commentItemForSend.setCommentUsername(JMessageClient.getMyInfo().getNickname());
                         commentItemForSend.setCommentVoice(audioPath);
                         Log.i("test", "audioPath：" + audioPath);
                         commentItemForSend.setCommentLength((int) (intervalTime / 1000));
@@ -584,7 +584,7 @@ public class MainActivity extends Activity implements
                 sendToGroup(showItem);
             }
 
-            showItem.setShowUsername(JMessageClient.getMyInfo().getUserName());
+            showItem.setShowUsername(JMessageClient.getMyInfo().getNickname());
             showList.add(0, showItem);
 
             ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
@@ -619,21 +619,6 @@ public class MainActivity extends Activity implements
                 //处理文字消息
                 RecieveTextTask recieveTextTask = new RecieveTextTask();
                 recieveTextTask.execute(msg);
-                break;
-            case eventNotification:
-                //处理事件提醒消息
-                EventNotificationContent eventNotificationContent = (EventNotificationContent) msg.getContent();
-                switch (eventNotificationContent.getEventNotificationType()) {
-                    case group_member_added:
-                        //群成员加群事件
-                        break;
-                    case group_member_removed:
-                        //群成员被踢事件
-                        break;
-                    case group_member_exit:
-                        //群成员退群事件
-                        break;
-                }
                 break;
         }
 
@@ -745,7 +730,7 @@ public class MainActivity extends Activity implements
 
             UserInfo tUserInfo = msg.getFromUser();
             ShowItemModel textShowItem = new ShowItemModel();
-            textShowItem.setShowUsername(tUserInfo.getUserName());
+            textShowItem.setShowUsername(tUserInfo.getNickname());
             textShowItem.setShowText(textContent.getText());
             textShowItem.setMsgKey(tShowKey);
             String[] groupIds = textContent.getStringExtra("groupBelongTo").split(",");
@@ -837,7 +822,7 @@ public class MainActivity extends Activity implements
             imgRecieveFlag = imageContent.getStringExtra("recieveFlag");
             CheckRecievedShowItem = new ShowItemModel();
             CheckRecievedShowItem.setMsgKey((String) iMsgMap.get("showKey"));
-            CheckRecievedShowItem.setShowUsername(iUserInfo.getUserName());
+            CheckRecievedShowItem.setShowUsername(iUserInfo.getNickname());
             CheckRecievedShowItem.setShowText("");
             if (iMsgMap.containsKey("showText")) {
                 CheckRecievedShowItem.setShowText((String) iMsgMap.get("showText"));
@@ -900,7 +885,7 @@ public class MainActivity extends Activity implements
 
             CommentItemModel commentItem = new CommentItemModel();
             commentItem.setMsgKey((String) vMsgMap.get("showKey"));
-            commentItem.setCommentUsername(vUserInfo.getUserName());
+            commentItem.setCommentUsername(vUserInfo.getNickname());
             commentItem.setCommentLength(Integer.parseInt((String) vMsgMap.get("voiceLength")));
 
             Log.i("test", "voiceContent.getLocalPath" + voiceContent.getLocalPath());

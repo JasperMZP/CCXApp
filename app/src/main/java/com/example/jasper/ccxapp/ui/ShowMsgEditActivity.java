@@ -35,7 +35,11 @@ import java.util.Set;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetGroupIDListCallback;
 import cn.jpush.im.android.api.callback.GetGroupInfoCallback;
+import cn.jpush.im.android.api.content.EventNotificationContent;
+import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.model.GroupInfo;
+import cn.jpush.im.android.api.model.Message;
+import cn.jpush.im.android.eventbus.EventBus;
 import me.iwf.photopicker.PhotoPicker;
 import me.iwf.photopicker.PhotoPreview;
 
@@ -47,6 +51,8 @@ import me.iwf.photopicker.PhotoPreview;
 public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, SourceFolder {
 
     public static final int RESULT_SEND_MSG_ITEM = 1;
+
+    private MessageEvent messageEvent;
 
     private TextView textEditEt;
     private Button msgSendBtn;
@@ -74,7 +80,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         getAllGroupList();
 
         selectPhotoAndPreview();
-
 
     }
 
@@ -213,6 +218,54 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
                 selectedPhotos.addAll(photosPath);
             }
             photoAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        JMessageClient.registerEventReceiver(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        JMessageClient.unRegisterEventReceiver(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (messageEvent!=null){
+            EventBus.getDefault().post(messageEvent);
+        }
+    }
+
+    public void onEventMainThread(MessageEvent event) {
+
+        Message msg = event.getMessage();
+        switch (msg.getContentType()) {
+            case text:
+                //处理文字消息
+                messageEvent = event;
+                break;
+        }
+
+
+    }
+
+    public void onEvent(MessageEvent event) {
+        Message msg = event.getMessage();
+
+        switch (msg.getContentType()) {
+            case voice:
+                //处理语音消息
+                messageEvent = event;
+                break;
+            case image:
+                //处理图片消息
+                messageEvent = event;
+                break;
         }
     }
 
