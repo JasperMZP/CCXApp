@@ -47,12 +47,28 @@
                 android:layout_height="wrap_content" />
 
 
-            <VideoView
-                android:id="@+id/show_video_vv"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/show_text_content_tv"
-                android:visibility="gone" />
+                android:layout_gravity="center">
+
+                <com.example.jasper.ccxapp.widget.CustomVideoView
+                    android:id="@+id/show_video_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:visibility="gone"/>
+
+                <ImageView
+                    android:id="@+id/show_video_play_video_btn"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_play_action"
+                    android:onClick="onClickShowVideoPlayBtn"
+                    android:visibility="gone" />
+
+            </RelativeLayout>
 
         </LinearLayout>
 

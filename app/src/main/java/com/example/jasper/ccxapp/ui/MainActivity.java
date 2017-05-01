@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -34,6 +36,7 @@ import com.example.jasper.ccxapp.entitiy.ShowItemModel;
 
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 import com.example.jasper.ccxapp.util.showMessage;
+import com.example.jasper.ccxapp.widget.CustomVideoView;
 import com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView;
 import com.example.jasper.ccxapp.widget.RecordButton;
 import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
@@ -41,6 +44,7 @@ import com.example.jasper.ccxapp.widget.StickyLayout;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +52,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
 import cn.jpush.im.android.api.content.EventNotificationContent;
+import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.content.VoiceContent;
@@ -56,6 +62,7 @@ import cn.jpush.im.android.api.event.ContactNotifyEvent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
+import cn.jpush.im.android.api.exceptions.JMFileSizeExceedException;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
@@ -67,6 +74,7 @@ public class MainActivity extends Activity implements
         ExpandableListView.OnChildClickListener,
         ExpandableListView.OnGroupClickListener,
         PinnedHeaderExpandableListView.OnHeaderUpdateListener, StickyLayout.OnGiveUpTouchEventListener {
+    private final int REQUEST_SEND_MSG_ITEM = 0;
 
     //View
     private PinnedHeaderExpandableListView expandableListView;
@@ -78,8 +86,8 @@ public class MainActivity extends Activity implements
     private ArrayList<List<CommentItemModel>> childCommentList = new ArrayList<List<CommentItemModel>>();
     private MyexpandableListAdapter adapter;
     private Conversation mConversation;
+    private MediaPlayer mediaPlayer = new MediaPlayer();
 
-    private final int REQUEST_SEND_MSG_ITEM = 0;
 
     //收到的图片消息
     private ShowItemModel CheckRecievedShowItem = new ShowItemModel();
@@ -163,6 +171,15 @@ public class MainActivity extends Activity implements
         });
     }
 
+    private void initMediaPlayer(String voicePath) {
+        try {
+            mediaPlayer.setDataSource(voicePath);
+            mediaPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void loginOut() {
         try {
             File file = new File(getFilesDir(), "info.properties");
@@ -238,6 +255,31 @@ public class MainActivity extends Activity implements
             }
         }
 
+    }
+
+    private void sendVideoMsg(ShowItemModel showItemForSend) {
+        try {
+            FileContent fileContent = new FileContent(new File(showItemForSend.getShowVideo()));
+            fileContent.setStringExtra("showKey", showItemForSend.getMsgKey());
+            fileContent.setStringExtra("showText", showItemForSend.getShowText());
+            String groupIds = "";
+            for (long groupId : showItemForSend.getGroupBelongToList()) {
+                groupIds += groupId + ",";
+            }
+            fileContent.setStringExtra("groupBelongTo", groupIds);
+            Message message = mConversation.createSendMessage(fileContent);
+            message.setOnSendCompleteCallback(new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    Log.i("test", "视频发送" + i + s);
+                }
+            });
+            JMessageClient.sendMessage(message);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (JMFileSizeExceedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendVoice(CommentItemModel commentItemForSend) {
@@ -321,12 +363,17 @@ public class MainActivity extends Activity implements
         showItemForSend.setMsgKey(showItem.getMsgKey());
         showItemForSend.setGroupBelongToList(showItem.getGroupBelongToList());
 
-        //有图片
         if (showItem.getShowImagesList() != null) {
+            //有图片
             showItemForSend.setShowImagesList(showItem.getShowImagesList());
             //发送带图片的消息
             sendImageMsg(showItemForSend);
-        } else {//发送文字信息
+        } else if (showItem.getShowVideo() != null) {
+            //有视频
+            showItemForSend.setShowVideo(showItem.getShowVideo());
+            sendVideoMsg(showItemForSend);
+        } else if (showItem.getShowImagesList() == null && showItem.getShowVideo() == null) {
+            //发送文字信息
             sendTextMsg(showItemForSend);
         }
     }
@@ -337,7 +384,7 @@ public class MainActivity extends Activity implements
      * @author Administrator
      *
      */
-    class MyexpandableListAdapter extends BaseExpandableListAdapter {
+    class MyexpandableListAdapter extends BaseExpandableListAdapter{
         private Context context;
         private LayoutInflater inflater;
 
@@ -384,10 +431,11 @@ public class MainActivity extends Activity implements
             return true;
         }
 
+        private ShowHolder showHolder;
+
         @Override
         public View getGroupView(final int groupPosition, boolean isExpanded,
                                  View convertView, ViewGroup parent) {
-            ShowHolder showHolder = null;
             if (convertView == null) {
                 showHolder = new ShowHolder();
                 convertView = inflater.inflate(R.layout.show_item, null);
@@ -396,16 +444,21 @@ public class MainActivity extends Activity implements
                 showHolder.showTextTv = (TextView) convertView.findViewById(R.id.show_text_content_tv);
                 showHolder.expandedIv = (ImageView) convertView.findViewById(R.id.expanded_img);
                 showHolder.showImageRv = (RecyclerView) convertView.findViewById(R.id.show_recycler_view);
+                showHolder.showVideoView = (CustomVideoView) convertView.findViewById(R.id.show_video_view);
+                showHolder.showVideoPlayBtn = (ImageView) convertView.findViewById(R.id.show_video_play_video_btn);
                 convertView.setTag(showHolder);
             } else {
                 showHolder = (ShowHolder) convertView.getTag();
             }
 
-
             final ShowItemModel showItem = (ShowItemModel) getGroup(groupPosition);
             showHolder.showUsernameTv.setText(showItem.getShowUsername());
             showHolder.showTextTv.setText(showItem.getShowText());
+
             if (showItem.getShowImagesList() != null) {
+                showHolder.showVideoView.setVisibility(View.GONE);
+                showHolder.showVideoPlayBtn.setVisibility(View.GONE);
+                showHolder.showImageRv.setVisibility(View.VISIBLE);
                 ShowPhotoAdapter showPhotoAdapter = new ShowPhotoAdapter(MainActivity.this, showItem.getShowImagesList());
                 showHolder.showImageRv.setLayoutManager(new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL));
                 showHolder.showImageRv.setAdapter(showPhotoAdapter);
@@ -430,8 +483,30 @@ public class MainActivity extends Activity implements
                         }
                     }
                 });
-            } else {
-                showHolder.showImageRv.setAdapter(null);
+            } else if (showItem.getShowVideo() != null) {
+                showHolder.showImageRv.setVisibility(View.GONE);
+                showHolder.showVideoView.setVisibility(View.VISIBLE);
+                showHolder.showVideoPlayBtn.setVisibility(View.VISIBLE);
+                showHolder.showVideoView.setVideoHeight(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+                showHolder.showVideoView.setVideoWidth(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+                showHolder.showVideoView.setVideoPath(showItem.getShowVideo());
+                showHolder.showVideoPlayBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showHolder.showVideoPlayBtn.setVisibility(View.INVISIBLE);
+                        showHolder.showVideoView.start();
+                    }
+                });
+                showHolder.showVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        showHolder.showVideoPlayBtn.setVisibility(View.VISIBLE);
+                    }
+                });
+            }else if (showItem.getShowImagesList() == null&&showItem.getShowVideo()==null){
+                showHolder.showVideoView.setVisibility(View.GONE);
+                showHolder.showVideoPlayBtn.setVisibility(View.GONE);
+                showHolder.showImageRv.setVisibility(View.GONE);
             }
 
             return convertView;
@@ -451,7 +526,6 @@ public class MainActivity extends Activity implements
             } else {
                 commentHolder = (CommentHolder) convertView.getTag();
             }
-
 
             final CommentItemModel commentItem = (CommentItemModel) getChild(groupPosition, childPosition);
             if (commentItem.getMsgKey().equals("-1")) {
@@ -484,8 +558,6 @@ public class MainActivity extends Activity implements
                                 }
                             }
                         }
-
-
                     }
                 });
             } else {
@@ -494,6 +566,16 @@ public class MainActivity extends Activity implements
                 commentHolder.sendVoiceCommentBtn.setVisibility(View.GONE);
                 commentHolder.commentUsernameTv.setText(commentItem.getCommentUsername());
                 commentHolder.playVoiceCommentBtn.setText("" + commentItem.getCommentLength());
+                commentHolder.playVoiceCommentBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mediaPlayer.isPlaying()) {
+                            mediaPlayer.reset();
+                            initMediaPlayer(commentItem.getCommentVoice());
+                        }
+                        mediaPlayer.start();
+                    }
+                });
             }
 
             return convertView;
@@ -528,7 +610,8 @@ public class MainActivity extends Activity implements
         ImageView showUserAvatarIv;
         TextView showTextTv;
         RecyclerView showImageRv;
-        VideoView showVideoVv;
+        CustomVideoView showVideoView;
+        ImageView showVideoPlayBtn;
         ImageView expandedIv;
     }
 
@@ -614,8 +697,7 @@ public class MainActivity extends Activity implements
         switch (msg.getContentType()) {
             case text:
                 //处理文字消息
-                RecieveTextTask recieveTextTask = new RecieveTextTask();
-                recieveTextTask.execute(msg);
+                new RecieveTextTask().execute(msg);
                 break;
         }
 
@@ -629,14 +711,14 @@ public class MainActivity extends Activity implements
             case voice:
                 //处理语音消息
                 new RecieveVoiceTask().execute(msg);
-
                 break;
             case image:
                 //处理图片消息
-
-                RecieveImageTask recieveImageTask = new RecieveImageTask();
-                recieveImageTask.execute(msg);
-
+                new RecieveImageTask().execute(msg);
+                break;
+            case file:
+                //处理视频消息
+                new RecieveVideoTask().execute(msg);
                 break;
         }
     }
@@ -687,8 +769,8 @@ public class MainActivity extends Activity implements
         //获取事件发生的原因，对于漫游完成触发的事件，此处的reason应该是
         //MSG_ROAMING_COMPLETE
         ConversationRefreshEvent.Reason reason = event.getReason();
-        Log.i("test",String.format(Locale.SIMPLIFIED_CHINESE, "收到ConversationRefreshEvent事件,待刷新的会话是%s.\n", conversation.getTargetId()));
-        Log.i("test","事件发生的原因 : " + reason);
+        Log.i("test", String.format(Locale.SIMPLIFIED_CHINESE, "收到ConversationRefreshEvent事件,待刷新的会话是%s.\n", conversation.getTargetId()));
+        Log.i("test", "事件发生的原因 : " + reason);
         System.out.println(String.format(Locale.SIMPLIFIED_CHINESE, "收到ConversationRefreshEvent事件,待刷新的会话是%s.\n", conversation.getTargetId()));
         System.out.println("事件发生的原因 : " + reason);
     }
@@ -864,6 +946,63 @@ public class MainActivity extends Activity implements
         }
     }
 
+    class RecieveVideoTask extends AsyncTask<Message, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Message... params) {
+            Message msg = params[0];
+            Log.i("test", "收到视频消息");
+            FileContent fileContent = (FileContent) msg.getContent();
+            //跳过群重复消息
+            String fShowKey = fileContent.getStringExtra("showKey");
+            if (fShowKey.equals(checkShowKey)) {
+                Log.i("test", "同一个视频消息，跳过");
+                return false;
+            }
+            checkShowKey = fShowKey;
+            final String[] filePath = new String[1];
+            fileContent.downloadFile(msg, new DownloadCompletionCallback() {
+                @Override
+                public void onComplete(int i, String s, File file) {
+                    if (i == 0) {
+                        Log.i("test", "收到的视频下载完成" + i + s + file.getPath());
+                        filePath[0] = file.getPath();
+                    }
+                }
+            });
+            ShowItemModel videoShowItem = new ShowItemModel();
+            UserInfo fUserInfo = msg.getFromUser();
+            videoShowItem.setShowUsername(fUserInfo.getNickname());
+            videoShowItem.setShowText(fileContent.getStringExtra("showText"));
+            videoShowItem.setMsgKey(fShowKey);
+            videoShowItem.setShowVideo(filePath[0]);
+            String[] groupIds = fileContent.getStringExtra("groupBelongTo").split(",");
+            List<Long> groupIdBelongTo = new ArrayList<Long>();
+            for (int i = 0; i < groupIds.length; i++) {
+                groupIdBelongTo.add(Long.parseLong(groupIds[i]));
+                Log.i("test", "解析出群:" + groupIds[i]);
+            }
+            videoShowItem.setGroupBelongToList(groupIdBelongTo);
+
+            showList.add(0, videoShowItem);
+
+            ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+            CommentItemModel noneComment = new CommentItemModel();
+            noneComment.setMsgKey("-1");
+            commentItemModels.add(noneComment);
+            childCommentList.add(0, commentItemModels);
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean) {
+            super.onPostExecute(aBoolean);
+            if (aBoolean) {
+                adapter.notifyDataSetChanged();
+            }
+        }
+    }
+
     class RecieveVoiceTask extends AsyncTask<Message, Integer, Boolean> {
 
         @Override
@@ -917,7 +1056,7 @@ public class MainActivity extends Activity implements
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            if (aBoolean){
+            if (aBoolean) {
                 adapter.notifyDataSetChanged();
             }
         }

@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.example.jasper.ccxapp.R;
+import com.example.jasper.ccxapp.interfaces.SourceFolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.util.TimerTask;
 /**
  * Created by suzhenpeng on 2015/6/1.
  */
-public class VideoRecorderView extends LinearLayout implements MediaRecorder.OnErrorListener {
+public class VideoRecorderView extends LinearLayout implements MediaRecorder.OnErrorListener, SourceFolder {
 
     //视频展示
     private SurfaceView surfaceView;
@@ -401,7 +402,7 @@ public class VideoRecorderView extends LinearLayout implements MediaRecorder.OnE
      * 创建视频文件
      */
     private void createRecordDir() {
-        File sampleDir = new File(Environment.getExternalStorageDirectory() + File.separator + "WeChatVideoRecorder/");
+        File sampleDir = videoFolder;
         if (!sampleDir.exists()) {
             sampleDir.mkdirs();
         }

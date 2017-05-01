@@ -48,7 +48,4 @@ dependencies {
 
     //群组标签显示组件
     compile 'com.zhy:flowlayout-lib:1.0.3'
-
-    //自动播放视频组件
-    compile 'com.github.waynell:VideoListPlayer:1.4'
 }
