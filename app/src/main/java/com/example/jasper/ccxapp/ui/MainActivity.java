@@ -75,13 +75,10 @@ public class MainActivity extends Activity implements
 
     //变量
     private ArrayList<ShowItemModel> showList = new ArrayList<ShowItemModel>();
-
     private ArrayList<List<CommentItemModel>> childCommentList = new ArrayList<List<CommentItemModel>>();
-
-
     private MyexpandableListAdapter adapter;
-
     private Conversation mConversation;
+
     private final int REQUEST_SEND_MSG_ITEM = 0;
 
     //收到的图片消息

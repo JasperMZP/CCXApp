@@ -40,8 +40,11 @@
     <uses-permission android:name="android.permission.GET_TASKS" />
 
 
-    <uses-permission android:name="android.permission.RECORD_AUDIO"></uses-permission>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
 
 
     <application
@@ -59,11 +62,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.MainActivity" ></activity>
-        <activity android:name=".ui.ShowMsgEditActivity" />
+        <activity android:name=".ui.MainActivity"></activity>
+        <activity
+            android:name=".ui.ShowMsgEditActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".ui.FriendRequestActivity" />
         <activity android:name=".ui.SendRequestActivity" />
-        <activity android:name=".ui.MakeChatroomActivity"/>
+        <activity android:name=".ui.MakeChatroomActivity" />
+        <activity android:name=".ui.VideoRecordActivity" />
         <activity
             android:name=".ui.NewFriendActivity"
             android:label="好友申请"

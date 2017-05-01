@@ -1,17 +1,25 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,7 +29,9 @@ import com.example.jasper.ccxapp.entitiy.ShowItemModel;
 import com.example.jasper.ccxapp.interfaces.ShowType;
 import com.example.jasper.ccxapp.interfaces.SourceFolder;
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
+import com.example.jasper.ccxapp.widget.CustomVideoView;
 import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
+import com.waynell.videolist.widget.TextureVideoView;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
@@ -33,6 +43,7 @@ import java.util.Set;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetGroupIDListCallback;
 import cn.jpush.im.android.api.callback.GetGroupInfoCallback;
+import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
@@ -48,19 +59,22 @@ import me.iwf.photopicker.PhotoPreview;
 public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, SourceFolder {
 
     public static final int RESULT_SEND_MSG_ITEM = 1;
+    public static final int REQUSET_RECORD_VIDEO_PATH = 2;
 
     private MessageEvent messageEvent;
 
     private TextView textEditEt;
     private Button msgSendBtn;
     private RecyclerView recyclerView;
+    private ImageButton recordVideoIb;
+    private CustomVideoView videoView;
+    private ImageView playVideoBtn;
 
+    private String videoPath;
     private ShowItemModel showItem;
     private ArrayList<String> photosPath = null;
-
     private PhotoAdapter photoAdapter;
     private ArrayList<String> selectedPhotos = new ArrayList<>();
-
     private TagFlowLayout mFlowLayout;
     private List<GroupInfo> groupInfoList = new ArrayList<GroupInfo>();
     private List<String> groupTag = new ArrayList<String>();
@@ -78,6 +92,8 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
 
         selectPhotoAndPreview();
 
+        recordVideo();
+
     }
 
 
@@ -86,6 +102,9 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         msgSendBtn = (Button) findViewById(R.id.msg_send_btn);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mFlowLayout = (TagFlowLayout) findViewById(R.id.id_flowlayout);
+        recordVideoIb = (ImageButton) findViewById(R.id.record_video_ib);
+        videoView = (CustomVideoView) findViewById(R.id.video_view);
+        playVideoBtn=(ImageView)findViewById(R.id.play_video_btn);
     }
 
     private void getAllGroupList() {
@@ -174,6 +193,18 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
                 }));
     }
 
+    private void recordVideo() {
+        recordVideoIb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ShowMsgEditActivity.this, VideoRecordActivity.class);
+                startActivityForResult(intent, REQUSET_RECORD_VIDEO_PATH);
+            }
+        });
+    }
+
+
+
     private void BackShowMsgItemToSend() {
         if (selectedGroupId != null && selectedGroupId.size() > 0) {
             showItem = new ShowItemModel();
@@ -182,6 +213,8 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
             showItem.setShowText(textEditEt.getText().toString().trim());
             if (photosPath != null) {//有图片
                 showItem.setShowImagesList(photosPath);
+            }else if (videoPath!=null){//有视频
+                showItem.setShowVideo(videoPath);
             }
             Intent intent = new Intent();
             intent.putExtra("showItem", showItem);
@@ -201,7 +234,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
 
         if (resultCode == RESULT_OK &&
                 (requestCode == PhotoPicker.REQUEST_CODE || requestCode == PhotoPreview.REQUEST_CODE)) {
-
             if (data != null) {
                 photosPath = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
                 for (String photoPath : photosPath) {
@@ -209,12 +241,35 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
                 }
             }
             selectedPhotos.clear();
-
             if (photosPath != null) {
-
                 selectedPhotos.addAll(photosPath);
             }
             photoAdapter.notifyDataSetChanged();
+        } else if (requestCode == REQUSET_RECORD_VIDEO_PATH && resultCode == VideoRecordActivity.RESULT_RETUEN_VIDEO_PATH) {
+            if (data != null) {
+                videoPath = data.getStringExtra("videoPath");
+
+                recyclerView.setVisibility(View.GONE);
+                videoView.setVisibility(View.VISIBLE);
+                playVideoBtn.setVisibility(View.VISIBLE);
+                videoView.setVideoHeight(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+                videoView.setVideoWidth(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+                videoView.setVideoPath(videoPath);
+                playVideoBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        playVideoBtn.setVisibility(View.INVISIBLE);
+                        videoView.start();
+                    }
+                });
+                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        playVideoBtn.setVisibility(View.VISIBLE);
+                    }
+                });
+
+            }
         }
     }
 
@@ -233,7 +288,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
     @Override
     protected void onStop() {
         super.onStop();
-        if (messageEvent!=null){
+        if (messageEvent != null) {
             EventBus.getDefault().post(messageEvent);
         }
     }

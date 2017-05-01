@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:zhy="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:zhy="http://schemas.android.com/apk/res-auto"
     android:background="#F3F6F8"
     android:orientation="vertical">
 
@@ -46,6 +46,42 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <com.example.jasper.ccxapp.widget.CustomVideoView
+                android:id="@+id/video_view"
+                android:layout_width="112.5dp"
+                android:layout_height="200dp"
+                android:layout_centerInParent="true"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/play_video_btn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_play_action"
+                android:visibility="gone" />
+
+        </RelativeLayout>
+
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:src="#E4E3E3" />
+
+        <ImageButton
+            android:id="@+id/record_video_ib"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/mirco_state" />
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -53,11 +89,10 @@
 
         <com.zhy.view.flowlayout.TagFlowLayout
             android:id="@+id/id_flowlayout"
-            zhy:max_select="-1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
-        </com.zhy.view.flowlayout.TagFlowLayout>
+            android:padding="20dp"
+            zhy:max_select="-1"></com.zhy.view.flowlayout.TagFlowLayout>
 
         <ImageView
             android:layout_width="match_parent"
