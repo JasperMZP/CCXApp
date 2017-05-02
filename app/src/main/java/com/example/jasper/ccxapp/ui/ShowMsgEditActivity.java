@@ -84,7 +84,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
     private CustomVideoView videoView;
     private ImageView playVideoBtn;
 
-    //private String videoPath = Environment.getExternalStorageDirectory()+File.separator+"1.mp4";
     private String videoPath;
     private ShowItemModel showItem;
     private ArrayList<String> photosPath = null;
@@ -256,6 +255,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
 
         if (resultCode == RESULT_OK &&
                 (requestCode == PhotoPicker.REQUEST_CODE || requestCode == PhotoPreview.REQUEST_CODE)) {
+            recordVideoIb.setVisibility(View.GONE);
             if (data != null) {
                 photosPath = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
                 for (String photoPath : photosPath) {
@@ -270,7 +270,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         } else if (requestCode == REQUSET_RECORD_VIDEO_PATH && resultCode == VideoRecordActivity.RESULT_RETUEN_VIDEO_PATH) {
             if (data != null) {
                 videoPath = data.getStringExtra("videoPath");
-
                 recyclerView.setVisibility(View.GONE);
                 videoView.setVisibility(View.VISIBLE);
                 playVideoBtn.setVisibility(View.VISIBLE);
@@ -296,7 +295,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
 
             }
         }else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-            Log.i("test", "相机返回video :" + data.getData().getPath());
+            Log.i("test", "录像返回video :" + data.getData().getPath());
             videoPath = data.getData().getPath();
             recyclerView.setVisibility(View.GONE);
             videoView.setVisibility(View.VISIBLE);
