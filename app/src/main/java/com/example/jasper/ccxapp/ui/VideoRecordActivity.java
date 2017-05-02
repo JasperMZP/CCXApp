@@ -21,9 +21,7 @@ import com.example.jasper.ccxapp.widget.VideoRecorderView;
 
 import java.io.File;
 
-/**
- * Created by suzhenpeng on 2015/6/1.
- */
+
 public class VideoRecordActivity extends Activity {
 
     public static final int RESULT_RETUEN_VIDEO_PATH=3;

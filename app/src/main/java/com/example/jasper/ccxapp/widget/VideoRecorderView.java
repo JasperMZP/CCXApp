@@ -24,9 +24,7 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Created by suzhenpeng on 2015/6/1.
- */
+
 public class VideoRecorderView extends LinearLayout implements MediaRecorder.OnErrorListener, SourceFolder {
 
     //视频展示

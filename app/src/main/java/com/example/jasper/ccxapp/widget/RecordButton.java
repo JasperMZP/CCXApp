@@ -27,10 +27,6 @@ import java.io.File;
 import java.io.IOException;
 
 
-
-/**
- * Created by xuan on 2016/6/8.
- */
 public class RecordButton extends android.support.v7.widget.AppCompatButton implements ShowType{
     private final int Volume_What_100 = 100;
     private final int Time_What_101 = 101;
