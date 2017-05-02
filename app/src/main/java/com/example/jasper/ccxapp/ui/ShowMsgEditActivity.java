@@ -1,9 +1,21 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ColorFilter;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
@@ -12,8 +24,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -36,20 +46,23 @@ import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetGroupIDListCallback;
 import cn.jpush.im.android.api.callback.GetGroupInfoCallback;
-import cn.jpush.im.android.api.content.CustomContent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.eventbus.EventBus;
 import me.iwf.photopicker.PhotoPicker;
 import me.iwf.photopicker.PhotoPreview;
+
+import static android.R.attr.bitmap;
 
 
 /**
@@ -60,6 +73,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
 
     public static final int RESULT_SEND_MSG_ITEM = 1;
     public static final int REQUSET_RECORD_VIDEO_PATH = 2;
+    static final int REQUEST_VIDEO_CAPTURE = 9;
 
     private MessageEvent messageEvent;
 
@@ -70,6 +84,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
     private CustomVideoView videoView;
     private ImageView playVideoBtn;
 
+    //private String videoPath = Environment.getExternalStorageDirectory()+File.separator+"1.mp4";
     private String videoPath;
     private ShowItemModel showItem;
     private ArrayList<String> photosPath = null;
@@ -104,7 +119,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         mFlowLayout = (TagFlowLayout) findViewById(R.id.id_flowlayout);
         recordVideoIb = (ImageButton) findViewById(R.id.record_video_ib);
         videoView = (CustomVideoView) findViewById(R.id.video_view);
-        playVideoBtn=(ImageView)findViewById(R.id.play_video_btn);
+        playVideoBtn = (ImageView) findViewById(R.id.play_video_btn);
     }
 
     private void getAllGroupList() {
@@ -197,12 +212,17 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         recordVideoIb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ShowMsgEditActivity.this, VideoRecordActivity.class);
-                startActivityForResult(intent, REQUSET_RECORD_VIDEO_PATH);
+               /* Intent intent = new Intent(ShowMsgEditActivity.this, VideoRecordActivity.class);
+                startActivityForResult(intent, REQUSET_RECORD_VIDEO_PATH);*/
+
+                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                // create a file Uri to save the video
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(videoFolder + File.separator + UUIDKeyUtil.getUUIDKey() + ".mp4")));
+                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+                startActivityForResult(intent, REQUEST_VIDEO_CAPTURE);
             }
         });
     }
-
 
 
     private void BackShowMsgItemToSend() {
@@ -213,13 +233,13 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
             showItem.setShowText(textEditEt.getText().toString().trim());
             if (photosPath != null) {//有图片
                 showItem.setShowImagesList(photosPath);
-            }else if (videoPath!=null){//有视频
+            } else if (videoPath != null) {//有视频
+                Log.i("test","有视频："+videoPath);
                 showItem.setShowVideo(videoPath);
             }
             Intent intent = new Intent();
             intent.putExtra("showItem", showItem);
             setResult(RESULT_SEND_MSG_ITEM, intent);
-
         }
         selectedPhotos = null;
         showItem = null;
@@ -231,6 +251,8 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+
 
         if (resultCode == RESULT_OK &&
                 (requestCode == PhotoPicker.REQUEST_CODE || requestCode == PhotoPreview.REQUEST_CODE)) {
@@ -255,10 +277,13 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
                 videoView.setVideoHeight(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
                 videoView.setVideoWidth(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
                 videoView.setVideoPath(videoPath);
+                Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
+                videoView.setBackgroundDrawable(new BitmapDrawable(bitmap));
                 playVideoBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         playVideoBtn.setVisibility(View.INVISIBLE);
+                        videoView.setBackgroundDrawable(null);
                         videoView.start();
                     }
                 });
@@ -270,6 +295,31 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
                 });
 
             }
+        }else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+            Log.i("test", "相机返回video :" + data.getData().getPath());
+            videoPath = data.getData().getPath();
+            recyclerView.setVisibility(View.GONE);
+            videoView.setVisibility(View.VISIBLE);
+            playVideoBtn.setVisibility(View.VISIBLE);
+            videoView.setVideoHeight(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+            videoView.setVideoWidth(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+            videoView.setVideoPath(videoPath);
+            Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
+            videoView.setBackgroundDrawable(new BitmapDrawable(bitmap));
+            playVideoBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    playVideoBtn.setVisibility(View.INVISIBLE);
+                    videoView.setBackgroundDrawable(null);
+                    videoView.start();
+                }
+            });
+            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    playVideoBtn.setVisibility(View.VISIBLE);
+                }
+            });
         }
     }
 

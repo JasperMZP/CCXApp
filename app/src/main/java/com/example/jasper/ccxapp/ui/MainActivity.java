@@ -4,10 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutCompat;
@@ -25,6 +31,7 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -317,9 +324,6 @@ public class MainActivity extends Activity implements
             showItem.setShowUsername("user" + i);
             showItem.setShowText("show text" + i);
             ArrayList<String> showImgs = new ArrayList<>();
-            showImgs.add("/storage/sdcard/Pictures/JPEG_20170421_084405.jpg");
-            showImgs.add("/storage/sdcard/Pictures/JPEG_20170421_091106.jpg");
-            showImgs.add("/storage/sdcard/Pictures/JPEG_20170421_094403.jpg");
             showItem.setShowImagesList(showImgs);
             showList.add(showItem);
         }
@@ -384,7 +388,7 @@ public class MainActivity extends Activity implements
      * @author Administrator
      *
      */
-    class MyexpandableListAdapter extends BaseExpandableListAdapter{
+    class MyexpandableListAdapter extends BaseExpandableListAdapter {
         private Context context;
         private LayoutInflater inflater;
 
@@ -432,10 +436,13 @@ public class MainActivity extends Activity implements
         }
 
         private ShowHolder showHolder;
+        private CustomVideoView showVideoView;
+        private ImageView showVideoPlayBtn;
 
         @Override
         public View getGroupView(final int groupPosition, boolean isExpanded,
                                  View convertView, ViewGroup parent) {
+            showHolder = null;
             if (convertView == null) {
                 showHolder = new ShowHolder();
                 convertView = inflater.inflate(R.layout.show_item, null);
@@ -444,20 +451,21 @@ public class MainActivity extends Activity implements
                 showHolder.showTextTv = (TextView) convertView.findViewById(R.id.show_text_content_tv);
                 showHolder.expandedIv = (ImageView) convertView.findViewById(R.id.expanded_img);
                 showHolder.showImageRv = (RecyclerView) convertView.findViewById(R.id.show_recycler_view);
-                showHolder.showVideoView = (CustomVideoView) convertView.findViewById(R.id.show_video_view);
-                showHolder.showVideoPlayBtn = (ImageView) convertView.findViewById(R.id.show_video_play_video_btn);
                 convertView.setTag(showHolder);
             } else {
                 showHolder = (ShowHolder) convertView.getTag();
             }
+
+            showVideoView = (CustomVideoView) convertView.findViewById(R.id.show_video_view);
+            showVideoPlayBtn = (ImageView) convertView.findViewById(R.id.show_video_play_video_btn);
 
             final ShowItemModel showItem = (ShowItemModel) getGroup(groupPosition);
             showHolder.showUsernameTv.setText(showItem.getShowUsername());
             showHolder.showTextTv.setText(showItem.getShowText());
 
             if (showItem.getShowImagesList() != null) {
-                showHolder.showVideoView.setVisibility(View.GONE);
-                showHolder.showVideoPlayBtn.setVisibility(View.GONE);
+                showVideoView.setVisibility(View.GONE);
+                showVideoPlayBtn.setVisibility(View.GONE);
                 showHolder.showImageRv.setVisibility(View.VISIBLE);
                 ShowPhotoAdapter showPhotoAdapter = new ShowPhotoAdapter(MainActivity.this, showItem.getShowImagesList());
                 showHolder.showImageRv.setLayoutManager(new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL));
@@ -485,27 +493,35 @@ public class MainActivity extends Activity implements
                 });
             } else if (showItem.getShowVideo() != null) {
                 showHolder.showImageRv.setVisibility(View.GONE);
-                showHolder.showVideoView.setVisibility(View.VISIBLE);
-                showHolder.showVideoPlayBtn.setVisibility(View.VISIBLE);
-                showHolder.showVideoView.setVideoHeight(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
-                showHolder.showVideoView.setVideoWidth(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
-                showHolder.showVideoView.setVideoPath(showItem.getShowVideo());
-                showHolder.showVideoPlayBtn.setOnClickListener(new View.OnClickListener() {
+                showVideoView.setVisibility(View.VISIBLE);
+                showVideoPlayBtn.setVisibility(View.VISIBLE);
+                showVideoView.setVideoHeight(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+                showVideoView.setVideoWidth(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
+                showVideoView.setVideoPath(showItem.getShowVideo());
+                Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(showItem.getShowVideo(), MediaStore.Video.Thumbnails.MINI_KIND);
+                showVideoView.setBackgroundDrawable(new BitmapDrawable(bitmap));
+                //showVideoView.setMediaController(new MediaController(MainActivity.this));
+                showVideoView.setVideoPath(showItem.getShowVideo());
+                showVideoPlayBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        showHolder.showVideoPlayBtn.setVisibility(View.INVISIBLE);
-                        showHolder.showVideoView.start();
+                        Log.i("test", "点击了播放按钮");
+                        showVideoPlayBtn.setVisibility(View.INVISIBLE);
+                        showVideoView.setBackgroundDrawable(null);
+                        showVideoView.start();
+                        showVideoView.requestFocus();
                     }
                 });
-                showHolder.showVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                showVideoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        showHolder.showVideoPlayBtn.setVisibility(View.VISIBLE);
+                        showVideoPlayBtn.setVisibility(View.VISIBLE);
                     }
                 });
-            }else if (showItem.getShowImagesList() == null&&showItem.getShowVideo()==null){
-                showHolder.showVideoView.setVisibility(View.GONE);
-                showHolder.showVideoPlayBtn.setVisibility(View.GONE);
+            } else if (showItem.getShowImagesList() == null && showItem.getShowVideo() == null) {
+                showVideoView.setVisibility(View.GONE);
+                showVideoPlayBtn.setVisibility(View.GONE);
                 showHolder.showImageRv.setVisibility(View.GONE);
             }
 
@@ -828,6 +844,7 @@ public class MainActivity extends Activity implements
             noneComment.setMsgKey("-1");
             commentItemModels.add(noneComment);
             childCommentList.add(0, commentItemModels);
+            Log.i("test", "background");
 
             return true;
         }
@@ -837,6 +854,7 @@ public class MainActivity extends Activity implements
             super.onPostExecute(aBoolean);
             if (aBoolean) {
                 adapter.notifyDataSetChanged();
+                Log.i("test", "post");
             }
         }
     }
@@ -933,6 +951,7 @@ public class MainActivity extends Activity implements
                 noneComment.setMsgKey("-1");
                 commentItemModels.add(noneComment);
                 childCommentList.add(0, commentItemModels);
+                Log.i("test", "background");
             }
             return true;
         }
@@ -942,6 +961,7 @@ public class MainActivity extends Activity implements
             super.onPostExecute(aBoolean);
             if (aBoolean) {
                 adapter.notifyDataSetChanged();
+                Log.i("test", "post");
             }
         }
     }
@@ -950,47 +970,49 @@ public class MainActivity extends Activity implements
 
         @Override
         protected Boolean doInBackground(Message... params) {
-            Message msg = params[0];
+            final Message msg = params[0];
             Log.i("test", "收到视频消息");
-            FileContent fileContent = (FileContent) msg.getContent();
+            final FileContent fileContent = (FileContent) msg.getContent();
             //跳过群重复消息
-            String fShowKey = fileContent.getStringExtra("showKey");
+            final String fShowKey = fileContent.getStringExtra("showKey");
             if (fShowKey.equals(checkShowKey)) {
                 Log.i("test", "同一个视频消息，跳过");
                 return false;
             }
             checkShowKey = fShowKey;
-            final String[] filePath = new String[1];
+
             fileContent.downloadFile(msg, new DownloadCompletionCallback() {
                 @Override
                 public void onComplete(int i, String s, File file) {
                     if (i == 0) {
                         Log.i("test", "收到的视频下载完成" + i + s + file.getPath());
-                        filePath[0] = file.getPath();
+                        ShowItemModel videoShowItem = new ShowItemModel();
+                        UserInfo fUserInfo = msg.getFromUser();
+                        videoShowItem.setShowUsername(fUserInfo.getNickname());
+                        videoShowItem.setShowText(fileContent.getStringExtra("showText"));
+                        videoShowItem.setMsgKey(fShowKey);
+                        videoShowItem.setShowVideo(file.getPath());
+                        String[] groupIds = fileContent.getStringExtra("groupBelongTo").split(",");
+                        List<Long> groupIdBelongTo = new ArrayList<Long>();
+                        for (int j = 0; j < groupIds.length; j++) {
+                            groupIdBelongTo.add(Long.parseLong(groupIds[j]));
+                            Log.i("test", "解析出群:" + groupIds[j]);
+                        }
+                        videoShowItem.setGroupBelongToList(groupIdBelongTo);
+
+                        showList.add(0, videoShowItem);
+
+                        ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
+                        CommentItemModel noneComment = new CommentItemModel();
+                        noneComment.setMsgKey("-1");
+                        commentItemModels.add(noneComment);
+                        childCommentList.add(0, commentItemModels);
+                        Log.i("test", "background");
+                        adapter.notifyDataSetChanged();
                     }
                 }
             });
-            ShowItemModel videoShowItem = new ShowItemModel();
-            UserInfo fUserInfo = msg.getFromUser();
-            videoShowItem.setShowUsername(fUserInfo.getNickname());
-            videoShowItem.setShowText(fileContent.getStringExtra("showText"));
-            videoShowItem.setMsgKey(fShowKey);
-            videoShowItem.setShowVideo(filePath[0]);
-            String[] groupIds = fileContent.getStringExtra("groupBelongTo").split(",");
-            List<Long> groupIdBelongTo = new ArrayList<Long>();
-            for (int i = 0; i < groupIds.length; i++) {
-                groupIdBelongTo.add(Long.parseLong(groupIds[i]));
-                Log.i("test", "解析出群:" + groupIds[i]);
-            }
-            videoShowItem.setGroupBelongToList(groupIdBelongTo);
 
-            showList.add(0, videoShowItem);
-
-            ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
-            CommentItemModel noneComment = new CommentItemModel();
-            noneComment.setMsgKey("-1");
-            commentItemModels.add(noneComment);
-            childCommentList.add(0, commentItemModels);
             return true;
         }
 
@@ -998,7 +1020,7 @@ public class MainActivity extends Activity implements
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             if (aBoolean) {
-                adapter.notifyDataSetChanged();
+                Log.i("test", "视频接收成功");
             }
         }
     }
@@ -1043,6 +1065,7 @@ public class MainActivity extends Activity implements
                         commentItemModels.add(commentItemModels.size() - 1, commentItem);
                         childCommentList.remove(j);
                         childCommentList.add(j, commentItemModels);
+                        Log.i("test", "background");
                         Log.i("test", "添加一条语音消息");
                         return true;
 
@@ -1058,6 +1081,7 @@ public class MainActivity extends Activity implements
             super.onPostExecute(aBoolean);
             if (aBoolean) {
                 adapter.notifyDataSetChanged();
+                Log.i("test", "post");
             }
         }
     }
