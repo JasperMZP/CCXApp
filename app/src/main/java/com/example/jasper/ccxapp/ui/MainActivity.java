@@ -500,7 +500,6 @@ public class MainActivity extends Activity implements
                 showVideoView.setVideoPath(showItem.getShowVideo());
                 Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(showItem.getShowVideo(), MediaStore.Video.Thumbnails.MINI_KIND);
                 showVideoView.setBackgroundDrawable(new BitmapDrawable(bitmap));
-                //showVideoView.setMediaController(new MediaController(MainActivity.this));
                 showVideoView.setVideoPath(showItem.getShowVideo());
                 showVideoPlayBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
