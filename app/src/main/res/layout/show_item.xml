@@ -55,8 +55,8 @@
 
                 <com.example.jasper.ccxapp.widget.CustomVideoView
                     android:id="@+id/show_video_view"
-                    android:layout_width="225dp"
-                    android:layout_height="400dp"
+                    android:layout_width="270dp"
+                    android:layout_height="480dp"
                     android:layout_centerInParent="true"
                     android:visibility="gone" />
 
