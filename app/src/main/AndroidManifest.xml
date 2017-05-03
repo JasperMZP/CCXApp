@@ -71,6 +71,7 @@
         <activity android:name=".ui.SendRequestActivity" />
         <activity android:name=".ui.MakeChatroomActivity" />
         <activity android:name=".ui.VideoRecordActivity" />
+        <activity android:name=".ui.AddUserMessageActivity" />
         <activity
             android:name=".ui.NewFriendActivity"
             android:label="好友申请"

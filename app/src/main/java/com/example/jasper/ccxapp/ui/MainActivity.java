@@ -7,11 +7,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
@@ -31,16 +29,13 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
-
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 import com.example.jasper.ccxapp.util.showMessage;
 import com.example.jasper.ccxapp.widget.CustomVideoView;
@@ -60,7 +55,7 @@ import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
-import cn.jpush.im.android.api.content.EventNotificationContent;
+import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
@@ -105,7 +100,9 @@ public class MainActivity extends Activity implements
     private TextView toFriend;
     private TextView myName;
     private TextView loginout;
+    private ImageView userImage;
     private DrawerLayout drawerLayout;
+    private ImageView imageView;
 
 
     @Override
@@ -143,7 +140,16 @@ public class MainActivity extends Activity implements
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
         addShowBtn = (Button) findViewById(R.id.add_show_btn);
+        imageView = (ImageView)findViewById(R.id.imageView1);
 
+        JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
+            @Override
+            public void gotResult(int i, String s, Bitmap bitmap) {
+                if(i == 0){
+                    imageView.setImageBitmap(bitmap);
+                }
+            }
+        });
 
         initDrawerLayout();
         drawerLayout.setScrimColor(Color.GRAY);
@@ -157,7 +163,16 @@ public class MainActivity extends Activity implements
         toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
         myName = (TextView) v1.findViewById(R.id.myName);
         loginout = (TextView) v1.findViewById(R.id.loginout);
+        userImage = (ImageView) v1.findViewById(R.id.profile_image);
         myName.setText(JMessageClient.getMyInfo().getNickname());
+        JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
+            @Override
+            public void gotResult(int i, String s, Bitmap bitmap) {
+                if(i == 0){
+                    userImage.setImageBitmap(bitmap);
+                }
+            }
+        });
         toFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -746,16 +761,12 @@ public class MainActivity extends Activity implements
         switch (event.getType()) {
             case invite_received://收到好友邀请
                 showMessage.showNewFriend(MainActivity.this, fromUsername + "请求添加您为好友", "点击查看详细信息");
-//                saveRequest(fromUsername, reason);
                 break;
             case invite_accepted://对方接收了你的好友邀请
-                //...
                 break;
             case invite_declined://对方拒绝了你的好友邀请
-                //...
                 break;
             case contact_deleted://对方将你从好友中删除
-                //...
                 break;
             default:
                 break;

@@ -67,11 +67,6 @@ public class FriendRequestActivity extends AppCompatActivity{
                                 showDialog("暂无好友请求");
                             }else{
                                 String data = "";
-                                /*
-                                for(int i=0;i<message.size();i+=2){
-                                    data += message.get(i)+":"+message.get(i+1)+"\n";
-                                }*/
-                               // showDialog("好友请求查询成功:\n"+data);
                                 int i=0;
                                 data += message.get(i)+":"+message.get(i+1)+"\n";
                                 textView.setText(data+" 请求添加好友");
@@ -128,8 +123,8 @@ public class FriendRequestActivity extends AppCompatActivity{
     }
 
     private boolean checkUserName(String userName) {
-        if(userName.length() < 5){
-            showDialog("用户名不应少于5位字符");
+        if(userName.length() == 0){
+            showDialog("请输入您想查找的用户名");
             return false;
         }
         return true;

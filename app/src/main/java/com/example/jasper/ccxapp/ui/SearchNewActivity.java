@@ -17,11 +17,6 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackUserInfo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Properties;
-
-import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 
@@ -82,20 +77,27 @@ public class SearchNewActivity extends AppCompatActivity {
     }
 
     private void showNewFriends(final UserInfo message) {
+        final Bitmap[] bitmap2 = {null};
         message.getAvatarBitmap(new GetAvatarBitmapCallback() {
             @Override
             public void gotResult(int i, String s, Bitmap bitmap) {
                 a_friend_image.setImageBitmap(bitmap);
+                bitmap2[0] = bitmap;
             }
         });
-        a_friend_name.setText(message.getUserName());
+        if(message.getNickname().equals(message.getUserName())){
+            a_friend_name.setText(message.getNickname());
+        }else {
+            a_friend_name.setText(message.getNickname() + "(" + message.getUserName() + ")");
+        }
         all_new_friend.setVisibility(View.VISIBLE);
 		all_new_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setClass(SearchNewActivity.this, SendRequestActivity.class);
-                intent.putExtra("newFriendName", message.getUserName());
+                intent.putExtra("newFriendName", a_friend_name.getText().toString());
+                intent.putExtra("userImage", bitmap2[0]);
                 SearchNewActivity.this.startActivity(intent);
             }
 		});
@@ -112,6 +114,7 @@ public class SearchNewActivity extends AppCompatActivity {
         if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
             super.onKeyDown(keyCode, event);
             Intent intent = new Intent(SearchNewActivity.this, FriendActivity.class);
+            startActivity(intent);
             this.finish();
         }
         return false;

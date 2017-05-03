@@ -1,15 +1,12 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -25,8 +22,9 @@ import android.widget.Toast;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.userDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.util.ImageUtil;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 
 import cn.jpush.im.android.api.JMessageClient;
 
@@ -46,12 +44,13 @@ public class AddUserMessageActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-    private String image_path = "/storage/emulated/0/headimage.jpg";
+//    private String image_path = "/storage/emulated/0/headimage.jpg";
     private String oriNickName;
     private String oriSex;
     private String oriBirthday;
     private String oriAddress;
     private String oriExplain;
+    private ImageUtil imageUtils;
 
 
     @Override
@@ -70,27 +69,90 @@ public class AddUserMessageActivity extends AppCompatActivity {
         message_address = (EditText)findViewById(R.id.message_address);
         message_explain = (EditText)findViewById(R.id.message_explain);
         add_message = (Button)findViewById(R.id.add_message_btn);
+        imageUtils = new ImageUtil(AddUserMessageActivity.this);
 
         userName.setText(getIntent().getStringExtra("userName"));
         btn_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, 1);
+                chooseDialog();
             }
         });
-        
+
         add_message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveUserMessage();
                 showDialog("正在添加信息");
-//                startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
-//                finish();
             }
         });
 
         addOriMessage();
+    }
+
+    private void chooseDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("选择头像")
+                .setNegativeButton("相册", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        imageUtils.byAlbum();
+                    }
+                })
+                .setPositiveButton("拍照", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        String status = Environment.getExternalStorageState();
+                        if (status.equals(Environment.MEDIA_MOUNTED)) {// 判断是否存在SD卡
+                            imageUtils.byCamera();
+                        }
+                    }
+                }).show();
+
+    }
+
+    // 这里需要注意resultCode，正常情况返回值为 -1 没有任何操作直接后退则返回 0
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        System.out.println("-->requestCode:" + requestCode + "-->resultCode:" + resultCode);
+
+        switch (requestCode) {
+            case ImageUtil.ACTIVITY_RESULT_CAMERA: // 拍照
+                try {
+                    if (resultCode == -1) {
+                        imageUtils.cutImageByCamera();
+                    } else {
+                        // 因为在无任何操作返回时，系统依然会创建一个文件，这里就是删除那个产生的文件
+                        if (imageUtils.picFile != null) {
+                            imageUtils.picFile.delete();
+                        }
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case ImageUtil.ACTIVITY_RESULT_ALBUM:
+                try {
+                    if (resultCode == -1) {
+                        Bitmap bm_icon = imageUtils.decodeBitmap();
+                        if (bm_icon != null) {
+                            message_image.setImageBitmap(bm_icon);
+                        }
+                    } else {
+                        // 因为在无任何操作返回时，系统依然会创建一个文件，这里就是删除那个产生的文件
+                        if (imageUtils.picFile != null) {
+                            imageUtils.picFile.delete();
+                        }
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
     }
 
     private void addOriMessage() {
@@ -109,14 +171,14 @@ public class AddUserMessageActivity extends AppCompatActivity {
             @Override
             public void showResult(boolean result, String message) {
                 if(!result){
-                    showDialog("联网错误！");
+                    showDialog2("联网错误！");
                 }else{
-                    userDB.addUserMessage(image_path, oriNickName, oriSex, oriBirthday, oriAddress,
+                    userDB.addUserMessage(null, oriNickName, oriSex, oriBirthday, oriAddress,
                             oriExplain, new userBackListener() {
                                 @Override
                                 public void showResult(boolean result, String message) {
                                     if(!result){
-                                        showDialog("联网错误！");
+                                        showDialog2("联网错误！");
                                     }
                                 }
                             });
@@ -126,7 +188,7 @@ public class AddUserMessageActivity extends AppCompatActivity {
     }
 
     private void saveUserMessage() {
-        String imagePath = "/storage/emulated/0/headimage.jpg";
+        File imagePath = imageUtils.picFile;
         String nickname = nickName.getText().toString().trim();
         int sexid = message_sex.getCheckedRadioButtonId();
         String sex;
@@ -139,9 +201,6 @@ public class AddUserMessageActivity extends AppCompatActivity {
         String address = message_address.getText().toString().trim();
         String explain = message_explain.getText().toString().trim();
 
-        if(imagePath.equals(image_path)){
-            imagePath = null;
-        }
         if(nickname.equals(oriNickName) || nickname.equals("")){
             nickname = null;
         }
@@ -171,55 +230,12 @@ public class AddUserMessageActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        ContentResolver resolver = getContentResolver();
-        Bitmap bitmap = null;
-        if (resultCode == RESULT_OK) {
-            if (requestCode == 1) {
-                Uri originalUri = intent.getData();
-                try {
-                    Bitmap originalBitmap = BitmapFactory.decodeStream(resolver
-                            .openInputStream(originalUri));
-                    // originalUri 为拿到的不完整Uri
-                    bitmap = resizeImage(originalBitmap,100, 100);
-                    originalUri.toString();
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                if (bitmap != null) {
-                    message_image.setImageBitmap(bitmap);
-                } else {
-                    Toast.makeText(AddUserMessageActivity.this, "获取图片失败", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
-    }
-
-    public static Bitmap resizeImage(Bitmap bitmap, int w, int h) {
-        Bitmap BitmapOrg = bitmap;
-        int width = BitmapOrg.getWidth();
-        int height = BitmapOrg.getHeight();
-        float scale;
-
-        if((float)width/(float)height > (float)w/(float)h){
-            scale = (float)w/(float)width;
-        }else{
-            scale = (float)h/(float)height;
-        }
-
-        Matrix matrix = new Matrix();
-        matrix.postScale(scale, scale);
-        // if you want to rotate the Bitmap
-        // matrix.postRotate(45);
-        Bitmap resizedBitmap = Bitmap.createBitmap(BitmapOrg, 0, 0, width, height, matrix, true);
-        return resizedBitmap;
-
-    }
-
     private void showDialog(String message) {
+        new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
+                .setPositiveButton("确定", null).show();
+    }
+
+    private void showDialog2(String message) {
         new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override

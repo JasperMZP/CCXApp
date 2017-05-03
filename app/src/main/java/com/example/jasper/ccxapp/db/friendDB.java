@@ -106,9 +106,9 @@ public class friendDB {
         });
     }
 
-    //发送好友请求,userName1为发送人，userName2为接受请求人
-    public static void sendfriendrequest(String userName1, final String userName2, final String message, final userBackListener userBackListener) {
-        NewFriend friend = getNewFriend(userName1, userName2, message);
+    //发送好友请求,userName2为接受请求人
+    public static void sendfriendrequest(final String userName2, final String message, final userBackListener userBackListener) {
+        NewFriend friend = getNewFriend(JMessageClient.getMyInfo().getUserName(), userName2, message);
         friend.save(new SaveListener<String>() {
             @Override
             public void done(String s, BmobException e) {

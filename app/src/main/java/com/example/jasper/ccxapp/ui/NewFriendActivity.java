@@ -18,10 +18,9 @@ import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackListListener;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Properties;
+
+import cn.jpush.im.android.api.JMessageClient;
 
 
 public class NewFriendActivity extends AppCompatActivity implements OnClickListener {
@@ -39,25 +38,7 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 	}
 
 	private void getFriendRequest() {
-		String userName = getUserName();
-//		try {
-////			File file = new File(getFilesDir(), "infoRequest.properties");
-////			FileInputStream fis = new FileInputStream(file);
-////			Properties pro = new Properties();
-////			pro.load(fis);
-////			fis.close();
-////			ArrayList<String> message = new ArrayList<String>();
-////            String[] names = pro.getProperty("requestName").toString().split("|");
-////            String[] reasons = pro.getProperty("reason").toString().split("|");
-////            for(int i=0;i<names.length;i++){
-////                message.add(names[i]);
-////                message.add(reasons[i]);
-////            }
-////            showFriendRequest(null, message);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//            showDialog("查询好友请求出错");
-//		}
+		String userName = JMessageClient.getMyInfo().getUserName();
 		friendDB.searchRequestList(userName, new userBackListListener() {
 			@Override
 			public void showResult(boolean result, ArrayList<String> message) {
@@ -72,7 +53,7 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 
 	private void showFriendRequest(ArrayList<String> imgPath, final ArrayList<String> message) {
 		ListView lv = (ListView) findViewById(R.id.all_friend_request);
-		message.add(getUserName());
+		message.add(JMessageClient.getMyInfo().getUserName());
 
 		NewFriendAdapter adapter = new NewFriendAdapter(NewFriendActivity.this, NewFriendActivity.this, imgPath, message);
 		lv.setAdapter(adapter);
@@ -97,25 +78,6 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 				return true;
 			}
 		});
-	}
-
-	public String getUserName(){
-		try {
-            // 创建File对象
-            File file = new File(getFilesDir(), "info.properties");
-            // 创建FileIutputStream 对象
-            FileInputStream fis = new FileInputStream(file);
-            // 创建属性对象
-            Properties pro = new Properties();
-            // 加载文件
-            pro.load(fis);
-            // 关闭输入流对象
-            fis.close();
-            return pro.get("userName").toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
 	}
 
 	private void showDialog(String message) {
