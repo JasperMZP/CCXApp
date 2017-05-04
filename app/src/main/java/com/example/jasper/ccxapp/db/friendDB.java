@@ -182,23 +182,36 @@ public class friendDB {
 
     //得到该用户被请求为好友的信息
     public static void searchRequestList(String userName, final userBackListListener userBackListListener) {
+        final List<UserInfo> userInfos = new ArrayList<UserInfo>();
         BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
         query.addWhereEqualTo("responseFriend", userName);
         query.setLimit(200);
         query.findObjects(new FindListener<NewFriend>() {
             @Override
-            public void done(List<NewFriend> list, BmobException e) {
-                ArrayList<String> messages = new ArrayList<String>();
+            public void done(final List<NewFriend> list, BmobException e) {
+                final ArrayList<String> messages = new ArrayList<String>();
                 if(e==null){
-                    for(NewFriend friend : list) {
-                        messages.add(friend.getRequestFriend());
-                        messages.add(friend.getMessage());
+                    for(final NewFriend friend : list) {
+                        JMessageClient.getUserInfo(friend.getRequestFriend(), new GetUserInfoCallback() {
+                            @Override
+                            public void gotResult(int i, String s, UserInfo userInfo) {
+                                if(i == 0){
+                                    userInfos.add(userInfo);
+                                    messages.add(friend.getMessage());
+                                }else{
+                                    userBackListListener.showResult(false, null, null);
+                                    return;
+                                }
+                                if(messages.size() == list.size()){
+                                    userBackListListener.showResult(true, messages, userInfos);
+                                }
+                            }
+                        });
                     }
-                    userBackListListener.showResult(true, messages);
                 }else {
                     Log.e("friend", "查询信息失败" + e.getMessage());
                     messages.add(e.getMessage());
-                    userBackListListener.showResult(false, messages);
+                    userBackListListener.showResult(false, messages, null);
                 }
             }
         });

@@ -19,8 +19,10 @@ import com.example.jasper.ccxapp.interfaces.userBackListListener;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.model.UserInfo;
 
 
 public class NewFriendActivity extends AppCompatActivity implements OnClickListener {
@@ -41,9 +43,9 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 		String userName = JMessageClient.getMyInfo().getUserName();
 		friendDB.searchRequestList(userName, new userBackListListener() {
 			@Override
-			public void showResult(boolean result, ArrayList<String> message) {
+			public void showResult(boolean result, ArrayList<String> message, List<cn.jpush.im.android.api.model.UserInfo> userInfos) {
 				if(result){
-					showFriendRequest(null, message);
+					showFriendRequest(userInfos, message);
 				}else{
 					showDialog("查询好友请求出错");
 				}
@@ -51,11 +53,10 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 		});
 	}
 
-	private void showFriendRequest(ArrayList<String> imgPath, final ArrayList<String> message) {
+	private void showFriendRequest(List<UserInfo> userInfos, final ArrayList<String> message) {
 		ListView lv = (ListView) findViewById(R.id.all_friend_request);
-		message.add(JMessageClient.getMyInfo().getUserName());
 
-		NewFriendAdapter adapter = new NewFriendAdapter(NewFriendActivity.this, NewFriendActivity.this, imgPath, message);
+		NewFriendAdapter adapter = new NewFriendAdapter(NewFriendActivity.this, NewFriendActivity.this, userInfos, message);
 		lv.setAdapter(adapter);
 		lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
 			@Override
