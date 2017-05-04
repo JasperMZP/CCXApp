@@ -203,14 +203,6 @@ public class MainActivity extends Activity implements
     }
 
     private void loginOut() {
-        try {
-            File file = new File(getFilesDir(), "info.properties");
-            file.delete();
-            File file2 = new File(getFilesDir(), "infoRequest.properties");
-            file2.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         JMessageClient.logout();
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
         this.finish();

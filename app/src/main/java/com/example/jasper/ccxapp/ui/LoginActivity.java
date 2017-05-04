@@ -58,11 +58,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void ifLogin() {
-        if (JMessageClient.getMyInfo().getUserName() == null) {
-            return;
-        } else {
-            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-            this.finish();
+        try {
+            if (JMessageClient.getMyInfo().getUserName() == null) {
+                return;
+            } else {
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                this.finish();
+            }
+        }catch (Exception e){
+
         }
     }
 
