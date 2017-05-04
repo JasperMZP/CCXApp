@@ -164,13 +164,23 @@ public class MainActivity extends Activity implements
         myName = (TextView) v1.findViewById(R.id.myName);
         loginout = (TextView) v1.findViewById(R.id.loginout);
         userImage = (ImageView) v1.findViewById(R.id.profile_image);
-        myName.setText(JMessageClient.getMyInfo().getNickname());
+        try {
+            myName.setText(JMessageClient.getMyInfo().getNickname());
+        }catch (Exception e){
+            myName.setText(JMessageClient.getMyInfo().getUserName());
+        }
         JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
             @Override
             public void gotResult(int i, String s, Bitmap bitmap) {
                 if(i == 0){
                     userImage.setImageBitmap(bitmap);
                 }
+            }
+        });
+        userImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(MainActivity.this, UserMessageReviseActivity.class), 1);
             }
         });
         toFriend.setOnClickListener(new View.OnClickListener() {
@@ -676,6 +686,22 @@ public class MainActivity extends Activity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == 666){
+            try {
+                myName.setText(JMessageClient.getMyInfo().getNickname());
+            }catch (Exception e){
+                myName.setText(JMessageClient.getMyInfo().getUserName());
+            }
+            JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
+                @Override
+                public void gotResult(int i, String s, Bitmap bitmap) {
+                    if(i == 0){
+                        userImage.setImageBitmap(bitmap);
+                        imageView.setImageBitmap(bitmap);
+                    }
+                }
+            });
+        }
         if (requestCode == REQUEST_SEND_MSG_ITEM && resultCode == ShowMsgEditActivity.RESULT_SEND_MSG_ITEM) {
             ShowItemModel showItem = (ShowItemModel) data.getSerializableExtra("showItem");
             List<Long> groupBelongtoList = showItem.getGroupBelongToList();

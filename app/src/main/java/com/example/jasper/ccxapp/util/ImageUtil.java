@@ -4,6 +4,7 @@ package com.example.jasper.ccxapp.util;
  * Created by Administrator on 2017/5/3 0003.
  */
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -25,6 +26,7 @@ public class ImageUtil {
 
     public final static int ACTIVITY_RESULT_CAMERA = 0001;//选择 拍照 的返回码
     public final static int ACTIVITY_RESULT_ALBUM = 0002;//选择 相册 的返回码
+    public final static int ACTIVITY_RESULT_IMAGE = 0003;//选择 相册 的返回码
 
     public Uri photoUri;// 图片路径的URI
     private Uri tempUri;
@@ -41,7 +43,7 @@ public class ImageUtil {
 
     // 选择拍照的方式
     public void byCamera() {
-        int permission = ContextCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(context, new String[]{android.Manifest.permission.CAMERA}, 1);
@@ -92,7 +94,8 @@ public class ImageUtil {
             tempUri = Uri.fromFile(picFile);
 
             // 获得剪辑图片的Intent
-            final Intent intent = cutImageByAlbumIntent();
+//            final Intent intent = cutImageByAlbumIntent();
+            Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             context.startActivityForResult(intent, ACTIVITY_RESULT_ALBUM);
 
         } catch (Exception e) {
@@ -101,10 +104,10 @@ public class ImageUtil {
     }
 
     // 调用图片剪辑程序的Intent
-    private Intent cutImageByAlbumIntent() {
+    public void cutImageByAlbumIntent(Uri image) {
 //        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
         Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setType("image/*");
+        intent.setDataAndType(image, "image/*");
         intent.putExtra("crop", "true");
         //设定宽高比
         intent.putExtra("aspectX", 1);
@@ -118,7 +121,8 @@ public class ImageUtil {
         intent.putExtra("return-data", false);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempUri);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
-        return intent;
+        intent.putExtra("noFaceDetection", true);
+        context.startActivityForResult(intent, ACTIVITY_RESULT_IMAGE);
     }
 
     //通过相机拍照后进行剪辑
@@ -135,7 +139,7 @@ public class ImageUtil {
         intent.putExtra("return-data", false);
         intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
         intent.putExtra("noFaceDetection", true);
-        context.startActivityForResult(intent, ACTIVITY_RESULT_ALBUM);
+        context.startActivityForResult(intent, ACTIVITY_RESULT_IMAGE);
     }
 
     // 对图片进行编码成Bitmap

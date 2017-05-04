@@ -16,8 +16,6 @@ import cn.jpush.im.api.BasicCallback;
 
 public class userDB {
 
-    private static UserInfo userInfo;
-
     //需输入用户名，密码新建用户
     public static void addNewUser(String userName, String pwd, final userBackListener ubl) {
         JMessageClient.register(userName, pwd, new BasicCallback() {
@@ -47,7 +45,7 @@ public class userDB {
     }
 
     //添加用户相关信息
-    public static void addUserMessage(File image, String nickName, String sex, String birthday, String address, String explain, final userBackListener ubl) {
+    public static void addUserMessage(File image, String nickName, cn.jpush.im.android.api.model.UserInfo.Gender sex, Long birthday, String address, String explain, final userBackListener ubl) {
         final int[] a = {0, 0};
         if (image != null && image.exists()) {
             a[0]++;
@@ -69,6 +67,7 @@ public class userDB {
         }
         UserInfo userInfo = new UserInfo();
         userInfo.setNickname(nickName);
+        userInfo.setGender(sex);
         userInfo.setAddress(address);
         userInfo.setSignature(explain);
         if (nickName != null) {
@@ -93,11 +92,6 @@ public class userDB {
         }
         if (sex != null) {
             a[0]++;
-            if (sex.equals("male")) {
-                userInfo.setGender(cn.jpush.im.android.api.model.UserInfo.Gender.male);
-            } else {
-                userInfo.setGender(cn.jpush.im.android.api.model.UserInfo.Gender.female);
-            }
             JMessageClient.updateMyInfo(UserInfo.Field.gender, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
@@ -118,7 +112,7 @@ public class userDB {
         }
         if (birthday != null) {
             a[0]++;
-            userInfo.setBirthday(Long.valueOf(birthday));
+            userInfo.setBirthday(birthday);
             JMessageClient.updateMyInfo(UserInfo.Field.birthday, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {

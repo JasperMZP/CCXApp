@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
@@ -27,6 +28,10 @@ import com.example.jasper.ccxapp.util.ImageUtil;
 import java.io.File;
 
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.model.UserInfo;
+
+import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_ALBUM;
+import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_IMAGE;
 
 public class AddUserMessageActivity extends AppCompatActivity {
 
@@ -44,10 +49,9 @@ public class AddUserMessageActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-//    private String image_path = "/storage/emulated/0/headimage.jpg";
     private String oriNickName;
-    private String oriSex;
-    private String oriBirthday;
+    private UserInfo.Gender oriSex;
+    private Long oriBirthday;
     private String oriAddress;
     private String oriExplain;
     private ImageUtil imageUtils;
@@ -82,8 +86,7 @@ public class AddUserMessageActivity extends AppCompatActivity {
         add_message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveUserMessage();
-                showDialog("正在添加信息");
+                showDialog("确认添加信息?");
             }
         });
 
@@ -134,7 +137,23 @@ public class AddUserMessageActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 break;
-            case ImageUtil.ACTIVITY_RESULT_ALBUM:
+            case ACTIVITY_RESULT_ALBUM:
+                try {
+                    if (resultCode == -1) {
+                        Uri selectedImage = data.getData();
+                        imageUtils.cutImageByAlbumIntent(selectedImage);
+                    } else {
+                        // 因为在无任何操作返回时，系统依然会创建一个文件，这里就是删除那个产生的文件
+                        if (imageUtils.picFile != null) {
+                            imageUtils.picFile.delete();
+                        }
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case ACTIVITY_RESULT_IMAGE:
                 try {
                     if (resultCode == -1) {
                         Bitmap bm_icon = imageUtils.decodeBitmap();
@@ -161,9 +180,14 @@ public class AddUserMessageActivity extends AppCompatActivity {
         if (permission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
         }
+        permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
+        }
         oriNickName = getIntent().getStringExtra("userName");
-        oriSex = "male";
-        oriBirthday = "19900101";
+        oriSex = UserInfo.Gender.male;
+        oriBirthday = Long.valueOf(19900101);
         oriAddress = "北京";
         oriExplain = "";
         String password = getIntent().getStringExtra("password");
@@ -191,20 +215,20 @@ public class AddUserMessageActivity extends AppCompatActivity {
         File imagePath = imageUtils.picFile;
         String nickname = nickName.getText().toString().trim();
         int sexid = message_sex.getCheckedRadioButtonId();
-        String sex;
+        UserInfo.Gender sex;
         if(sexid == R.id.female){
-            sex = "female";
+            sex = UserInfo.Gender.female;
         }else{
-            sex = "male";
+            sex = UserInfo.Gender.male;
         }
-        String birthday = message_birthday.getText().toString().trim();
+        Long birthday = Long.valueOf(message_birthday.getText().toString().trim());
         String address = message_address.getText().toString().trim();
         String explain = message_explain.getText().toString().trim();
 
         if(nickname.equals(oriNickName) || nickname.equals("")){
             nickname = null;
         }
-        if(oriSex.equals(sex)){
+        if(oriSex == sex){
             sex = null;
         }
         if(birthday.equals(oriBirthday)){
@@ -232,7 +256,12 @@ public class AddUserMessageActivity extends AppCompatActivity {
 
     private void showDialog(String message) {
         new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
-                .setPositiveButton("确定", null).show();
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveUserMessage();
+                    }
+                }).setNegativeButton("取消", null).show();
     }
 
     private void showDialog2(String message) {

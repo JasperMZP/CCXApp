@@ -3,9 +3,13 @@ package com.example.jasper.ccxapp.ui;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -13,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -23,6 +28,13 @@ import com.example.jasper.ccxapp.util.ImageUtil;
 
 import java.io.File;
 
+import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
+import cn.jpush.im.android.api.model.UserInfo;
+
+import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_ALBUM;
+import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_IMAGE;
+
 public class UserMessageReviseActivity extends AppCompatActivity {
 
 
@@ -31,6 +43,8 @@ public class UserMessageReviseActivity extends AppCompatActivity {
     private EditText userName;
     private EditText nickName;
     private RadioGroup message_sex;
+    private RadioButton male;
+    private RadioButton female;
     private EditText message_birthday;
     private EditText message_address;
     private EditText message_explain;
@@ -40,10 +54,9 @@ public class UserMessageReviseActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-    private File image_path;
     private String oriNickName;
-    private String oriSex;
-    private String oriBirthday;
+    private UserInfo.Gender oriSex;
+    private Long oriBirthday;
     private String oriAddress;
     private String oriExplain;
     private ImageUtil imageUtils;
@@ -62,9 +75,12 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         message_address = (EditText)findViewById(R.id.message_address);
         message_explain = (EditText)findViewById(R.id.message_explain);
         add_message = (Button)findViewById(R.id.add_message_btn);
+        male = (RadioButton)findViewById(R.id.male);
+        female = (RadioButton)findViewById(R.id.female);
         imageUtils = new ImageUtil(UserMessageReviseActivity.this);
 
-        userName.setText(getIntent().getStringExtra("userName"));
+        initVariable();
+
         btn_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,13 +91,44 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         add_message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveUserMessage();
-                showDialog("正在添加信息");
+                showDialog("确认修改信息?");
             }
         });
     }
 
+    private void initVariable() {
+        oriNickName = JMessageClient.getMyInfo().getNickname();
+        oriAddress = JMessageClient.getMyInfo().getAddress();
+        oriBirthday = JMessageClient.getMyInfo().getBirthday();
+        oriSex = JMessageClient.getMyInfo().getGender();
+        oriExplain = JMessageClient.getMyInfo().getSignature();
+
+        JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
+            @Override
+            public void gotResult(int i, String s, Bitmap bitmap) {
+                if(i == 0){
+                    message_image.setImageBitmap(bitmap);
+                }
+            }
+        });
+        userName.setText(JMessageClient.getMyInfo().getUserName());
+        nickName.setText(oriNickName);
+        message_address.setText(oriAddress);
+        message_birthday.setText(String.valueOf(oriBirthday));
+        if(oriSex.equals(UserInfo.Gender.male)){
+            male.setChecked(true);
+        }else{
+            female.setChecked(true);
+        }
+        message_explain.setText(oriExplain);
+    }
+
     private void chooseDialog() {
+        //获得读取本地数据权限
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+        }
         new AlertDialog.Builder(this)
                 .setTitle("选择头像")
                 .setNegativeButton("相册", new DialogInterface.OnClickListener() {
@@ -124,7 +171,23 @@ public class UserMessageReviseActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 break;
-            case ImageUtil.ACTIVITY_RESULT_ALBUM:
+            case ACTIVITY_RESULT_ALBUM:
+                try {
+                    if (resultCode == -1) {
+                        Uri selectedImage = data.getData();
+                        imageUtils.cutImageByAlbumIntent(selectedImage);
+                    } else {
+                        // 因为在无任何操作返回时，系统依然会创建一个文件，这里就是删除那个产生的文件
+                        if (imageUtils.picFile != null) {
+                            imageUtils.picFile.delete();
+                        }
+
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case ACTIVITY_RESULT_IMAGE:
                 try {
                     if (resultCode == -1) {
                         Bitmap bm_icon = imageUtils.decodeBitmap();
@@ -149,23 +212,23 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         File imagePath = imageUtils.picFile;
         String nickname = nickName.getText().toString().trim();
         int sexid = message_sex.getCheckedRadioButtonId();
-        String sex;
+        UserInfo.Gender sex;
         if(sexid == R.id.female){
-            sex = "female";
+            sex = UserInfo.Gender.female;
         }else{
-            sex = "male";
+            sex = UserInfo.Gender.male;
         }
-        String birthday = message_birthday.getText().toString().trim();
+        Long birthday = Long.valueOf(message_birthday.getText().toString().trim());
         String address = message_address.getText().toString().trim();
         String explain = message_explain.getText().toString().trim();
 
         if(nickname.equals(oriNickName) || nickname.equals("")){
             nickname = null;
         }
-        if(oriSex.equals(sex)){
+        if(oriSex == sex){
             sex = null;
         }
-        if(birthday.equals(oriBirthday)){
+        if(birthday == oriBirthday){
             birthday = null;
         }
         if(address.equals(oriAddress)){
@@ -178,6 +241,9 @@ public class UserMessageReviseActivity extends AppCompatActivity {
             @Override
             public void showResult(boolean result,String message) {
                 if(result){
+                    if(imageUtils.picFile != null || !oriNickName.equals(JMessageClient.getMyInfo().getNickname())) {
+                        setResult(666, getIntent());
+                    }
                     Toast.makeText(UserMessageReviseActivity.this, "修改信息成功", Toast.LENGTH_SHORT).show();
                     finish();
                 }else{
@@ -189,11 +255,15 @@ public class UserMessageReviseActivity extends AppCompatActivity {
 
     private void showDialog(String message) {
         new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
-                .setPositiveButton("确定", null).show();
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        saveUserMessage();
+                    }
+                }).setNegativeButton("取消", null).show();
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
             this.finish();
         }
