@@ -6,6 +6,10 @@ android {
     aaptOptions.cruncherEnabled = false
     aaptOptions.useNewCruncher = false
 
+    lintOptions {
+        abortOnError false
+    }
+    
     defaultConfig {
         applicationId "com.example.jasper.ccxapp"
         minSdkVersion 19
