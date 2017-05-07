@@ -5,13 +5,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
@@ -31,16 +31,13 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
-
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 import com.example.jasper.ccxapp.util.showMessage;
 import com.example.jasper.ccxapp.widget.CustomVideoView;
@@ -60,7 +57,7 @@ import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
-import cn.jpush.im.android.api.content.EventNotificationContent;
+import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
@@ -75,6 +72,7 @@ import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.model.UserInfo;
 import cn.jpush.im.api.BasicCallback;
+import de.hdodenhof.circleimageview.CircleImageView;
 import me.iwf.photopicker.PhotoPreview;
 
 public class MainActivity extends Activity implements
@@ -93,7 +91,7 @@ public class MainActivity extends Activity implements
     private ArrayList<List<CommentItemModel>> childCommentList = new ArrayList<List<CommentItemModel>>();
     private MyexpandableListAdapter adapter;
     private Conversation mConversation;
-    private MediaPlayer mediaPlayer = new MediaPlayer();
+    private MediaPlayer mediaPlayer;
 
 
     //收到的图片消息
@@ -105,7 +103,9 @@ public class MainActivity extends Activity implements
     private TextView toFriend;
     private TextView myName;
     private TextView loginout;
+    private CircleImageView leftUserAvatarCIV;
     private DrawerLayout drawerLayout;
+    private CircleImageView myAvatarCIV;
 
 
     @Override
@@ -143,7 +143,16 @@ public class MainActivity extends Activity implements
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
         addShowBtn = (Button) findViewById(R.id.add_show_btn);
+        myAvatarCIV = (CircleImageView) findViewById(R.id.my_avatar_civ);
 
+        JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
+            @Override
+            public void gotResult(int i, String s, Bitmap bitmap) {
+                if (i == 0) {
+                    myAvatarCIV.setImageBitmap(bitmap);
+                }
+            }
+        });
 
         initDrawerLayout();
         drawerLayout.setScrimColor(Color.GRAY);
@@ -157,7 +166,26 @@ public class MainActivity extends Activity implements
         toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
         myName = (TextView) v1.findViewById(R.id.myName);
         loginout = (TextView) v1.findViewById(R.id.loginout);
-        myName.setText(JMessageClient.getMyInfo().getNickname());
+        leftUserAvatarCIV = (CircleImageView) v1.findViewById(R.id.left_my_avatar_civ);
+        try {
+            myName.setText(JMessageClient.getMyInfo().getNickname());
+        } catch (Exception e) {
+            myName.setText(JMessageClient.getMyInfo().getUserName());
+        }
+        JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
+            @Override
+            public void gotResult(int i, String s, Bitmap bitmap) {
+                if (i == 0) {
+                    leftUserAvatarCIV.setImageBitmap(bitmap);
+                }
+            }
+        });
+        leftUserAvatarCIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivityForResult(new Intent(MainActivity.this, UserMessageReviseActivity.class), 1);
+            }
+        });
         toFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,14 +216,6 @@ public class MainActivity extends Activity implements
     }
 
     private void loginOut() {
-        try {
-            File file = new File(getFilesDir(), "info.properties");
-            file.delete();
-            File file2 = new File(getFilesDir(), "infoRequest.properties");
-            file2.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         JMessageClient.logout();
         startActivity(new Intent(MainActivity.this, LoginActivity.class));
         this.finish();
@@ -447,7 +467,7 @@ public class MainActivity extends Activity implements
                 showHolder = new ShowHolder();
                 convertView = inflater.inflate(R.layout.show_item, null);
                 showHolder.showUsernameTv = (TextView) convertView.findViewById(R.id.show_username_tv);
-                showHolder.showUserAvatarIv = (ImageView) convertView.findViewById(R.id.show_user_avatar);
+                showHolder.showUserAvatarCIv = (CircleImageView) convertView.findViewById(R.id.show_user_avatar_civ);
                 showHolder.showTextTv = (TextView) convertView.findViewById(R.id.show_text_content_tv);
                 showHolder.expandedIv = (ImageView) convertView.findViewById(R.id.expanded_img);
                 showHolder.showImageRv = (RecyclerView) convertView.findViewById(R.id.show_recycler_view);
@@ -462,6 +482,13 @@ public class MainActivity extends Activity implements
             final ShowItemModel showItem = (ShowItemModel) getGroup(groupPosition);
             showHolder.showUsernameTv.setText(showItem.getShowUsername());
             showHolder.showTextTv.setText(showItem.getShowText());
+            File avatarFile = showItem.getShowAvatar();
+            if (avatarFile!=null){
+                Log.i("test","头像不为NULL ");
+                showHolder.showUserAvatarCIv.setImageBitmap(BitmapFactory.decodeFile(avatarFile.getPath()));
+            }else {
+                Log.i("test","头像为NULL");
+            }
 
             if (showItem.getShowImagesList() != null) {
                 showVideoView.setVisibility(View.GONE);
@@ -584,10 +611,9 @@ public class MainActivity extends Activity implements
                 commentHolder.playVoiceCommentBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (mediaPlayer.isPlaying()) {
-                            mediaPlayer.reset();
-                            initMediaPlayer(commentItem.getCommentVoice());
-                        }
+                        mediaPlayer= new MediaPlayer();
+                        initMediaPlayer(commentItem.getCommentVoice());
+                        Log.i("test","点击了播放语音"+commentItem.getCommentVoice());
                         mediaPlayer.start();
                     }
                 });
@@ -622,11 +648,9 @@ public class MainActivity extends Activity implements
     class ShowHolder {
 
         TextView showUsernameTv;
-        ImageView showUserAvatarIv;
+        CircleImageView showUserAvatarCIv;
         TextView showTextTv;
         RecyclerView showImageRv;
-        CustomVideoView showVideoView;
-        ImageView showVideoPlayBtn;
         ImageView expandedIv;
     }
 
@@ -651,8 +675,17 @@ public class MainActivity extends Activity implements
         ShowItemModel firstVisibleShowItem = (ShowItemModel) adapter.getGroup(firstVisibleGroupPos);
         TextView showUsernameTv = (TextView) headerView.findViewById(R.id.show_username_tv);
         TextView showTextTv = (TextView) headerView.findViewById(R.id.show_text_content_tv);
+        CircleImageView showAvatarIv = (CircleImageView) headerView.findViewById(R.id.show_user_avatar_civ);
         showUsernameTv.setText(firstVisibleShowItem.getShowUsername());
         showTextTv.setText(firstVisibleShowItem.getShowText());
+
+        File avatarFile = firstVisibleShowItem.getShowAvatar();
+        if (avatarFile!=null){
+            Log.i("test","头像不为NULL ");
+            showAvatarIv.setImageBitmap(BitmapFactory.decodeFile(avatarFile.getPath()));
+        }else {
+            Log.i("test","头像为NULL");
+        }
     }
 
     @Override
@@ -669,6 +702,23 @@ public class MainActivity extends Activity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == 666) {
+            try {
+                myName.setText(JMessageClient.getMyInfo().getNickname());
+            } catch (Exception e) {
+                myName.setText(JMessageClient.getMyInfo().getUserName());
+            }
+            JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
+                @Override
+                public void gotResult(int i, String s, Bitmap bitmap) {
+                    if (i == 0) {
+                        leftUserAvatarCIV.setImageBitmap(bitmap);
+                        myAvatarCIV.setImageBitmap(bitmap);
+                    }
+                }
+            });
+        }
+
         if (requestCode == REQUEST_SEND_MSG_ITEM && resultCode == ShowMsgEditActivity.RESULT_SEND_MSG_ITEM) {
             ShowItemModel showItem = (ShowItemModel) data.getSerializableExtra("showItem");
             List<Long> groupBelongtoList = showItem.getGroupBelongToList();
@@ -679,7 +729,9 @@ public class MainActivity extends Activity implements
                 sendToGroup(showItem);
             }
 
-            showItem.setShowUsername(JMessageClient.getMyInfo().getNickname());
+            UserInfo myInfo = JMessageClient.getMyInfo();
+            showItem.setShowUsername(myInfo.getNickname());
+            showItem.setShowAvatar(myInfo.getAvatarFile());
             showList.add(0, showItem);
 
             ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
@@ -746,16 +798,12 @@ public class MainActivity extends Activity implements
         switch (event.getType()) {
             case invite_received://收到好友邀请
                 showMessage.showNewFriend(MainActivity.this, fromUsername + "请求添加您为好友", "点击查看详细信息");
-//                saveRequest(fromUsername, reason);
                 break;
             case invite_accepted://对方接收了你的好友邀请
-                //...
                 break;
             case invite_declined://对方拒绝了你的好友邀请
-                //...
                 break;
             case contact_deleted://对方将你从好友中删除
-                //...
                 break;
             default:
                 break;
@@ -836,6 +884,7 @@ public class MainActivity extends Activity implements
                 Log.i("test", "解析出群:" + groupIds[i]);
             }
             textShowItem.setGroupBelongToList(groupIdBelongTo);
+            textShowItem.setShowAvatar(tUserInfo.getAvatarFile());
             showList.add(0, textShowItem);
 
             ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
@@ -942,7 +991,7 @@ public class MainActivity extends Activity implements
                     Log.i("test", "解析出群:" + iGroupIds[i]);
                 }
                 CheckRecievedShowItem.setGroupBelongToList(iGroupIdBelongTo);
-
+                CheckRecievedShowItem.setShowAvatar(iUserInfo.getAvatarFile());
                 showList.add(0, CheckRecievedShowItem);
 
                 ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
@@ -998,7 +1047,16 @@ public class MainActivity extends Activity implements
                             Log.i("test", "解析出群:" + groupIds[j]);
                         }
                         videoShowItem.setGroupBelongToList(groupIdBelongTo);
-
+                        final Bitmap[] avatarBitmap = new Bitmap[1];
+                        fUserInfo.getAvatarBitmap(new GetAvatarBitmapCallback() {
+                            @Override
+                            public void gotResult(int i, String s, Bitmap bitmap) {
+                                if (i==0) {
+                                    avatarBitmap[0] = bitmap;
+                                }
+                            }
+                        });
+                        videoShowItem.setShowAvatar(fUserInfo.getAvatarFile());
                         showList.add(0, videoShowItem);
 
                         ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();

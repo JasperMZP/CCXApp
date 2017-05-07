@@ -1,5 +1,8 @@
 package com.example.jasper.ccxapp.entitiy;
 
+import android.graphics.Bitmap;
+
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +18,15 @@ public class ShowItemModel implements Serializable {
     private String showText;
     private ArrayList<String> showImagesList;
     private String showVideo;
+    private File showAvatar;
+
+    public File getShowAvatar() {
+        return showAvatar;
+    }
+
+    public void setShowAvatar(File showAvatar) {
+        this.showAvatar = showAvatar;
+    }
 
     public List<Long> getGroupBelongToList() {
         return groupBelongToList;

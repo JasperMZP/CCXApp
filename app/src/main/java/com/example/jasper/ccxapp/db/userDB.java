@@ -16,16 +16,14 @@ import cn.jpush.im.api.BasicCallback;
 
 public class userDB {
 
-    private static UserInfo userInfo;
-
     //需输入用户名，密码新建用户
     public static void addNewUser(String userName, String pwd, final userBackListener ubl) {
         JMessageClient.register(userName, pwd, new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
-                if(s.equals("Success")) {
+                if (i == 0) {
                     ubl.showResult(true, "");
-                }else{
+                } else {
                     ubl.showResult(false, s);
                 }
             }
@@ -37,9 +35,9 @@ public class userDB {
         JMessageClient.login(userName, password, new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
-                if(i == 0){
+                if (i == 0) {
                     ubl.showResult(true, "");
-                }else{
+                } else {
                     ubl.showResult(false, s);
                 }
             }
@@ -47,83 +45,129 @@ public class userDB {
     }
 
     //添加用户相关信息
-    public static void addUserMessage(String imgPath, String nickName, String sex, String birthday, String address, String explain, final userBackListener ubl) {
-        if(imgPath != null) {
-            File file = new File(imgPath);
-            if(file.exists()) {
-                JMessageClient.updateUserAvatar(file, new BasicCallback() {
-                    @Override
-                    public void gotResult(int i, String s) {
-                        Log.i("user", "aaaaaaaaaaaafile" + i + "    " + s);
-                        if (i != 0) {
-                            ubl.showResult(false, "");
+    public static void addUserMessage(File image, String nickName, cn.jpush.im.android.api.model.UserInfo.Gender sex, Long birthday, String address, String explain, final userBackListener ubl) {
+        final int[] a = {0, 0};
+        if (image != null && image.exists()) {
+            a[0]++;
+            JMessageClient.updateUserAvatar(image, new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    Log.i("user", "aaaaaaaaaaaafile" + i + "    " + s);
+                    if (i != 0) {
+                        ubl.showResult(false, s);
+                        a[1]++;
+                    } else {
+                        a[0]--;
+                        if (a[0] == 0) {
+                            ubl.showResult(true, "");
                         }
                     }
-                });
-            }
+                }
+            });
         }
         UserInfo userInfo = new UserInfo();
         userInfo.setNickname(nickName);
+        userInfo.setGender(sex);
         userInfo.setAddress(address);
         userInfo.setSignature(explain);
-        if(nickName != null){
+        if (nickName != null) {
+            a[0]++;
             JMessageClient.updateMyInfo(UserInfo.Field.nickname, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("user", "aaaaaaaaaaaanickname"+i+"    "+s);
-                    if(i != 0){
-                        ubl.showResult(false, s);
+                    Log.i("user", "aaaaaaaaaaaanickname" + i + "    " + s);
+                    if (i != 0) {
+                        if (a[1] == 0) {
+                            ubl.showResult(false, s);
+                            a[1]++;
+                        }
+                    } else {
+                        a[0]--;
+                        if (a[0] == 0) {
+                            ubl.showResult(true, "");
+                        }
                     }
                 }
             });
         }
-        if(sex != null){
-            if(sex.equals("male")) {
-                userInfo.setGender(cn.jpush.im.android.api.model.UserInfo.Gender.male);
-            }else{
-                userInfo.setGender(cn.jpush.im.android.api.model.UserInfo.Gender.female);
-            }
+        if (sex != null) {
+            a[0]++;
             JMessageClient.updateMyInfo(UserInfo.Field.gender, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("user", "aaaaaaaaaaaagender"+i+"    "+s);
-                    if(i != 0){
-                        ubl.showResult(false, s);
+                    Log.i("user", "aaaaaaaaaaaagender" + i + "    " + s);
+                    if (i != 0) {
+                        if (a[1] == 0) {
+                            ubl.showResult(false, s);
+                            a[1]++;
+                        }
+                    } else {
+                        a[0]--;
+                        if (a[0] == 0) {
+                            ubl.showResult(true, "");
+                        }
                     }
                 }
             });
         }
-        if(birthday != null){
-            userInfo.setBirthday(Long.valueOf(birthday));
+        if (birthday != null) {
+            a[0]++;
+            userInfo.setBirthday(birthday);
             JMessageClient.updateMyInfo(UserInfo.Field.birthday, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("user", "aaaaaaaaaaaabirthday"+i+"    "+s);
-                    if(i != 0){
-                        ubl.showResult(false, s);
+                    Log.i("user", "aaaaaaaaaaaabirthday" + i + "    " + s);
+                    if (i != 0) {
+                        if (a[1] == 0) {
+                            ubl.showResult(false, s);
+                            a[1]++;
+                        }
+                    } else {
+                        a[0]--;
+                        if (a[0] == 0) {
+                            ubl.showResult(true, "");
+                        }
                     }
                 }
             });
         }
-        if(address != null){
+        if (address != null) {
+            a[0]++;
             JMessageClient.updateMyInfo(UserInfo.Field.address, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("user", "aaaaaaaaaaaaaddress"+i+"    "+s);
-                    if(i != 0){
-                        ubl.showResult(false, s);
+                    Log.i("user", "aaaaaaaaaaaaaddress" + i + "    " + s);
+                    if (i != 0) {
+                        if (a[1] == 0) {
+                            ubl.showResult(false, s);
+                            a[1]++;
+                        }
+                    } else {
+                        a[0]--;
+                        if (a[0] == 0) {
+                            ubl.showResult(true, "");
+                        }
                     }
                 }
             });
         }
 
-        if(explain != null){
+        if (explain != null) {
+            a[0]++;
             JMessageClient.updateMyInfo(UserInfo.Field.signature, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("user", "aaaaaaaaaaaasignture"+i+"    "+s);
-                    if(i != 0){
-                        ubl.showResult(false, s);
+                    Log.i("user", "aaaaaaaaaaaasignture" + i + "    " + s);
+                    if (i != 0) {
+                        if (a[1] == 0) {
+                            ubl.showResult(false, s);
+                            a[1]++;
+                        }
+                    } else {
+                        a[0]--;
+                        if (a[0] == 0) {
+                            ubl.showResult(true, "");
+                        }
                     }
                 }
             });
