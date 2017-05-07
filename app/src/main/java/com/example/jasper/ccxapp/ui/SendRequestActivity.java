@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -49,6 +50,7 @@ public class SendRequestActivity extends AppCompatActivity{
 
     private void sendfriendrequest() {
         String userName2 = getIntent().getStringExtra("newFriendName");
+        Log.i("test",userName2);
         String message = add_friend_reason.getText().toString().trim();
 
         friendDB.sendfriendrequest(userName2, message,

@@ -113,7 +113,9 @@ public class friendDB {
             @Override
             public void done(String s, BmobException e) {
                 if(e==null){
-                    ContactManager.sendInvitationRequest(userName2, null, message, new BasicCallback() {
+                    String userId = userName2.substring(userName2.indexOf("(")+1,userName2.indexOf(")"));
+                    Log.i("test",userId);
+                    ContactManager.sendInvitationRequest(userId, null, message, new BasicCallback() {
                         @Override
                         public void gotResult(int i, String s) {
                             if(0 == i){
