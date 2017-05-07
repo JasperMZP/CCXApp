@@ -48,4 +48,7 @@ dependencies {
 
     //群组标签显示组件
     compile 'com.zhy:flowlayout-lib:1.0.3'
+
+    //圆形头像
+    compile 'de.hdodenhof:circleimageview:2.1.0'
 }
