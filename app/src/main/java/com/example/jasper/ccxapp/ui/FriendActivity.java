@@ -17,10 +17,7 @@ import com.example.jasper.ccxapp.adapter.FriendAdapter;
 import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
-import java.util.Properties;
 
 import cn.jpush.im.android.api.model.UserInfo;
 
@@ -92,25 +89,6 @@ public class FriendActivity extends AppCompatActivity {
 
 		FriendAdapter adapter = new FriendAdapter(FriendActivity.this, message);
 		lv.setAdapter(adapter);
-	}
-
-	public String getUserName(){
-		try {
-            // 创建File对象
-            File file = new File(getFilesDir(), "info.properties");
-            // 创建FileIutputStream 对象
-            FileInputStream fis = new FileInputStream(file);
-            // 创建属性对象
-            Properties pro = new Properties();
-            // 加载文件
-            pro.load(fis);
-            // 关闭输入流对象
-            fis.close();
-            return pro.get("userName").toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
 	}
 
 	private void showDialog(String message) {

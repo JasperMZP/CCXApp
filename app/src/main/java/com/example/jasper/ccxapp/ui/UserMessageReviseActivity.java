@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -28,18 +29,22 @@ import com.example.jasper.ccxapp.util.ImageUtil;
 import java.io.File;
 
 import cn.jpush.im.android.api.JMessageClient;
+import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 
 import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_ALBUM;
 import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_IMAGE;
 
-public class AddUserMessageActivity extends AppCompatActivity {
+public class UserMessageReviseActivity extends AppCompatActivity {
+
 
     private ImageView message_image;
     private Button btn_image;
     private EditText userName;
     private EditText nickName;
     private RadioGroup message_sex;
+    private RadioButton male;
+    private RadioButton female;
     private EditText message_birthday;
     private EditText message_address;
     private EditText message_explain;
@@ -56,13 +61,10 @@ public class AddUserMessageActivity extends AppCompatActivity {
     private String oriExplain;
     private ImageUtil imageUtils;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_user_message);
-
-        Toast.makeText(this, "注册完成，请填写详细信息", Toast.LENGTH_SHORT).show();
+        setContentView(R.layout.activity_user_message_revise);
 
         message_image = (ImageView)findViewById(R.id.add_message_image);
         btn_image = (Button)findViewById(R.id.add_message_image_btn);
@@ -73,9 +75,12 @@ public class AddUserMessageActivity extends AppCompatActivity {
         message_address = (EditText)findViewById(R.id.message_address);
         message_explain = (EditText)findViewById(R.id.message_explain);
         add_message = (Button)findViewById(R.id.add_message_btn);
-        imageUtils = new ImageUtil(AddUserMessageActivity.this);
+        male = (RadioButton)findViewById(R.id.male);
+        female = (RadioButton)findViewById(R.id.female);
+        imageUtils = new ImageUtil(UserMessageReviseActivity.this);
 
-        userName.setText(getIntent().getStringExtra("userName"));
+        initVariable();
+
         btn_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,14 +91,44 @@ public class AddUserMessageActivity extends AppCompatActivity {
         add_message.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog("确认添加信息?");
+                showDialog("确认修改信息?");
             }
         });
+    }
 
-        addOriMessage();
+    private void initVariable() {
+        oriNickName = JMessageClient.getMyInfo().getNickname();
+        oriAddress = JMessageClient.getMyInfo().getAddress();
+        oriBirthday = JMessageClient.getMyInfo().getBirthday();
+        oriSex = JMessageClient.getMyInfo().getGender();
+        oriExplain = JMessageClient.getMyInfo().getSignature();
+
+        JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
+            @Override
+            public void gotResult(int i, String s, Bitmap bitmap) {
+                if(i == 0){
+                    message_image.setImageBitmap(bitmap);
+                }
+            }
+        });
+        userName.setText(JMessageClient.getMyInfo().getUserName());
+        nickName.setText(oriNickName);
+        message_address.setText(oriAddress);
+        message_birthday.setText(String.valueOf(oriBirthday));
+        if(oriSex.equals(UserInfo.Gender.male)){
+            male.setChecked(true);
+        }else{
+            female.setChecked(true);
+        }
+        message_explain.setText(oriExplain);
     }
 
     private void chooseDialog() {
+        //获得读取本地数据权限
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+        }
         new AlertDialog.Builder(this)
                 .setTitle("选择头像")
                 .setNegativeButton("相册", new DialogInterface.OnClickListener() {
@@ -113,7 +148,6 @@ public class AddUserMessageActivity extends AppCompatActivity {
                         }
                     }
                 }).show();
-
     }
 
     // 这里需要注意resultCode，正常情况返回值为 -1 没有任何操作直接后退则返回 0
@@ -174,43 +208,6 @@ public class AddUserMessageActivity extends AppCompatActivity {
         }
     }
 
-    private void addOriMessage() {
-        //获得读取本地数据权限
-        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
-        }
-        permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
-        }
-        oriNickName = getIntent().getStringExtra("userName");
-        oriSex = UserInfo.Gender.male;
-        oriBirthday = Long.valueOf(19900101);
-        oriAddress = "北京";
-        oriExplain = "";
-        String password = getIntent().getStringExtra("password");
-        userDB.forUserLogin(oriNickName, password, new userBackListener() {
-            @Override
-            public void showResult(boolean result, String message) {
-                if(!result){
-                    showDialog2("联网错误！");
-                }else{
-                    userDB.addUserMessage(null, oriNickName, oriSex, oriBirthday, oriAddress,
-                            oriExplain, new userBackListener() {
-                                @Override
-                                public void showResult(boolean result, String message) {
-                                    if(!result){
-                                        showDialog2("联网错误！");
-                                    }
-                                }
-                            });
-                }
-            }
-        });
-    }
-
     private void saveUserMessage() {
         File imagePath = imageUtils.picFile;
         String nickname = nickName.getText().toString().trim();
@@ -231,7 +228,7 @@ public class AddUserMessageActivity extends AppCompatActivity {
         if(oriSex == sex){
             sex = null;
         }
-        if(birthday.equals(oriBirthday)){
+        if(birthday == oriBirthday){
             birthday = null;
         }
         if(address.equals(oriAddress)){
@@ -244,11 +241,13 @@ public class AddUserMessageActivity extends AppCompatActivity {
             @Override
             public void showResult(boolean result,String message) {
                 if(result){
-                    Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+                    if(imageUtils.picFile != null || !oriNickName.equals(JMessageClient.getMyInfo().getNickname())) {
+                        setResult(666, getIntent());
+                    }
+                    Toast.makeText(UserMessageReviseActivity.this, "修改信息成功", Toast.LENGTH_SHORT).show();
                     finish();
                 }else{
-                    Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserMessageReviseActivity.this, "修改信息失败", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -264,24 +263,8 @@ public class AddUserMessageActivity extends AppCompatActivity {
                 }).setNegativeButton("取消", null).show();
     }
 
-    private void showDialog2(String message) {
-        new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
-                        finish();
-                    }
-                }).show();
-    }
-
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){
-            JMessageClient.logout();
-            Intent myIntent;
-            myIntent = new Intent(AddUserMessageActivity.this, LoginActivity.class);
-            startActivity(myIntent);
             this.finish();
         }
         return false;

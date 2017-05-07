@@ -106,14 +106,16 @@ public class friendDB {
         });
     }
 
-    //发送好友请求,userName1为发送人，userName2为接受请求人
-    public static void sendfriendrequest(String userName1, final String userName2, final String message, final userBackListener userBackListener) {
-        NewFriend friend = getNewFriend(userName1, userName2, message);
+    //发送好友请求,userName2为接受请求人
+    public static void sendfriendrequest(final String userName2, final String message, final userBackListener userBackListener) {
+        NewFriend friend = getNewFriend(JMessageClient.getMyInfo().getUserName(), userName2, message);
         friend.save(new SaveListener<String>() {
             @Override
             public void done(String s, BmobException e) {
                 if(e==null){
-                    ContactManager.sendInvitationRequest(userName2, null, message, new BasicCallback() {
+                    String userId = userName2.substring(userName2.indexOf("(")+1,userName2.indexOf(")"));
+                    Log.i("test",userId);
+                    ContactManager.sendInvitationRequest(userId, null, message, new BasicCallback() {
                         @Override
                         public void gotResult(int i, String s) {
                             if(0 == i){
@@ -182,23 +184,36 @@ public class friendDB {
 
     //得到该用户被请求为好友的信息
     public static void searchRequestList(String userName, final userBackListListener userBackListListener) {
+        final List<UserInfo> userInfos = new ArrayList<UserInfo>();
         BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
         query.addWhereEqualTo("responseFriend", userName);
         query.setLimit(200);
         query.findObjects(new FindListener<NewFriend>() {
             @Override
-            public void done(List<NewFriend> list, BmobException e) {
-                ArrayList<String> messages = new ArrayList<String>();
+            public void done(final List<NewFriend> list, BmobException e) {
+                final ArrayList<String> messages = new ArrayList<String>();
                 if(e==null){
-                    for(NewFriend friend : list) {
-                        messages.add(friend.getRequestFriend());
-                        messages.add(friend.getMessage());
+                    for(final NewFriend friend : list) {
+                        JMessageClient.getUserInfo(friend.getRequestFriend(), new GetUserInfoCallback() {
+                            @Override
+                            public void gotResult(int i, String s, UserInfo userInfo) {
+                                if(i == 0){
+                                    userInfos.add(userInfo);
+                                    messages.add(friend.getMessage());
+                                }else{
+                                    userBackListListener.showResult(false, null, null);
+                                    return;
+                                }
+                                if(messages.size() == list.size()){
+                                    userBackListListener.showResult(true, messages, userInfos);
+                                }
+                            }
+                        });
                     }
-                    userBackListListener.showResult(true, messages);
                 }else {
                     Log.e("friend", "查询信息失败" + e.getMessage());
                     messages.add(e.getMessage());
-                    userBackListListener.showResult(false, messages);
+                    userBackListListener.showResult(false, messages, null);
                 }
             }
         });

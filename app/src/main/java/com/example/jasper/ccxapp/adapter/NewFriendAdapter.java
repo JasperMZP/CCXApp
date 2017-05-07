@@ -18,10 +18,10 @@ import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
-import cn.jpush.im.android.api.callback.GetUserInfoCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 
 public class NewFriendAdapter extends BaseAdapter {
@@ -29,25 +29,25 @@ public class NewFriendAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     private Context context;
     private View.OnClickListener onClickListener;
-    private ArrayList<String> imgPath;
-    private ArrayList<String> userName;
+    private List<UserInfo> userInfos;
+    private ArrayList<String> message;
 
     public NewFriendAdapter(Context context) {
         this.mInflater = LayoutInflater.from(context);
         this.context = context;
     }
 
-    public NewFriendAdapter(Context context, View.OnClickListener clickListener, ArrayList<String> imgPath, ArrayList<String> userName) {
+    public NewFriendAdapter(Context context, View.OnClickListener clickListener, List<UserInfo> userInfos, ArrayList<String> message) {
         this.mInflater = LayoutInflater.from(context);
         this.context = context;
-        this.imgPath = imgPath;
-        this.userName = userName;
+        this.userInfos = userInfos;
+        this.message = message;
         this.onClickListener = clickListener;
     }
 
     @Override
     public int getCount() {
-        return (userName.size()-1)/2;
+        return userInfos.size();
     }
 
     @Override
@@ -78,31 +78,24 @@ public class NewFriendAdapter extends BaseAdapter {
         }
         final ViewHolder finalHolder = (ViewHolder)convertView.getTag();//取出ViewHolder对象                  }
     		/*设置TextView显示的内容，即我们存放在动态数组中的数据*/
-        JMessageClient.getUserInfo(userName.get(position*2).toString(), new GetUserInfoCallback(){
+        userInfos.get(position).getAvatarBitmap(new GetAvatarBitmapCallback() {
             @Override
-            public void gotResult(int i, String s, UserInfo userInfo) {
+            public void gotResult(int i, String s, Bitmap bitmap) {
                 if(i == 0){
-                    userInfo.getAvatarBitmap(new GetAvatarBitmapCallback() {
-                        @Override
-                        public void gotResult(int i, String s, Bitmap bitmap) {
-                            if(i == 0){
-                                finalHolder.a_friend_image.setImageBitmap(bitmap);
-                            }
-                        }
-                    });
+                    finalHolder.a_friend_image.setImageBitmap(bitmap);
                 }
             }
         });
-        finalHolder.a_friend_name.setText(userName.get(position*2).toString());
-        finalHolder.a_friend_request.setText(userName.get(position*2+1).toString());
+        finalHolder.a_friend_name.setText(userInfos.get(position).getNickname()+"("+userInfos.get(position).getUserName()+")");
+        finalHolder.a_friend_request.setText(message.get(position));
         finalHolder.btn_agree.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(context).setTitle("系统提示").setMessage("确认添加"+userName.get(position*2).toString()+"为好友？")
+                new AlertDialog.Builder(context).setTitle("系统提示").setMessage("确认添加"+userInfos.get(position).getNickname() +"("+userInfos.get(position).getUserName()+")"+"为好友？")
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                friendDB.agreenewfriend(userName.get(userName.size()-1), userName.get(position*2).toString(), new userBackListener(){
+                                friendDB.agreenewfriend(JMessageClient.getMyInfo().getUserName(), userInfos.get(position).getUserName(), new userBackListener(){
                                     @Override
                                     public void showResult(boolean result, String message) {
                                         onClickListener.onClick(null);
