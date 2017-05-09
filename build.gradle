@@ -11,7 +11,6 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
-
 allprojects {
     repositories {
         jcenter()
@@ -19,6 +18,11 @@ allprojects {
         maven { url "https://raw.github.com/bmob/bmob-android-sdk/master" }
 
         maven { url "https://jitpack.io" }
+    }
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
     }
 }
 
