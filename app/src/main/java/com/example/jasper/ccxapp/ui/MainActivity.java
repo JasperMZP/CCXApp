@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
@@ -39,6 +40,7 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
+import com.example.jasper.ccxapp.util.SendMessageUtil;
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 import com.example.jasper.ccxapp.util.showMessage;
 import com.example.jasper.ccxapp.widget.CustomVideoView;
@@ -76,37 +78,31 @@ import cn.jpush.im.api.BasicCallback;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.iwf.photopicker.PhotoPreview;
 
-public class MainActivity extends Activity implements
+public class MainActivity extends AppCompatActivity implements
         ExpandableListView.OnChildClickListener,
         ExpandableListView.OnGroupClickListener,
         PinnedHeaderExpandableListView.OnHeaderUpdateListener, StickyLayout.OnGiveUpTouchEventListener {
     private final int REQUEST_SEND_MSG_ITEM = 0;
-
     //View
     private PinnedHeaderExpandableListView expandableListView;
     private StickyLayout stickyLayout;
-
     //变量
     private ArrayList<ShowItemModel> showList = new ArrayList<ShowItemModel>();
     private ArrayList<List<CommentItemModel>> childCommentList = new ArrayList<List<CommentItemModel>>();
     private MyexpandableListAdapter adapter;
     private Conversation mConversation;
     private MediaPlayer mediaPlayer;
-
-
     //收到的图片消息
     private ShowItemModel CheckRecievedShowItem = new ShowItemModel();
     private String imgRecieveFlag = "";
     private String checkShowKey = "";
     private String checkCommKey = "";
-
     private TextView toFriend;
     private TextView myName;
     private TextView loginout;
     private CircleImageView leftUserAvatarCIV;
     private DrawerLayout drawerLayout;
     private CircleImageView myAvatarCIV;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -118,13 +114,10 @@ public class MainActivity extends Activity implements
 
         adapter = new MyexpandableListAdapter(this);
         expandableListView.setAdapter(adapter);
-
-
         // 展开所有group
         for (int i = 0, count = expandableListView.getCount(); i < count; i++) {
             expandableListView.expandGroup(i);
         }
-
         expandableListView.setOnHeaderUpdateListener(this);
         expandableListView.setOnChildClickListener(this);
         expandableListView.setOnGroupClickListener(this);
@@ -229,115 +222,6 @@ public class MainActivity extends Activity implements
         this.finish();
     }
 
-    private void sendTextMsg(ShowItemModel showItemForSend) {
-        TextContent textContent = new TextContent(showItemForSend.getShowText());
-        textContent.setStringExtra("showKey", showItemForSend.getMsgKey());
-        String groupIds = "";
-        for (long groupId : showItemForSend.getGroupBelongToList()) {
-            groupIds += groupId + ",";
-        }
-        textContent.setStringExtra("groupBelongTo", groupIds);
-        Message message = mConversation.createSendMessage(textContent);
-        message.setOnSendCompleteCallback(new BasicCallback() {
-            @Override
-            public void gotResult(int responseCode, String responseDesc) {
-                if (responseCode == 0) {
-                    //消息发送成功
-                    Log.i("test", "文本发送成功");
-                } else {
-                    //消息发送失败
-                    Log.e("test", "文本发送失败");
-                }
-            }
-        });
-
-        JMessageClient.sendMessage(message);
-    }
-
-
-    private void sendImageMsg(ShowItemModel showItemForSend) {
-        ArrayList<String> imgPaths = showItemForSend.getShowImagesList();
-        String recieveFlag = UUIDKeyUtil.getUUIDKey();
-        for (int i = 0; i < imgPaths.size(); i++) {
-            try {
-                ImageContent imageContent = new ImageContent(new File(imgPaths.get(i)));
-                Map extrasMap = new HashMap();
-                extrasMap.put("showKey", showItemForSend.getMsgKey());
-                if (i == 0 && showItemForSend.getShowText() != null) {
-                    extrasMap.put("showText", showItemForSend.getShowText());
-                }
-                String groupIds = "";
-                for (long groupId : showItemForSend.getGroupBelongToList()) {
-                    groupIds += groupId + ",";
-                }
-                Log.i("test", "传递groupIds" + groupIds);
-                //imageContent.setStringExtra("groupBelongTo",groupIds);
-                extrasMap.put("groupBelongTo", groupIds);
-                imageContent.setExtras(extrasMap);
-                imageContent.setNumberExtra("imageNum", imgPaths.size());
-                imageContent.setNumberExtra("imageCount", i + 1);
-                imageContent.setStringExtra("recieveFlag", recieveFlag);
-                Message message = mConversation.createSendMessage(imageContent);
-                message.setOnSendCompleteCallback(new BasicCallback() {
-                    @Override
-                    public void gotResult(int i, String s) {
-                        Log.i("test", "发送图片消息" + i + s);
-                    }
-                });
-                JMessageClient.sendMessage(message);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    private void sendVideoMsg(ShowItemModel showItemForSend) {
-        try {
-            FileContent fileContent = new FileContent(new File(showItemForSend.getShowVideo()));
-            fileContent.setStringExtra("showKey", showItemForSend.getMsgKey());
-            fileContent.setStringExtra("showText", showItemForSend.getShowText());
-            String groupIds = "";
-            for (long groupId : showItemForSend.getGroupBelongToList()) {
-                groupIds += groupId + ",";
-            }
-            fileContent.setStringExtra("groupBelongTo", groupIds);
-            Message message = mConversation.createSendMessage(fileContent);
-            message.setOnSendCompleteCallback(new BasicCallback() {
-                @Override
-                public void gotResult(int i, String s) {
-                    Log.i("test", "视频发送" + i + s);
-                }
-            });
-            JMessageClient.sendMessage(message);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (JMFileSizeExceedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void sendVoice(CommentItemModel commentItemForSend) {
-        try {
-            VoiceContent voiceContent = new VoiceContent(new File(commentItemForSend.getCommentVoice()), commentItemForSend.getCommentLength());
-            Map extrasMap = new HashMap();
-            extrasMap.put("showKey", commentItemForSend.getMsgKey());
-            extrasMap.put("commKey", commentItemForSend.getCommKey());
-            extrasMap.put("voiceLength", "" + commentItemForSend.getCommentLength());
-            voiceContent.setExtras(extrasMap);
-            Message message = mConversation.createSendMessage(voiceContent);
-            message.setOnSendCompleteCallback(new BasicCallback() {
-                @Override
-                public void gotResult(int i, String s) {
-                    Log.i("test", "发送语音消息" + i + s);
-                }
-            });
-            JMessageClient.sendMessage(message);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     /***
      * InitData
@@ -399,14 +283,14 @@ public class MainActivity extends Activity implements
             //有图片
             showItemForSend.setShowImagesList(showItem.getShowImagesList());
             //发送带图片的消息
-            sendImageMsg(showItemForSend);
+            SendMessageUtil.sendImageMsg(showItemForSend, mConversation);
         } else if (showItem.getShowVideo() != null) {
             //有视频
             showItemForSend.setShowVideo(showItem.getShowVideo());
-            sendVideoMsg(showItemForSend);
+            SendMessageUtil.sendVideoMsg(showItemForSend, mConversation);
         } else if (showItem.getShowImagesList() == null && showItem.getShowVideo() == null) {
             //发送文字信息
-            sendTextMsg(showItemForSend);
+            SendMessageUtil.sendTextMsg(showItemForSend, mConversation);
         }
     }
 
@@ -602,7 +486,7 @@ public class MainActivity extends Activity implements
                             for (long groupId : groupBelongtoList) {
                                 Log.i("test", "要发送的群id：" + groupId);
                                 if (createConversation(groupId)) {
-                                    sendVoice(commentItemForSend);
+                                    SendMessageUtil.sendVoice(commentItemForSend, mConversation);
                                 } else {
                                     Log.i("test", "不属于那个群");
                                 }
