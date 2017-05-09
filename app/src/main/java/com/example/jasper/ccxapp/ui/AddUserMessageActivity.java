@@ -212,6 +212,7 @@ public class AddUserMessageActivity extends AppCompatActivity {
     }
 
     private void saveUserMessage() {
+        boolean flag = false;
         File imagePath = imageUtils.picFile;
         String nickname = nickName.getText().toString().trim();
         int sexid = message_sex.getCheckedRadioButtonId();
@@ -227,31 +228,50 @@ public class AddUserMessageActivity extends AppCompatActivity {
 
         if(nickname.equals(oriNickName) || nickname.equals("")){
             nickname = null;
+        }else{
+            flag = true;
         }
         if(oriSex == sex){
             sex = null;
+        }else{
+            flag = true;
         }
         if(birthday.equals(oriBirthday)){
             birthday = null;
+        }else{
+            flag = true;
         }
         if(address.equals(oriAddress)){
             address = null;
+        }else{
+            flag = true;
         }
         if(explain.equals(oriExplain)){
             explain = null;
+        }else{
+            flag = true;
         }
-        userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
-            @Override
-            public void showResult(boolean result,String message) {
-                if(result){
-                    Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
-                    finish();
-                }else{
-                    Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
+        if(imagePath != null && imagePath.exists()){
+            flag = true;
+        }
+        if(flag) {
+            userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
+                @Override
+                public void showResult(boolean result, String message) {
+                    if (result) {
+                        Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+                        finish();
+                    } else {
+                        Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }else{
+            Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+            finish();
+        }
     }
 
     private void showDialog(String message) {

@@ -49,7 +49,7 @@ public class SendRequestActivity extends AppCompatActivity{
         });}
 
     private void sendfriendrequest() {
-        String userName2 = getIntent().getStringExtra("newFriendName");
+        String userName2 = getIntent().getStringExtra("newFriendName2");
         Log.i("test",userName2);
         String message = add_friend_reason.getText().toString().trim();
 

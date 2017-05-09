@@ -209,6 +209,7 @@ public class UserMessageReviseActivity extends AppCompatActivity {
     }
 
     private void saveUserMessage() {
+        boolean flag = false;
         File imagePath = imageUtils.picFile;
         String nickname = nickName.getText().toString().trim();
         int sexid = message_sex.getCheckedRadioButtonId();
@@ -224,33 +225,48 @@ public class UserMessageReviseActivity extends AppCompatActivity {
 
         if(nickname.equals(oriNickName) || nickname.equals("")){
             nickname = null;
+        }else{
+            flag = true;
         }
         if(oriSex == sex){
             sex = null;
+        }else{
+            flag = true;
         }
-        if(birthday == oriBirthday){
+        if(birthday.equals(oriBirthday)){
             birthday = null;
+        }else{
+            flag = true;
         }
         if(address.equals(oriAddress)){
             address = null;
+        }else{
+            flag = true;
         }
         if(explain.equals(oriExplain)){
             explain = null;
+        }else{
+            flag = true;
         }
-        userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
-            @Override
-            public void showResult(boolean result,String message) {
-                if(result){
-                    if(imageUtils.picFile != null || !oriNickName.equals(JMessageClient.getMyInfo().getNickname())) {
-                        setResult(666, getIntent());
+        if(imagePath != null && imagePath.exists()){
+            flag = true;
+        }
+        if(flag) {
+            userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
+                @Override
+                public void showResult(boolean result, String message) {
+                    if (result) {
+                        if (imageUtils.picFile != null || !oriNickName.equals(JMessageClient.getMyInfo().getNickname())) {
+                            setResult(666, getIntent());
+                        }
+                        Toast.makeText(UserMessageReviseActivity.this, "修改信息成功", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(UserMessageReviseActivity.this, "修改信息失败", Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(UserMessageReviseActivity.this, "修改信息成功", Toast.LENGTH_SHORT).show();
-                    finish();
-                }else{
-                    Toast.makeText(UserMessageReviseActivity.this, "修改信息失败", Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+            });
+        }
     }
 
     private void showDialog(String message) {

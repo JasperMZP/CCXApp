@@ -34,8 +34,8 @@
 
         <EditText
             android:id="@+id/sing_up_userName"
-            android:digits="0123456789abcdefghijklmnopqrstuvwxyz"
-            android:hint="请输入账号"
+            android:digits="0123456789"
+            android:hint="请输入手机号码"
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:layout_weight="5" />
