@@ -2,7 +2,7 @@ package com.example.jasper.ccxapp.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +13,10 @@ import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 
 public class FriendChatAdapter extends BaseAdapter {
@@ -56,10 +56,10 @@ public class FriendChatAdapter extends BaseAdapter {
     	return position;
     }
 
+    ViewHolder holder;
     @SuppressLint("InflateParams")
 	@Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-    	ViewHolder holder;
     	//观察convertView随ListView滚动情况
     	//Log.v("MyListViewBase", "getView " + position + " " + convertView);
     	if (convertView == null) {
@@ -71,18 +71,11 @@ public class FriendChatAdapter extends BaseAdapter {
 			holder.a_friend_chat_checkbox = (CheckBox)convertView.findViewById(R.id.a_friend_chat_checkbox);
     		convertView.setTag(holder);//绑定ViewHolder对象
     	}
-		final ViewHolder finalholder = (ViewHolder)convertView.getTag();
     		/*设置TextView显示的内容，即我们存放在动态数组中的数据*/
-        userInfos.get(position).getAvatarBitmap(new GetAvatarBitmapCallback() {
-            @Override
-            public void gotResult(int i, String s, Bitmap bitmap) {
-                if(i == 0){
-                    finalholder.a_friend_chat_imageview.setImageBitmap(bitmap);
-                }
-            }
-        });
-        finalholder.a_friend_chat_name.setText(userInfos.get(position).getNickname());
-        finalholder.a_friend_chat_checkbox.setOnClickListener(new View.OnClickListener() {
+        File avatarFile = userInfos.get(position).getAvatarFile();
+        holder.a_friend_chat_imageview.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(avatarFile)));;
+        holder.a_friend_chat_name.setText(userInfos.get(position).getNickname());
+        holder.a_friend_chat_checkbox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 selects[position] = !selects[position];

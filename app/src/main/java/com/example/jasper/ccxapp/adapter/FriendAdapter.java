@@ -2,7 +2,7 @@ package com.example.jasper.ccxapp.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +12,9 @@ import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 
+import java.io.File;
 import java.util.List;
 
-import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 
 public class FriendAdapter extends BaseAdapter {
@@ -49,10 +49,11 @@ public class FriendAdapter extends BaseAdapter {
     	return position;
     }
 
+	ViewHolder holder;
     @SuppressLint("InflateParams")
 	@Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-    	ViewHolder holder;
+    public View getView(int position, View convertView, ViewGroup parent) {
+
     	//观察convertView随ListView滚动情况
     	//Log.v("MyListViewBase", "getView " + position + " " + convertView);
     	if (convertView == null) {
@@ -63,19 +64,11 @@ public class FriendAdapter extends BaseAdapter {
     		holder.a_friend_name = (TextView) convertView.findViewById(R.id.a_friend_name);
     		convertView.setTag(holder);//绑定ViewHolder对象
     	}
-		holder = (ViewHolder)convertView.getTag();//取出ViewHolder对象                  }
-    		/*设置TextView显示的内容，即我们存放在动态数组中的数据*/
-		final ViewHolder finalHolder = holder;
-		userInfos.get(position).getAvatarBitmap(new GetAvatarBitmapCallback() {
-			@Override
-			public void gotResult(int i, String s, Bitmap bitmap) {
-				if(i == 0) {
-					finalHolder.a_friend_image.setImageBitmap(bitmap);
-				}
-			}
-		});
+		holder = (ViewHolder)convertView.getTag();
+		File avatarFile = userInfos.get(position).getAvatarFile();
+		holder.a_friend_image.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(avatarFile)));
 
-		finalHolder.a_friend_name.setText(userInfos.get(position).getUserName());
+		holder.a_friend_name.setText(userInfos.get(position).getUserName());
 		return convertView;
     }
 
