@@ -2,20 +2,12 @@ package com.example.jasper.ccxapp.ui;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
@@ -24,13 +16,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,7 +40,6 @@ import com.zhy.view.flowlayout.TagFlowLayout;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -61,8 +52,6 @@ import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.eventbus.EventBus;
 import me.iwf.photopicker.PhotoPicker;
 import me.iwf.photopicker.PhotoPreview;
-
-import static android.R.attr.bitmap;
 
 
 /**
@@ -83,6 +72,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
     private ImageButton recordVideoIb;
     private CustomVideoView videoView;
     private ImageView playVideoBtn;
+    private TextView lableVideoTv;
 
     private String videoPath;
     private ShowItemModel showItem;
@@ -109,16 +99,31 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         recordVideo();
 
     }
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.send_msg_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_scan:
+                BackShowMsgItemToSend();
+                System.out.println("lalalallalal");
+                break;
+        }
+            return true;
+            }
 
     private void initView() {
         textEditEt = (EditText) findViewById(R.id.text_edit_et);
-        msgSendBtn = (Button) findViewById(R.id.msg_send_btn);
+        //msgSendBtn = (Button) findViewById(R.id.msg_send_btn);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mFlowLayout = (TagFlowLayout) findViewById(R.id.id_flowlayout);
         recordVideoIb = (ImageButton) findViewById(R.id.record_video_ib);
         videoView = (CustomVideoView) findViewById(R.id.video_view);
         playVideoBtn = (ImageView) findViewById(R.id.play_video_btn);
+        lableVideoTv = (TextView) findViewById(R.id.labal_video_tv);
     }
 
     private void getAllGroupList() {
@@ -179,12 +184,12 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL));
         recyclerView.setAdapter(photoAdapter);
 
-        msgSendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BackShowMsgItemToSend();
-            }
-        });
+//        msgSendBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                BackShowMsgItemToSend();
+//            }
+//        });
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
                 new RecyclerItemClickListener.OnItemClickListener() {
@@ -256,6 +261,8 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
         if (resultCode == RESULT_OK &&
                 (requestCode == PhotoPicker.REQUEST_CODE || requestCode == PhotoPreview.REQUEST_CODE)) {
             recordVideoIb.setVisibility(View.GONE);
+            lableVideoTv.setVisibility(View.GONE);
+
             if (data != null) {
                 photosPath = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
                 for (String photoPath : photosPath) {
@@ -265,6 +272,13 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
             selectedPhotos.clear();
             if (photosPath != null) {
                 selectedPhotos.addAll(photosPath);
+            }
+            if(requestCode == PhotoPreview.REQUEST_CODE){
+                if (selectedPhotos.isEmpty()){
+                    Log.i("test","把照片全都删了");
+                    recordVideoIb.setVisibility(View.VISIBLE);
+                    lableVideoTv.setVisibility(View.VISIBLE);
+                }
             }
             photoAdapter.notifyDataSetChanged();
         } else if (requestCode == REQUSET_RECORD_VIDEO_PATH && resultCode == VideoRecordActivity.RESULT_RETUEN_VIDEO_PATH) {

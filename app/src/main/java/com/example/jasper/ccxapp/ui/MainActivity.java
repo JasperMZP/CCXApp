@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -23,6 +22,8 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,7 +85,6 @@ public class MainActivity extends Activity implements
     //View
     private PinnedHeaderExpandableListView expandableListView;
     private StickyLayout stickyLayout;
-    private Button addShowBtn;
 
     //变量
     private ArrayList<ShowItemModel> showList = new ArrayList<ShowItemModel>();
@@ -129,20 +129,28 @@ public class MainActivity extends Activity implements
         expandableListView.setOnChildClickListener(this);
         expandableListView.setOnGroupClickListener(this);
         stickyLayout.setOnGiveUpTouchEventListener(this);
+    }
 
-        addShowBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.addnew, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_scan:
                 Intent intent = new Intent(MainActivity.this, ShowMsgEditActivity.class);
                 startActivityForResult(intent, REQUEST_SEND_MSG_ITEM);
-            }
-        });
+                break;
+        }
+        return true;
     }
 
     private void initView() {
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
-        addShowBtn = (Button) findViewById(R.id.add_show_btn);
         myAvatarCIV = (CircleImageView) findViewById(R.id.my_avatar_civ);
 
         JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {

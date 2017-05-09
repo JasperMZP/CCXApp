@@ -98,6 +98,7 @@ public class SearchNewActivity extends AppCompatActivity {
                 intent.setClass(SearchNewActivity.this, SendRequestActivity.class);
                 intent.putExtra("newFriendName", a_friend_name.getText().toString());
                 intent.putExtra("userImage", bitmap2[0]);
+                intent.putExtra("newFriendName2", message.getUserName());
                 SearchNewActivity.this.startActivity(intent);
             }
 		});

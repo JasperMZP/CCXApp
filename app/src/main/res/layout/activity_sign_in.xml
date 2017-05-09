@@ -30,8 +30,6 @@
             android:src="@drawable/logup_1"
             android:layout_weight="1" />
 
-
-
         <EditText
             android:id="@+id/login_username"
             android:digits="0123456789"
