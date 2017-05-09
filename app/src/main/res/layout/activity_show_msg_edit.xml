@@ -40,7 +40,11 @@
             android:layout_height="1dp"
             android:layout_marginTop="10dp"
             android:src="#E4E3E3" />
-
+<TextView
+    android:id="@+id/text_photo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="选择/拍摄图片"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
@@ -74,7 +78,11 @@
             android:layout_height="1dp"
             android:layout_marginTop="10dp"
             android:src="#E4E3E3" />
-
+        <TextView
+            android:id="@+id/labal_video_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="拍摄小视频"/>
         <ImageButton
             android:id="@+id/record_video_ib"
             android:layout_width="wrap_content"
@@ -99,7 +107,7 @@
             android:layout_height="1dp"
             android:src="#E4E3E3" />
 
-        <Button
+        <!--Button
             android:id="@+id/msg_send_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -109,9 +117,9 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/send_btn_selector"
             android:gravity="center"
-            android:text="发送"
+            android:text="发表"
             android:textColor="#FFFFFF"
-            android:textSize="20sp" />
+            android:textSize="20sp" /-->
     </LinearLayout>
 
 </LinearLayout>

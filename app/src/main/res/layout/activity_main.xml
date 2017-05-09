@@ -43,14 +43,11 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/my_avatar_civ"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/ic_launcher"
-                    app:civ_border_width="2dp"
-                    app:civ_border_color="@color/white"/>
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_launcher" />
             </LinearLayout>
 
             <LinearLayout
@@ -58,7 +55,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1">
 
-                <Button
+                <!--Button
                     android:id="@+id/add_show_btn"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
@@ -67,7 +64,7 @@
                     android:background="@drawable/button"
                     android:text="+"
                     android:textColor="@color/white"
-                    android:textSize="30sp" />
+                    android:textSize="30sp" /-->
             </LinearLayout>
 
 
