@@ -25,7 +25,7 @@ import cn.jpush.im.android.api.model.UserInfo;
 public class FriendActivity extends AppCompatActivity {
 
 	private TextView toNewFriend;
-
+	private TextView toMyChat;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +34,15 @@ public class FriendActivity extends AppCompatActivity {
 
 		getFriends();
 
-
+		toMyChat = (TextView)findViewById(R.id.to_my_chat);
 		toNewFriend = (TextView)findViewById(R.id.to_new_friend);
+		toMyChat.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(FriendActivity.this, ChatActivity.class));
+				finish();
+			}
+		});
 		toNewFriend.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {

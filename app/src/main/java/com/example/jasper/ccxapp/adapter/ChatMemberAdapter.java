@@ -17,18 +17,18 @@ import java.util.List;
 
 import cn.jpush.im.android.api.model.UserInfo;
 
-public class FriendAdapter extends BaseAdapter {
+public class ChatMemberAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
     private Context context;
     private List<UserInfo> userInfos;
 
-    public FriendAdapter(Context context) {
+    public ChatMemberAdapter(Context context) {
     	this.mInflater = LayoutInflater.from(context);
     	this.context = context;
     }
 
-    public FriendAdapter(Context context, List<UserInfo> userInfos) {
+    public ChatMemberAdapter(Context context, List<UserInfo> userInfos) {
     	this.mInflater = LayoutInflater.from(context);
     	this.context = context;
     	this.userInfos = userInfos;
@@ -53,10 +53,7 @@ public class FriendAdapter extends BaseAdapter {
     @SuppressLint("InflateParams")
 	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
-    	//观察convertView随ListView滚动情况
-    	//Log.v("MyListViewBase", "getView " + position + " " + convertView);
-    	if (convertView == null) {
+		if (convertView == null) {
     		convertView = mInflater.inflate(R.layout.a_friend, null);
     		holder =new ViewHolder();
     		/*得到各个控件的对象*/
@@ -68,13 +65,13 @@ public class FriendAdapter extends BaseAdapter {
 		File avatarFile = userInfos.get(position).getAvatarFile();
 		holder.a_friend_image.setImageBitmap(BitmapFactory.decodeFile(String.valueOf(avatarFile)));
 
-        String userName2 = userInfos.get(position).getUserName();
-        try {
-            String nickName2 = userInfos.get(position).getNickname();
-            holder.a_friend_name.setText(nickName2 + "(" + userName2 + ")");
-        } catch (Exception e){
-            holder.a_friend_name.setText(userName2);
-        }
+		String userName2 = userInfos.get(position).getUserName();
+		try {
+			String nickName2 = userInfos.get(position).getNickname();
+			holder.a_friend_name.setText(nickName2 + "(" + userName2 + ")");
+		} catch (Exception e){
+			holder.a_friend_name.setText(userName2);
+		}
 		return convertView;
     }
 
