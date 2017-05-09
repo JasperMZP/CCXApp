@@ -491,11 +491,11 @@ public class MainActivity extends Activity implements
             showHolder.showUsernameTv.setText(showItem.getShowUsername());
             showHolder.showTextTv.setText(showItem.getShowText());
             File avatarFile = showItem.getShowAvatar();
-            if (avatarFile!=null){
-                Log.i("test","头像不为NULL ");
+            if (avatarFile != null) {
+                Log.i("test", "头像不为NULL ");
                 showHolder.showUserAvatarCIv.setImageBitmap(BitmapFactory.decodeFile(avatarFile.getPath()));
-            }else {
-                Log.i("test","头像为NULL");
+            } else {
+                Log.i("test", "头像为NULL");
             }
 
             if (showItem.getShowImagesList() != null) {
@@ -619,9 +619,9 @@ public class MainActivity extends Activity implements
                 commentHolder.playVoiceCommentBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mediaPlayer= new MediaPlayer();
+                        mediaPlayer = new MediaPlayer();
                         initMediaPlayer(commentItem.getCommentVoice());
-                        Log.i("test","点击了播放语音"+commentItem.getCommentVoice());
+                        Log.i("test", "点击了播放语音" + commentItem.getCommentVoice());
                         mediaPlayer.start();
                     }
                 });
@@ -688,11 +688,11 @@ public class MainActivity extends Activity implements
         showTextTv.setText(firstVisibleShowItem.getShowText());
 
         File avatarFile = firstVisibleShowItem.getShowAvatar();
-        if (avatarFile!=null){
-            Log.i("test","头像不为NULL ");
+        if (avatarFile != null) {
+            Log.i("test", "头像不为NULL ");
             showAvatarIv.setImageBitmap(BitmapFactory.decodeFile(avatarFile.getPath()));
-        }else {
-            Log.i("test","头像为NULL");
+        } else {
+            Log.i("test", "头像为NULL");
         }
     }
 
@@ -937,10 +937,6 @@ public class MainActivity extends Activity implements
                         CheckRecievedShowItem.setShowText((String) iMsgMap.get("showText"));
                     }
                     ArrayList<String> imgPaths = CheckRecievedShowItem.getShowImagesList();
-                    if (imgPaths.contains(imageContent.getLocalThumbnailPath())) {
-                        Log.i("test", "跳过重复图片消息");
-                        return false;
-                    }
                     imgPaths.add(imageContent.getLocalThumbnailPath());
 
                     Log.i("test", "图片path:" + imageContent.getLocalThumbnailPath());
@@ -1059,7 +1055,7 @@ public class MainActivity extends Activity implements
                         fUserInfo.getAvatarBitmap(new GetAvatarBitmapCallback() {
                             @Override
                             public void gotResult(int i, String s, Bitmap bitmap) {
-                                if (i==0) {
+                                if (i == 0) {
                                     avatarBitmap[0] = bitmap;
                                 }
                             }
@@ -1119,23 +1115,12 @@ public class MainActivity extends Activity implements
             for (int j = 0; j < showList.size(); j++) {
                 if (showList.get(j).getMsgKey().equals(commentItem.getMsgKey())) {
                     List<CommentItemModel> commentItemModels = childCommentList.get(j);
-                    //防止重复消息
-                    boolean flag = true;
-                    for (CommentItemModel commentTemp : commentItemModels) {
-                        if (commentItem.getCommentVoice().equals(commentTemp.getCommentVoice())) {
-                            flag = false;
-                        }
-                    }
-                    if (flag) {
-                        commentItemModels.add(commentItemModels.size() - 1, commentItem);
-                        childCommentList.remove(j);
-                        childCommentList.add(j, commentItemModels);
-                        Log.i("test", "background");
-                        Log.i("test", "添加一条语音消息");
-                        return true;
-
-                    }
-
+                    commentItemModels.add(commentItemModels.size() - 1, commentItem);
+                    childCommentList.remove(j);
+                    childCommentList.add(j, commentItemModels);
+                    Log.i("test", "background");
+                    Log.i("test", "添加一条语音消息");
+                    return true;
                 }
             }
             return false;
