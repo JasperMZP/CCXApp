@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
@@ -20,6 +21,7 @@ import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.TextPaint;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -99,10 +101,11 @@ public class MainActivity extends AppCompatActivity implements
     private String checkCommKey = "";
     private TextView toFriend;
     private TextView myName;
+    private TextView userName;
     private TextView loginout;
     private CircleImageView leftUserAvatarCIV;
     private DrawerLayout drawerLayout;
-    private CircleImageView myAvatarCIV;
+    private ImageView myAvatarCIV;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -144,8 +147,10 @@ public class MainActivity extends AppCompatActivity implements
     private void initView() {
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
-        myAvatarCIV = (CircleImageView) findViewById(R.id.my_avatar_civ);
-
+        myAvatarCIV = (ImageView) findViewById(R.id.my_avatar_civ);
+        userName=(TextView)findViewById(R.id.currentUserName);
+        TextPaint tp=userName.getPaint();
+        tp.setFakeBoldText(true);
         JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
             @Override
             public void gotResult(int i, String s, Bitmap bitmap) {
@@ -154,6 +159,11 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         });
+        try {
+            userName.setText(JMessageClient.getMyInfo().getNickname());
+        } catch (Exception e) {
+            userName.setText(JMessageClient.getMyInfo().getUserName());
+        }
 
         initDrawerLayout();
         drawerLayout.setScrimColor(Color.GRAY);
@@ -404,8 +414,10 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(View v) {
                         if (expandableListView.isGroupExpanded(groupPosition)) {
+                            showHolder.expandedIv.setImageResource(R.drawable.angle1);
                             expandableListView.collapseGroup(groupPosition);
                         } else {
+                            showHolder.expandedIv.setImageResource(R.drawable.angle);
                             expandableListView.expandGroup(groupPosition);
                         }
                     }
@@ -455,6 +467,7 @@ public class MainActivity extends AppCompatActivity implements
                 convertView = inflater.inflate(R.layout.comment_item, null);
                 commentHolder.commentUsernameTv = (TextView) convertView.findViewById(R.id.comment_username_tv);
                 commentHolder.playVoiceCommentBtn = (Button) convertView.findViewById(R.id.play_comment_audio_btn);
+                commentHolder.timeofvoice = (TextView) convertView.findViewById(R.id.time_of_voice);
                 commentHolder.sendVoiceCommentBtn = (RecordButton) convertView.findViewById(R.id.send_comment_audio_btn);
                 convertView.setTag(commentHolder);
             } else {
@@ -465,6 +478,7 @@ public class MainActivity extends AppCompatActivity implements
             if (commentItem.getMsgKey().equals("-1")) {
                 commentHolder.commentUsernameTv.setVisibility(View.GONE);
                 commentHolder.playVoiceCommentBtn.setVisibility(View.GONE);
+                commentHolder.timeofvoice.setVisibility(View.GONE);
                 commentHolder.sendVoiceCommentBtn.setVisibility(View.VISIBLE);
                 commentHolder.sendVoiceCommentBtn.setOnFinishedRecordListener(new RecordButton.OnFinishedRecordListener() {
                     @Override
@@ -497,9 +511,10 @@ public class MainActivity extends AppCompatActivity implements
             } else {
                 commentHolder.commentUsernameTv.setVisibility(View.VISIBLE);
                 commentHolder.playVoiceCommentBtn.setVisibility(View.VISIBLE);
+                commentHolder.timeofvoice.setVisibility(View.VISIBLE);
                 commentHolder.sendVoiceCommentBtn.setVisibility(View.GONE);
                 commentHolder.commentUsernameTv.setText(commentItem.getCommentUsername());
-                commentHolder.playVoiceCommentBtn.setText("" + commentItem.getCommentLength());
+                commentHolder.timeofvoice.setText("" + commentItem.getCommentLength()+ "''");
                 commentHolder.playVoiceCommentBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -550,6 +565,7 @@ public class MainActivity extends AppCompatActivity implements
 
         TextView commentUsernameTv;
         Button playVoiceCommentBtn;
+        TextView timeofvoice;
         RecordButton sendVoiceCommentBtn;
 
     }

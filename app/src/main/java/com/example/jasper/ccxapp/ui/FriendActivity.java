@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +27,8 @@ public class FriendActivity extends AppCompatActivity {
 
 	private TextView toNewFriend;
 	private TextView toMyChat;
+	private ImageView img_toNewFriend;
+	private ImageView img_toGroup;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +37,8 @@ public class FriendActivity extends AppCompatActivity {
 
 		getFriends();
 
+		img_toNewFriend= (ImageView)findViewById(R.id.image_to_new_friend);
+		img_toGroup= (ImageView)findViewById(R.id.to_group);
 		toMyChat = (TextView)findViewById(R.id.to_my_chat);
 		toNewFriend = (TextView)findViewById(R.id.to_new_friend);
 		toMyChat.setOnClickListener(new OnClickListener() {
@@ -47,6 +52,20 @@ public class FriendActivity extends AppCompatActivity {
 			@Override
 			public void onClick(View v) {
 				startActivity(new Intent(FriendActivity.this, NewFriendActivity.class));
+				finish();
+			}
+		});
+		img_toNewFriend.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(FriendActivity.this, NewFriendActivity.class));
+				finish();
+			}
+		});
+		img_toGroup.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(FriendActivity.this, ChatActivity.class));
 				finish();
 			}
 		});

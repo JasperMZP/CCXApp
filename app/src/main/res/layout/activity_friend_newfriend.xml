@@ -6,7 +6,8 @@
         android:id="@+id/showNewFriendsAll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"     android:background="@drawable/appback2"
+        android:layout_weight="1"
+        android:background="@drawable/appback2"
         android:radius="10dp">
         <!--tools:context="MainActivity"-->
         <!--tools:ignore="NamespaceTypo"-->
@@ -26,7 +27,8 @@
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:layout_alignParentStart="true"
-
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:digits="0123456789"
         android:layout_alignParentTop="true"
         android:layout_below="@+id/grass"
@@ -77,6 +79,7 @@ android:textAlignment="center"
             android:visibility="gone"/>
 
     <LinearLayout
+        android:layout_marginLeft="5dp"
         android:id="@+id/all_new_friend"
         android:layout_height="60dp"
         android:layout_width="match_parent"
