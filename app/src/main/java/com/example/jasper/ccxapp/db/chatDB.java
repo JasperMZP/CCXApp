@@ -91,4 +91,43 @@ public class chatDB {
             }
         });
     }
+
+    public static void addNewMember(long groupID, List<String> userNames, final userBackListener userBackListener){
+        JMessageClient.addGroupMembers(groupID, userNames, new BasicCallback() {
+            @Override
+            public void gotResult(int i, String s) {
+                if(i == 0){
+                    userBackListener.showResult(true, null);
+                }else {
+                    userBackListener.showResult(false, s);
+                }
+            }
+        });
+    }
+
+    public static void deleteSomeMember(long groupID, List<String> userNames, final userBackListener userBackListener){
+        JMessageClient.removeGroupMembers(groupID, userNames, new BasicCallback() {
+            @Override
+            public void gotResult(int i, String s) {
+                if(i == 0){
+                    userBackListener.showResult(true, null);
+                }else {
+                    userBackListener.showResult(false, s);
+                }
+            }
+        });
+    }
+
+    public static void quitChat(long groupID, final userBackListener userBackListener){
+        JMessageClient.exitGroup(groupID, new BasicCallback() {
+            @Override
+            public void gotResult(int i, String s) {
+                if(i == 0){
+                    userBackListener.showResult(true, null);
+                }else {
+                    userBackListener.showResult(false, s);
+                }
+            }
+        });
+    }
 }

@@ -51,7 +51,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(ChatActivity.this, ChatDetailActivity.class);
-                intent.putExtra("chatroom", groupInfos.get(position).getGroupID());
+                intent.putExtra("groupId", groupInfos.get(position).getGroupID());
                 startActivity(intent);
                 finish();
             }
