@@ -18,8 +18,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
+            android:layout_marginRight="5dp"
             android:textColor="@color/white"
-            android:background="@drawable/button"
+            android:background="@drawable/button_color"
             android:text="确定"
             android:layout_alignBottom="@+id/add_new_chatroom_name"
             android:layout_alignParentTop="true" />
@@ -31,7 +32,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp">
 
         <ListView
             android:id="@+id/all_friend_for_chat"

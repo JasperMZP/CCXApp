@@ -91,7 +91,12 @@ public class NewFriendAdapter extends BaseAdapter {
                                 friendDB.agreenewfriend(JMessageClient.getMyInfo().getUserName(), userInfos.get(position).getUserName(), new userBackListener(){
                                     @Override
                                     public void showResult(boolean result, String message) {
-                                        onClickListener.onClick(null);
+                                        if(result) {
+                                            onClickListener.onClick(null);
+                                        }else{
+                                            new AlertDialog.Builder(context).setTitle("系统提示").setMessage("添加好友失败！")
+                                                    .setPositiveButton("确定", null);
+                                        }
                                     }
                                 });
                             }
