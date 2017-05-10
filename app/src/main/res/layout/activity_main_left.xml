@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/biz_news_local_weather_bg_big"
+    android:background="@drawable/leftground"
     android:orientation="vertical">
 
     <RelativeLayout

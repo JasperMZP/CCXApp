@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout
-    android:background="@drawable/appback2"
+<android.support.v4.widget.DrawerLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -23,49 +22,46 @@
         android:layout_marginTop="0dp"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/sticky_header"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:background="#78A524"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="200dp"
+            android:background="@drawable/album"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"></LinearLayout>
+            <TextView
+                android:id="@+id/currentUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="用户1"
+                android:textStyle="bold"
+                android:layout_alignParentRight="true"
+                android:layout_above="@+id/my_avatar_civ"
+                android:layout_marginRight="5dp"
+                android:textSize="14.0sp"
+                android:textColor="#111055"
+                />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/my_avatar_civ"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:src="@drawable/ic_launcher"
-                    app:civ_border_width="1.5dp"
-                    app:civ_border_color="@color/white"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/my_avatar_civ"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:src="@drawable/ic_launcher"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="1dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true" />
 
 
-        </LinearLayout>
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/sticky_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
             android:orientation="vertical">
 
             <com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView
@@ -75,7 +71,7 @@
                 android:cacheColorHint="@null"
                 android:childDivider="@drawable/child_bg"
                 android:childIndicatorLeft="0dp"
-                android:divider="@color/Grey"
+                android:divider="@color/white"
                 android:dividerHeight="1dp"
                 android:groupIndicator="@null"
                 android:scrollbarAlwaysDrawHorizontalTrack="false"></com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView>

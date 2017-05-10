@@ -20,8 +20,13 @@
         android:id="@+id/play_comment_audio_btn"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:background="@drawable/startaudio"
-        android:text="13'" />
+        android:background="@drawable/startaudio" />
+    <TextView
+        android:layout_marginLeft="5dp"
+        android:id="@+id/time_of_voice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="13''" />
 
     <com.example.jasper.ccxapp.widget.RecordButton
         android:id="@+id/send_comment_audio_btn"

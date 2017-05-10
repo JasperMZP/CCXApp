@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/selector_group"
     android:orientation="vertical"
     android:padding="15dp">
 
@@ -33,11 +32,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
+                android:layout_marginLeft="6dp"
                 android:text="XXX"
                 android:textColor="#3366cc"
                 android:textSize="18sp" />
 
             <TextView
+                android:layout_marginTop="5dp"
                 android:id="@+id/show_text_content_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -86,7 +87,7 @@
                 android:layout_width="20dp"
                 android:layout_height="84dp"
                 android:layout_gravity="start"
-                android:src="@drawable/collapse" />
+                android:src="@drawable/angle1" />
         </LinearLayout>
 
 
