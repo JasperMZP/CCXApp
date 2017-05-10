@@ -45,7 +45,7 @@ public class UserMessageReviseActivity extends AppCompatActivity {
     private RadioGroup message_sex;
     private RadioButton male;
     private RadioButton female;
-    private EditText message_birthday;
+//    private EditText message_birthday;
     private EditText message_address;
     private EditText message_explain;
     private Button add_message;
@@ -71,7 +71,7 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         userName = (EditText)findViewById(R.id.message_userName);
         nickName = (EditText)findViewById(R.id.message_nickname);
         message_sex = (RadioGroup)findViewById(R.id.message_sex);
-        message_birthday = (EditText)findViewById(R.id.message_birthday);
+//        message_birthday = (EditText)findViewById(R.id.message_birthday);
         message_address = (EditText)findViewById(R.id.message_address);
         message_explain = (EditText)findViewById(R.id.message_explain);
         add_message = (Button)findViewById(R.id.add_message_btn);
@@ -99,7 +99,7 @@ public class UserMessageReviseActivity extends AppCompatActivity {
     private void initVariable() {
         oriNickName = JMessageClient.getMyInfo().getNickname();
         oriAddress = JMessageClient.getMyInfo().getAddress();
-        oriBirthday = JMessageClient.getMyInfo().getBirthday();
+//        oriBirthday = JMessageClient.getMyInfo().getBirthday();
         oriSex = JMessageClient.getMyInfo().getGender();
         oriExplain = JMessageClient.getMyInfo().getSignature();
 
@@ -114,7 +114,7 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         userName.setText(JMessageClient.getMyInfo().getUserName());
         nickName.setText(oriNickName);
         message_address.setText(oriAddress);
-        message_birthday.setText(String.valueOf(oriBirthday));
+//        message_birthday.setText(String.valueOf(oriBirthday));
         if(oriSex.equals(UserInfo.Gender.male)){
             male.setChecked(true);
         }else{
@@ -219,7 +219,7 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         }else{
             sex = UserInfo.Gender.male;
         }
-        Long birthday = Long.valueOf(message_birthday.getText().toString().trim());
+//        Long birthday = Long.valueOf(message_birthday.getText().toString().trim());
         String address = message_address.getText().toString().trim();
         String explain = message_explain.getText().toString().trim();
 
@@ -233,11 +233,11 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         }else{
             flag = true;
         }
-        if(birthday.equals(oriBirthday)){
-            birthday = null;
-        }else{
-            flag = true;
-        }
+//        if(birthday.equals(oriBirthday)){
+//            birthday = null;
+//        }else{
+//            flag = true;
+//        }
         if(address.equals(oriAddress)){
             address = null;
         }else{
@@ -252,7 +252,7 @@ public class UserMessageReviseActivity extends AppCompatActivity {
             flag = true;
         }
         if(flag) {
-            userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
+            userDB.addUserMessage(imagePath, nickname, sex, null, address, explain, new userBackListener() {
                 @Override
                 public void showResult(boolean result, String message) {
                     if (result) {

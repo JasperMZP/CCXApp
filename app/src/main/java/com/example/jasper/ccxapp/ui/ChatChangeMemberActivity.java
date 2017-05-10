@@ -112,6 +112,7 @@ public class ChatChangeMemberActivity extends AppCompatActivity {
                                         if(result){
                                             Intent intent = new Intent(ChatChangeMemberActivity.this, ChatDetailActivity.class);
                                             intent.putExtra("groupId", groupId);
+                                            intent.putExtra("ifOwn", getIntent().getBooleanExtra("ifOwn", false));
                                             startActivity(intent);
                                             finish();
                                         }else {
@@ -137,6 +138,7 @@ public class ChatChangeMemberActivity extends AppCompatActivity {
                                             Toast.makeText(ChatChangeMemberActivity.this, "删除成员成功！", Toast.LENGTH_SHORT).show();
                                             Intent intent = new Intent(ChatChangeMemberActivity.this, ChatDetailActivity.class);
                                             intent.putExtra("groupId", groupId);
+                                            intent.putExtra("ifOwn", getIntent().getBooleanExtra("ifOwn", false));
                                             startActivity(intent);
                                             finish();
                                         }else {
@@ -167,6 +169,7 @@ public class ChatChangeMemberActivity extends AppCompatActivity {
             super.onKeyDown(keyCode, event);
             Intent intent = new Intent(ChatChangeMemberActivity.this, ChatDetailActivity.class);
             intent.putExtra("groupId", groupId);
+            intent.putExtra("ifOwn", getIntent().getBooleanExtra("ifOwn", false));
             startActivity(intent);
             this.finish();
         }

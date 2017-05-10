@@ -59,7 +59,7 @@
 			android:id="@+id/to_my_chat"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:text=" 我的群聊"
+			android:text=" 我的群组"
 			android:layout_marginLeft="5dp"
 			android:layout_gravity="center"
 			android:textColor="#666666"
@@ -75,6 +75,8 @@
 		android:id="@+id/showFriendsAll"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginLeft="5dp"
+		android:layout_marginRight="5dp"
 		android:orientation="vertical">
 
         <ListView

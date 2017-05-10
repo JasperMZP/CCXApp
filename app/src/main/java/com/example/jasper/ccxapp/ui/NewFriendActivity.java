@@ -53,7 +53,7 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 		});
 	}
 
-	private void showFriendRequest(List<UserInfo> userInfos, final ArrayList<String> message) {
+	private void showFriendRequest(final List<UserInfo> userInfos, final ArrayList<String> message) {
 		ListView lv = (ListView) findViewById(R.id.all_friend_request);
 
 		NewFriendAdapter adapter = new NewFriendAdapter(NewFriendActivity.this, NewFriendActivity.this, userInfos, message);
@@ -65,11 +65,12 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								friendDB.disagreefriend(message.get(message.size()-1), message.get(position*2).toString(), new userBackListener(){
+								friendDB.disagreefriend(JMessageClient.getMyInfo().getUserName(), userInfos.get(position).getUserName(), new userBackListener(){
 									@Override
 									public void showResult(boolean result, String message) {
-										getFriendRequest();
-                                        if(!result){
+										if(result){
+											getFriendRequest();
+										}else{
                                             showDialog("删除信息失败");
                                         }
 									}
