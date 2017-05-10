@@ -232,12 +232,10 @@ public class MainActivity extends AppCompatActivity implements
         this.finish();
     }
 
-
     /***
      * InitData
      */
     void initData() {
-
         showList = new ArrayList<ShowItemModel>();
         ShowItemModel showItem = null;
         for (int i = 0; i < 2; i++) {
@@ -249,9 +247,7 @@ public class MainActivity extends AppCompatActivity implements
             showItem.setShowImagesList(showImgs);
             showList.add(showItem);
         }
-
         childCommentList = new ArrayList<List<CommentItemModel>>();
-
 
         ArrayList<CommentItemModel> commentItemList = new ArrayList<CommentItemModel>();
         CommentItemModel noneCommentItem1 = new CommentItemModel();
@@ -266,7 +262,6 @@ public class MainActivity extends AppCompatActivity implements
         commentItemList2.add(noneCommentItem2);
 
         childCommentList.add(commentItemList2);
-
     }
 
     private boolean createConversation(long groupId) {
@@ -553,7 +548,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     class ShowHolder {
-
         TextView showUsernameTv;
         CircleImageView showUserAvatarCIv;
         TextView showTextTv;
@@ -562,12 +556,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     class CommentHolder {
-
         TextView commentUsernameTv;
         Button playVoiceCommentBtn;
         TextView timeofvoice;
         RecordButton sendVoiceCommentBtn;
-
     }
 
     @Override
