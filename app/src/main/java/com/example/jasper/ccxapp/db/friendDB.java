@@ -108,25 +108,63 @@ public class friendDB {
 
     //发送好友请求,userName2为接受请求人
     public static void sendfriendrequest(final String userName2, final String message, final userBackListener userBackListener) {
-        NewFriend friend = getNewFriend(JMessageClient.getMyInfo().getUserName(), userName2, message);
-        friend.save(new SaveListener<String>() {
+        BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
+        query.addWhereEqualTo("requestFriend", userName2);
+        query.addWhereEqualTo("responseFriend", JMessageClient.getMyInfo().getUserName());
+        query.findObjects(new FindListener<NewFriend>() {
             @Override
-            public void done(String s, BmobException e) {
+            public void done(List<NewFriend> list, BmobException e) {
                 if(e==null){
-                    ContactManager.sendInvitationRequest(userName2, null, message, new BasicCallback() {
-                        @Override
-                        public void gotResult(int i, String s) {
-                            if(0 == i){
-                                userBackListener.showResult(true, "");
-                            }else {
-                                userBackListener.showResult(false, s);
+                    if(list.size() == 0){
+                        NewFriend friend = getNewFriend(JMessageClient.getMyInfo().getUserName(), userName2, message);
+                        friend.save(new SaveListener<String>() {
+                            @Override
+                            public void done(String s, BmobException e) {
+                                if(e==null){
+                                    ContactManager.sendInvitationRequest(userName2, null, message, new BasicCallback() {
+                                        @Override
+                                        public void gotResult(int i, String s) {
+                                            if(0 == i){
+                                                userBackListener.showResult(true, "");
+                                            }else {
+                                                userBackListener.showResult(false, s);
+                                            }
+                                        }
+                                    });
+                                    Log.d("friend", "发送好友请求成功");
+                                }else{
+                                    userBackListener.showResult(false, e.getMessage());
+                                    Log.e("friend", "发送好友请求失败：" + e.getMessage());
+                                }
                             }
+                        });
+                    }else{
+                        for(NewFriend friend : list){
+                            friend.delete(new UpdateListener() {
+                                @Override
+                                public void done(BmobException e) {
+                                    if(e==null){
+                                        ContactManager.acceptInvitation(userName2, null, new BasicCallback() {
+                                            @Override
+                                            public void gotResult(int i, String s) {
+                                                if(0 == i){
+                                                    userBackListener.showResult(true, "");
+                                                }else {
+                                                    userBackListener.showResult(false, s);
+                                                }
+                                            }
+                                        });
+                                        Log.d("friend", "添加好友成功");
+                                    }else{
+                                        Log.e("friend", "添加好友失败"+e.getMessage());
+                                    }
+                                }
+                            });
                         }
-                    });
-                    Log.d("friend", "发送好友请求成功");
+                    }
                 }else{
                     userBackListener.showResult(false, e.getMessage());
-                    Log.e("friend", "发送好友请求失败：" + e.getMessage());
+                    Log.e("friend", "添加好友失败"+e.getMessage());
                 }
             }
         });

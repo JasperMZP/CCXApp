@@ -17,10 +17,7 @@ import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.List;
-import java.util.Properties;
 
 import cn.jpush.im.android.api.model.UserInfo;
 
@@ -54,6 +51,10 @@ public class MakeChatroomActivity extends AppCompatActivity {
         String chatName = chatroomName.getText().toString().trim();
         if(chatName.equals("")){
             showDialog("请输入群聊名称！");
+            return;
+        }
+        if(adapter.getUserNameList().size() == 0){
+            showDialog("请选择加入群聊的人！");
             return;
         }
         chatDB.addnewchatroom(null, chatName, adapter.getUserNameList(), new userBackListener() {

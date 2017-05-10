@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.jasper.ccxapp.ui.ChatDetailActivity">
+
+    <TextView
+        android:id="@+id/a_word"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="当前群聊成员"
+        android:textSize="20dp"
+        android:padding="10dp" />
+    <ListView
+        android:id="@+id/show_chat_member"
+        android:layout_below="@id/a_word"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+    <Button
+        android:id="@+id/add_new_member"
+        android:layout_above="@+id/delete_some_member"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="添加新成员"/>
+    <Button
+        android:id="@+id/delete_some_member"
+        android:layout_above="@+id/quit_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="删除某些成员"/>
+    <Button
+        android:id="@+id/quit_chat"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="退出群聊"/>
+</RelativeLayout>
