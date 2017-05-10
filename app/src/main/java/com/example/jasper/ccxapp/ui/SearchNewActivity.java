@@ -17,6 +17,7 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackUserInfo;
 
+import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 
@@ -58,6 +59,10 @@ public class SearchNewActivity extends AppCompatActivity {
         if(NameNeedSearch.equals("")){
             showDialog("请输入关键词！");
             return;
+        }else{
+            if(NameNeedSearch.equals(JMessageClient.getMyInfo().getUserName())){
+                showDialog("不能添加自身为好友！");
+            }
         }
         friendDB.searchnewfriend(NameNeedSearch, new userBackUserInfo() {
             @Override

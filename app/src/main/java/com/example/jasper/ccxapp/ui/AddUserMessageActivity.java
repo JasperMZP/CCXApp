@@ -40,7 +40,7 @@ public class AddUserMessageActivity extends AppCompatActivity {
     private EditText userName;
     private EditText nickName;
     private RadioGroup message_sex;
-    private EditText message_birthday;
+//    private EditText message_birthday;
     private EditText message_address;
     private EditText message_explain;
     private Button add_message;
@@ -69,7 +69,7 @@ public class AddUserMessageActivity extends AppCompatActivity {
         userName = (EditText)findViewById(R.id.message_userName);
         nickName = (EditText)findViewById(R.id.message_nickname);
         message_sex = (RadioGroup)findViewById(R.id.message_sex);
-        message_birthday = (EditText)findViewById(R.id.message_birthday);
+//        message_birthday = (EditText)findViewById(R.id.message_birthday);
         message_address = (EditText)findViewById(R.id.message_address);
         message_explain = (EditText)findViewById(R.id.message_explain);
         add_message = (Button)findViewById(R.id.add_message_btn);
@@ -222,7 +222,7 @@ public class AddUserMessageActivity extends AppCompatActivity {
         }else{
             sex = UserInfo.Gender.male;
         }
-        Long birthday = Long.valueOf(message_birthday.getText().toString().trim());
+//        Long birthday = Long.valueOf(message_birthday.getText().toString().trim());
         String address = message_address.getText().toString().trim();
         String explain = message_explain.getText().toString().trim();
 
@@ -236,11 +236,11 @@ public class AddUserMessageActivity extends AppCompatActivity {
         }else{
             flag = true;
         }
-        if(birthday.equals(oriBirthday)){
-            birthday = null;
-        }else{
-            flag = true;
-        }
+//        if(birthday.equals(oriBirthday)){
+//            birthday = null;
+//        }else{
+//            flag = true;
+//        }
         if(address.equals(oriAddress)){
             address = null;
         }else{
@@ -255,7 +255,7 @@ public class AddUserMessageActivity extends AppCompatActivity {
             flag = true;
         }
         if(flag) {
-            userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
+            userDB.addUserMessage(imagePath, nickname, sex, null, address, explain, new userBackListener() {
                 @Override
                 public void showResult(boolean result, String message) {
                     if (result) {

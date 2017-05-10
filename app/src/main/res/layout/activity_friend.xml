@@ -15,68 +15,68 @@
 		android:layout_height="1.0dip"
 		android:layout_marginTop="8dp"
 		android:background="#CCCCCC" />
+	<LinearLayout
+		android:layout_marginLeft="5dp"
+		android:layout_width="match_parent"
+		android:layout_height="50dp"
+		>
+	<ImageView
+		android:id="@+id/image_to_new_friend"
+		android:layout_width="40dp"
+		android:layout_height="40dp"
+		android:src="@drawable/addf"
+		android:layout_gravity="center"
+		android:clickable="true"/>
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text=" 好友申请"
+		android:id="@+id/to_new_friend"
+		android:layout_marginLeft="5dp"
+		android:layout_gravity="center"
+		android:textColor="#666666"
+		android:textSize="16sp"
+		android:clickable="true"/>
+	</LinearLayout>
 
-    <TextView
-    android:id="@+id/to_new_friend"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:clickable="true"
-    android:drawableLeft="@mipmap/addf"
-    android:drawablePadding="10.0dip"
-    android:gravity="center_vertical"
-    android:paddingLeft="10.0dip"
-    android:paddingRight="10.0dip"
-    android:text=" 好友申请"
-    android:textColor="#666666"
-    android:textSize="16sp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1.0dip"
         android:background="#CCCCCC" />
-	<TextView
-		android:id="@+id/search_new_friend"
-		android:layout_width="383dp"
-
-		android:layout_height="50.0dip"
-		android:clickable="true"
-		android:drawableLeft="@mipmap/chatl"
-		android:text="我的群聊"
-		android:drawablePadding="15.0dip"
-		android:gravity="center_vertical"
-        android:paddingLeft="10.0dip"
-        android:paddingRight="10.0dip"
-		android:textColor="#666666"
-		android:textSize="16sp" />
-
-	<!--<TextView-->
-		<!--android:id="@+id/make_new_chat"-->
-		<!--android:layout_width="match_parent"-->
-		<!--android:layout_height="50.0dip"-->
-		<!--android:clickable="true"-->
-		<!--android:drawableLeft="@mipmap/group"-->
-		<!--android:drawablePadding="30.0dip"-->
-		<!--android:gravity="center_vertical"-->
-		<!--android:paddingLeft="20.0dip"-->
-		<!--android:paddingRight="10.0dip"-->
-		<!--android:text="创建新群聊"-->
-		<!--android:textColor="#666666"-->
-		<!--&lt;!&ndash;android:textSize="22sp" />&ndash;&gt;-->
-
-	<!--<View-->
-		<!--android:layout_width="match_parent"-->
-		<!--android:layout_height="2.0dip"-->
-		<!--android:background="#CCCCCC" />-->
+	<LinearLayout
+		android:layout_marginLeft="5dp"
+		android:layout_width="match_parent"
+		android:layout_height="50dp"
+		android:clickable="true">
+		<ImageView
+			android:id="@+id/to_group"
+			android:layout_width="40dp"
+			android:layout_height="40dp"
+			android:src="@drawable/chat1"
+			android:layout_gravity="center"/>
+		<TextView
+			android:id="@+id/to_my_chat"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text=" 我的群组"
+			android:layout_marginLeft="5dp"
+			android:layout_gravity="center"
+			android:textColor="#666666"
+			android:textSize="16sp"/>
+	</LinearLayout>
 
 	<View
 		android:layout_width="match_parent"
-		android:layout_height="20.0dip"
+		android:layout_height="15dip"
 		android:background="#e1e5ea" />
 
 	<LinearLayout
 		android:id="@+id/showFriendsAll"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
+		android:layout_marginLeft="5dp"
+		android:layout_marginRight="5dp"
 		android:orientation="vertical">
 
         <ListView
