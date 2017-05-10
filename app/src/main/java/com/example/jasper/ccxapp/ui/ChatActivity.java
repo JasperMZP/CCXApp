@@ -16,6 +16,7 @@ import com.example.jasper.ccxapp.interfaces.GroupInfos;
 
 import java.util.ArrayList;
 
+import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.model.GroupInfo;
 
 public class ChatActivity extends AppCompatActivity {
@@ -52,6 +53,11 @@ public class ChatActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(ChatActivity.this, ChatDetailActivity.class);
                 intent.putExtra("groupId", groupInfos.get(position).getGroupID());
+                if(groupInfos.get(position).getGroupOwner().equals(JMessageClient.getMyInfo().getUserName())){
+                    intent.putExtra("ifOwn", true);
+                }else{
+                    intent.putExtra("ifOwn", false);
+                }
                 startActivity(intent);
                 finish();
             }

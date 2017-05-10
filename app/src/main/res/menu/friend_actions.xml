@@ -5,7 +5,7 @@
         android:title="添加好友"
         />
     <item android:id="@+id/action_CreateGroup"
-        android:title="新建群聊"
+        android:title="新建群组"
         />
 
 </menu>

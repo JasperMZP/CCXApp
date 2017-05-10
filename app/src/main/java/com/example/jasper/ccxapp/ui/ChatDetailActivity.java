@@ -43,6 +43,10 @@ public class ChatDetailActivity extends AppCompatActivity {
         quit_chat = (Button)findViewById(R.id.quit_chat);
 
         groupId = getIntent().getLongExtra("groupId", groupId);
+        boolean ifOwn = getIntent().getBooleanExtra("ifOwn", false);
+        if(!ifOwn){
+            delete_some_member.setVisibility(View.GONE);
+        }
 
         getChatMember(groupId);
         setListeners();
@@ -59,6 +63,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                 Intent intent = new Intent(ChatDetailActivity.this, ChatChangeMemberActivity.class);
                 intent.putExtra("userNames", userNames);
                 intent.putExtra("type", "add");
+                intent.putExtra("ifOwn", getIntent().getBooleanExtra("ifOwn", false));
                 intent.putExtra("groupId", groupId);
                 startActivity(intent);
                 finish();

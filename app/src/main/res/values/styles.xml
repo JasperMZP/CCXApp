@@ -33,7 +33,7 @@
         <!-- 标题颜色-->
         <item name="android:textColorPrimary">#461111</item>
         <!-- 溢出菜单图标颜色-->
-        <item name="colorControlNormal">#ffff00</item>
+        <item name="colorControlNormal">#6d1362</item>
         <!-- 左边箭头 -->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <!-- 溢出菜单文字颜色-->
