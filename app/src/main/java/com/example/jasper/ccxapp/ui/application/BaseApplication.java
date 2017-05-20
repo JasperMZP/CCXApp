@@ -1,13 +1,8 @@
 package com.example.jasper.ccxapp.ui.application;
 
-
 import android.app.Application;
 import android.content.Context;
-
-
 import com.example.jasper.ccxapp.util.InitSourceFolderUtil;
-import com.example.jasper.ccxapp.util.MessageDBCreatorUtil;
-
 import cn.bmob.v3.Bmob;
 import cn.jpush.im.android.api.JMessageClient;
 
@@ -31,9 +26,6 @@ public class BaseApplication extends Application {
 
         //创建资源文件目录
         InitSourceFolderUtil.createFileDirs();
-
-        //创建数据库
-        MessageDBCreatorUtil.createMessageDB(getApplicationContext());
 
         mContext = getApplicationContext();
     }
