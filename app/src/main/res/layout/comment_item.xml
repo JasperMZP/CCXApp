@@ -11,29 +11,43 @@
         android:id="@+id/comment_username_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="#3366cc"
+        android:layout_marginLeft="15dp"
         android:text="username:"
-        android:layout_marginLeft="15dp"/>
+        android:textColor="#3366cc" />
 
     <Button
-        android:layout_marginLeft="10dp"
         android:id="@+id/play_comment_audio_btn"
         android:layout_width="30dp"
         android:layout_height="30dp"
+        android:layout_marginLeft="10dp"
         android:background="@drawable/startaudio" />
+
+
     <TextView
-        android:layout_marginLeft="5dp"
         android:id="@+id/time_of_voice"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
         android:text="13''" />
+
+
+    <TextView
+        android:id="@+id/comment_time_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|right"
+        android:gravity="right"
+        android:layout_marginRight="20dp"
+        android:text="yy年MM月dd日 HH:mm"
+        android:textSize="10sp" />
+
 
     <com.example.jasper.ccxapp.widget.RecordButton
         android:id="@+id/send_comment_audio_btn"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginLeft="50dp"
         android:text="  按住 说话  "
         android:textColor="@color/white"
-        android:visibility="invisible"/>
+        android:visibility="gone" />
 </LinearLayout>

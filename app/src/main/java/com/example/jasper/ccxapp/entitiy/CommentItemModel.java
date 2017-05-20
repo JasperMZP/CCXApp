@@ -10,6 +10,15 @@ public class CommentItemModel {
     private String commentUsername;
     private String commentVoice;
     private int commentLength;
+    private String commentTime;
+
+    public String getCommentTime() {
+        return commentTime;
+    }
+
+    public void setCommentTime(String commentTime) {
+        this.commentTime = commentTime;
+    }
 
     public String getCommKey() {
         return commKey;
