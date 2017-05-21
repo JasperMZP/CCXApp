@@ -13,14 +13,13 @@
         android:orientation="horizontal"
         android:weightSum="1">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/show_user_avatar_civ"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/ic_launcher"
-            app:civ_border_width="1.5dp"
-            app:civ_border_color="@color/white"/>
+            app:civ_border_color="@color/white"
+            app:civ_border_width="1.5dp" />
 
         <LinearLayout
             android:layout_width="200dp"
@@ -28,22 +27,45 @@
             android:layout_weight="0.92"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/show_username_tv"
+
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
                 android:layout_marginLeft="6dp"
-                android:text="XXX"
-                android:textColor="#3366cc"
-                android:textSize="18sp" />
+                android:layout_marginTop="15dp">
+
+                <TextView
+                    android:id="@+id/show_username_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="XXX"
+                    android:textColor="#3366cc"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/time_lable_tv"
+                    android:layout_width="30dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentRight="true"
+                    android:text="发布"
+                    android:textSize="10sp"/>
+
+                <TextView
+                    android:id="@+id/show_time_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_toLeftOf="@id/time_lable_tv"
+                    android:text="yy年MM月dd日 HH:mm "
+                    android:textSize="10sp"/>
+            </RelativeLayout>
 
             <TextView
-                android:layout_marginTop="5dp"
                 android:id="@+id/show_text_content_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/show_username_tv"
+                android:layout_marginTop="5dp"
                 android:text="text content" />
 
             <android.support.v7.widget.RecyclerView
@@ -70,11 +92,13 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_centerInParent="true"
-                    android:src="@drawable/ic_play_action"
                     android:onClick="onClickShowVideoPlayBtn"
+                    android:src="@drawable/ic_play_action"
                     android:visibility="gone" />
 
+
             </RelativeLayout>
+
 
         </LinearLayout>
 

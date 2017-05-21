@@ -12,13 +12,23 @@ import java.util.List;
  */
 
 public class ShowItemModel implements Serializable {
-    private List<Long> groupBelongToList;
     private String msgKey;
+    private List<Long> groupBelongToList;
     private String showUsername;
+    private File showAvatar;
     private String showText;
+    private String showTime;
+
     private ArrayList<String> showImagesList;
     private String showVideo;
-    private File showAvatar;
+
+    public String getShowTime() {
+        return showTime;
+    }
+
+    public void setShowTime(String showTime) {
+        this.showTime = showTime;
+    }
 
     public File getShowAvatar() {
         return showAvatar;

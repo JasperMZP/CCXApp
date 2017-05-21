@@ -58,7 +58,7 @@ import me.iwf.photopicker.PhotoPreview;
  * Created by Jasper on 2017/4/20.
  */
 
-public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, SourceFolder {
+public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, SourceFolder{
 
     public static final int RESULT_SEND_MSG_ITEM = 1;
     public static final int REQUSET_RECORD_VIDEO_PATH = 2;
@@ -231,17 +231,22 @@ public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, 
 
     private void BackShowMsgItemToSend() {
         if (selectedGroupId != null && selectedGroupId.size() > 0) {
+            Intent intent = new Intent();
             showItem = new ShowItemModel();
             showItem.setGroupBelongToList(selectedGroupId);
             showItem.setMsgKey(UUIDKeyUtil.getUUIDKey());
             showItem.setShowText(textEditEt.getText().toString().trim());
             if (photosPath != null) {//有图片
                 showItem.setShowImagesList(photosPath);
+                intent.putExtra("showType",SHOW_IMAGE);
             } else if (videoPath != null) {//有视频
                 Log.i("test","有视频："+videoPath);
                 showItem.setShowVideo(videoPath);
+                intent.putExtra("showType",SHOW_VIDEO);
+            }else {
+                intent.putExtra("showType",SHOW_TEXT);
             }
-            Intent intent = new Intent();
+
             intent.putExtra("showItem", showItem);
             setResult(RESULT_SEND_MSG_ITEM, intent);
         }
