@@ -256,6 +256,17 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
+        List<CommentItemModel> dbCommentList = messageDB.readCommentItemList();
+        for (CommentItemModel dbComm:dbCommentList){
+            for (int i=0;i<showList.size();i++){
+                if (showList.get(i).getMsgKey().equals(dbComm.getMsgKey())){
+                    int commIndex = childCommentList.get(i).size();
+                    childCommentList.get(i).add(commIndex-1,dbComm);
+                    Log.i("test","添加Comm"+dbComm.getCommentVoice());
+                }
+            }
+        }
+
         ShowItemModel showItem = null;
         for (int i = 0; i < 2; i++) {
             showItem = new ShowItemModel();
@@ -282,9 +293,6 @@ public class MainActivity extends AppCompatActivity implements
         commentItemList2.add(noneCommentItem2);
 
         childCommentList.add(commentItemList2);
-
-
-
     }
 
     private boolean createConversation(long groupId) {
@@ -517,6 +525,8 @@ public class MainActivity extends AppCompatActivity implements
 
                         childCommentList.get(groupPosition).add(getChildrenCount(groupPosition) - 1, commentItemForSend);
                         adapter.notifyDataSetChanged();
+
+                        messageDB.insertComment(commentItemForSend);
 
                         List<Long> groupBelongtoList = ((ShowItemModel) getGroup(groupPosition)).getGroupBelongToList();
                         if (groupBelongtoList != null) {
