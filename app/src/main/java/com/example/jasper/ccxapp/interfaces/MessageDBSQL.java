@@ -8,34 +8,52 @@ public interface MessageDBSQL {
 
     String MESSAGE_DB_NAME = "Message.db";
 
-    String CREATE_SHOW_TEXT = "create table ShowMessage (" +
-            "msgKey text primary key" +
-            "groupBelongToList text" +
-            "showUsername text" +
-            "showAvatar text" +
-            "showTime text" +
-            "showText text"+
-            ")";
+    int DATABASE_VERSION = 1;
 
-    String CREATE_SHOW_IMAGE = "create table ShowMessage (" +
-            "msgKey text primary key" +
-            "groupBelongToList text" +
-            "showUsername text" +
-            "showAvatar text" +
-            "showTime text" +
+    String showTextTableName = "ShowTextTable";
+    String showImageTableName = "ShowImageTable";
+    String showVideoTableName = "ShowVideoTable";
+    String commentTableName = "CommentTable";
+
+    /**
+     * private String msgKey;
+     private List<Long> groupBelongToList;
+     private String showUsername;
+     private File showAvatar;
+     private String showText;
+     private String showTime;
+     private ArrayList<String> showImagesList;
+     private String showVideo;
+     */
+
+    String CREATE_SHOW_TEXT = "create table if not exists "+showTextTableName+" (" +
+            "msgKey text primary key," +
+            "groupBelongToList text," +
+            "showUsername text," +
+            "showAvatar text," +
+            "showTime text," +
             "showText text"+
+            ");";
+
+    String CREATE_SHOW_IMAGE = "create table if not exists "+showImageTableName+" (" +
+            "msgKey text primary key," +
+            "groupBelongToList text," +
+            "showUsername text," +
+            "showAvatar text," +
+            "showTime text," +
+            "showText text,"+
             "showImagesList text" +
-            ")";
+            ");";
 
-    String CREATE_SHOW_VIDEO = "create table ShowMessage (" +
-            "msgKey text primary key" +
-            "groupBelongToList text" +
-            "showUsername text" +
-            "showAvatar text" +
-            "showTime text" +
-            "showText text"+
+    String CREATE_SHOW_VIDEO = "create table if not exists "+showVideoTableName+" (" +
+            "msgKey text primary key," +
+            "groupBelongToList text," +
+            "showUsername text," +
+            "showAvatar text," +
+            "showTime text," +
+            "showText text,"+
             "showVideo text" +
-            ")";
+            ");";
 
     /**
      * private String msgKey;
@@ -46,12 +64,12 @@ public interface MessageDBSQL {
      private String commentTime;
      */
 
-    String CREATE_COMMENT ="create table Comment (" +
-            "msgKey text" +
-            "commKey text" +
-            "commentUsername text" +
-            "commentVoice text" +
-            "commentLength integer" +
+    String CREATE_COMMENT ="create table if not exists "+commentTableName+" (" +
+            "commKey text primary key," +
+            "msgKey text," +
+            "commentUsername text," +
+            "commentVoice text," +
+            "commentLength integer," +
             "commentTime text" +
             ")";
 

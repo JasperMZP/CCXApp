@@ -6,6 +6,8 @@ package com.example.jasper.ccxapp.interfaces;
 
 public interface ShowType {
     //正文or评论
-    public static final String SHOW="show";
-    public static final String COMMENT="comment";
+    String SHOW_TEXT = "showText";
+    String SHOW_IMAGE = "showImage";
+    String SHOW_VIDEO = "showVideo";
+    String COMMENT = "comment";
 }

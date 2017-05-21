@@ -1,6 +1,5 @@
 package com.example.jasper.ccxapp.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
@@ -40,8 +38,11 @@ import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
+import com.example.jasper.ccxapp.db.CreateMessageDB;
+import com.example.jasper.ccxapp.db.WriteAndReadMessageDB;
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
+import com.example.jasper.ccxapp.interfaces.ShowType;
 import com.example.jasper.ccxapp.util.GetCurrentTimeUtil;
 import com.example.jasper.ccxapp.util.SendMessageUtil;
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
@@ -53,11 +54,9 @@ import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
 import com.example.jasper.ccxapp.widget.StickyLayout;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,12 +72,10 @@ import cn.jpush.im.android.api.event.ContactNotifyEvent;
 import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
 import cn.jpush.im.android.api.event.OfflineMessageEvent;
-import cn.jpush.im.android.api.exceptions.JMFileSizeExceedException;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
 import cn.jpush.im.android.api.model.UserInfo;
-import cn.jpush.im.api.BasicCallback;
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.iwf.photopicker.PhotoPreview;
 
@@ -108,6 +105,9 @@ public class MainActivity extends AppCompatActivity implements
     private CircleImageView leftUserAvatarCIV;
     private DrawerLayout drawerLayout;
     private ImageView myAvatarCIV;
+
+    private WriteAndReadMessageDB messageDB = new WriteAndReadMessageDB(MainActivity.this);
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -150,8 +150,8 @@ public class MainActivity extends AppCompatActivity implements
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
         myAvatarCIV = (ImageView) findViewById(R.id.my_avatar_civ);
-        userName=(TextView)findViewById(R.id.currentUserName);
-        TextPaint tp=userName.getPaint();
+        userName = (TextView) findViewById(R.id.currentUserName);
+        TextPaint tp = userName.getPaint();
         tp.setFakeBoldText(true);
         JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
             @Override
@@ -239,6 +239,23 @@ public class MainActivity extends AppCompatActivity implements
      */
     void initData() {
         showList = new ArrayList<ShowItemModel>();
+        childCommentList = new ArrayList<List<CommentItemModel>>();
+        //打开数据库
+        messageDB.open();
+
+        List<ShowItemModel> dbShowItemList  = messageDB.readShowItemList();
+        if (dbShowItemList!=null){
+            for (ShowItemModel s : dbShowItemList){
+                Log.i("test","DBreadText"+s.getShowText());
+                showList.add(s);
+                ArrayList<CommentItemModel> commentItemList3 = new ArrayList<CommentItemModel>();
+                CommentItemModel noneCommentItem3 = new CommentItemModel();
+                noneCommentItem3.setMsgKey("-1");
+                commentItemList3.add(noneCommentItem3);
+                childCommentList.add(commentItemList3);
+            }
+        }
+
         ShowItemModel showItem = null;
         for (int i = 0; i < 2; i++) {
             showItem = new ShowItemModel();
@@ -250,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements
             showItem.setShowImagesList(showImgs);
             showList.add(showItem);
         }
-        childCommentList = new ArrayList<List<CommentItemModel>>();
+
 
         ArrayList<CommentItemModel> commentItemList = new ArrayList<CommentItemModel>();
         CommentItemModel noneCommentItem1 = new CommentItemModel();
@@ -265,6 +282,9 @@ public class MainActivity extends AppCompatActivity implements
         commentItemList2.add(noneCommentItem2);
 
         childCommentList.add(commentItemList2);
+
+
+
     }
 
     private boolean createConversation(long groupId) {
@@ -383,8 +403,8 @@ public class MainActivity extends AppCompatActivity implements
             final ShowItemModel showItem = (ShowItemModel) getGroup(groupPosition);
             showHolder.showUsernameTv.setText(showItem.getShowUsername());
             showHolder.showTextTv.setText(showItem.getShowText());
-            Log.i("test","time "+showItem.getShowTime());
-            showHolder.showTimeTv.setText(showItem.getShowTime()+" ");
+            Log.i("test", "time " + showItem.getShowTime());
+            showHolder.showTimeTv.setText(showItem.getShowTime() + " ");
             File avatarFile = showItem.getShowAvatar();
             if (avatarFile != null) {
                 Log.i("test", "头像不为NULL ");
@@ -470,7 +490,7 @@ public class MainActivity extends AppCompatActivity implements
                 commentHolder.playVoiceCommentBtn = (Button) convertView.findViewById(R.id.play_comment_audio_btn);
                 commentHolder.timeofvoice = (TextView) convertView.findViewById(R.id.time_of_voice);
                 commentHolder.sendVoiceCommentBtn = (RecordButton) convertView.findViewById(R.id.send_comment_audio_btn);
-                commentHolder.commentTimeTv = (TextView)convertView.findViewById(R.id.comment_time_tv);
+                commentHolder.commentTimeTv = (TextView) convertView.findViewById(R.id.comment_time_tv);
                 convertView.setTag(commentHolder);
             } else {
                 commentHolder = (CommentHolder) convertView.getTag();
@@ -519,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements
                 commentHolder.commentTimeTv.setVisibility(View.VISIBLE);
                 commentHolder.sendVoiceCommentBtn.setVisibility(View.GONE);
                 commentHolder.commentUsernameTv.setText(commentItem.getCommentUsername());
-                commentHolder.timeofvoice.setText("" + commentItem.getCommentLength()+ "''");
+                commentHolder.timeofvoice.setText("" + commentItem.getCommentLength() + "''");
                 commentHolder.commentTimeTv.setText(commentItem.getCommentTime());
                 commentHolder.playVoiceCommentBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -588,7 +608,7 @@ public class MainActivity extends AppCompatActivity implements
         ShowItemModel firstVisibleShowItem = (ShowItemModel) adapter.getGroup(firstVisibleGroupPos);
         TextView showUsernameTv = (TextView) headerView.findViewById(R.id.show_username_tv);
         TextView showTextTv = (TextView) headerView.findViewById(R.id.show_text_content_tv);
-        TextView showTimeTv =(TextView) headerView.findViewById(R.id.show_time_tv);
+        TextView showTimeTv = (TextView) headerView.findViewById(R.id.show_time_tv);
         CircleImageView showAvatarIv = (CircleImageView) headerView.findViewById(R.id.show_user_avatar_civ);
         showUsernameTv.setText(firstVisibleShowItem.getShowUsername());
         showTextTv.setText(firstVisibleShowItem.getShowText());
@@ -659,6 +679,7 @@ public class MainActivity extends AppCompatActivity implements
             adapter.notifyDataSetChanged();
             Log.i("test", "show内容" + showItem.getShowText());
 
+            messageDB.insertShow(showItem, data.getStringExtra("showType"));
         }
     }
 
@@ -811,6 +832,8 @@ public class MainActivity extends AppCompatActivity implements
             childCommentList.add(0, commentItemModels);
             Log.i("test", "background");
 
+            messageDB.insertShow(textShowItem, ShowType.SHOW_TEXT);
+
             return true;
         }
 
@@ -864,13 +887,13 @@ public class MainActivity extends AppCompatActivity implements
                         CheckRecievedShowItem.setGroupBelongToList(iGroupIdBelongTo);
                         showList.add(0, CheckRecievedShowItem);
 
-
                         ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
                         CommentItemModel noneComment = new CommentItemModel();
                         noneComment.setMsgKey("-1");
                         commentItemModels.add(noneComment);
                         childCommentList.add(0, commentItemModels);
 
+                        messageDB.insertShow(CheckRecievedShowItem, ShowType.SHOW_IMAGE);
                     }
 
                     return true;
@@ -913,6 +936,8 @@ public class MainActivity extends AppCompatActivity implements
                 commentItemModels.add(noneComment);
                 childCommentList.add(0, commentItemModels);
                 Log.i("test", "background");
+
+                messageDB.insertShow(CheckRecievedShowItem, ShowType.SHOW_IMAGE);
             }
             return true;
         }
@@ -980,6 +1005,8 @@ public class MainActivity extends AppCompatActivity implements
                         childCommentList.add(0, commentItemModels);
                         Log.i("test", "background");
                         adapter.notifyDataSetChanged();
+
+                        messageDB.insertShow(videoShowItem, ShowType.SHOW_VIDEO);
                     }
                 }
             });
@@ -1028,8 +1055,9 @@ public class MainActivity extends AppCompatActivity implements
                     commentItemModels.add(commentItemModels.size() - 1, commentItem);
                     childCommentList.remove(j);
                     childCommentList.add(j, commentItemModels);
-                    Log.i("test", "background");
                     Log.i("test", "添加一条语音消息");
+
+                    messageDB.insertComment(commentItem);
                     return true;
                 }
             }
