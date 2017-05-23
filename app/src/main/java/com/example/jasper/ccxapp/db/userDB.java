@@ -174,4 +174,21 @@ public class userDB {
         }
     }
 
+    //添加用户相关信息
+    public static void addUserIdentity(String identity, final userBackListener ubl) {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setRegion(identity);
+        JMessageClient.updateMyInfo(UserInfo.Field.region, userInfo, new BasicCallback() {
+                @Override
+                public void gotResult(int i, String s) {
+                    Log.i("user", "aaaaaaaaaaaaidentity" + i + "    " + s);
+                    if (i != 0) {
+                        ubl.showResult(false, s);
+                    } else {
+                        ubl.showResult(true, "");
+                    }
+                }
+        });
+    }
+
 }

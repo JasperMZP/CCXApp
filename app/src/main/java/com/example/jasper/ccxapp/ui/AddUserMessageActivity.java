@@ -203,6 +203,15 @@ public class AddUserMessageActivity extends AppCompatActivity {
                                 public void showResult(boolean result, String message) {
                                     if(!result){
                                         showDialog2("联网错误！");
+                                    }else{
+                                        userDB.addUserIdentity("young", new userBackListener() {
+                                            @Override
+                                            public void showResult(boolean result, String message) {
+                                                if(!result){
+                                                    showDialog2("联网错误！");
+                                                }
+                                            }
+                                        });
                                     }
                                 }
                             });

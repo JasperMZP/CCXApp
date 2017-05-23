@@ -18,6 +18,7 @@ import com.example.jasper.ccxapp.adapter.FriendAdapter;
 import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.jpush.im.android.api.model.UserInfo;
@@ -106,15 +107,31 @@ public class FriendActivity extends AppCompatActivity {
 				}else{
 					showDialog("查询好友出错");
 				}
-			}
+		}
 		});
 	}
 
 	private void showFriends(List<UserInfo> message) {
-		ListView lv = (ListView) findViewById(R.id.all_friend);
+		List<UserInfo> userInfosOld = new ArrayList<>();
+		List<UserInfo> userInfosYoung = new ArrayList<>();
+		for(UserInfo userInfo:message){
+            try {
+                if (userInfo.getRegion().equals("old")) {
+                    userInfosOld.add(userInfo);
+                } else {
+                    userInfosYoung.add(userInfo);
+                }
+            }catch (Exception e){
+                userInfosYoung.add(userInfo);
+            }
+		}
+        ListView lv = (ListView) findViewById(R.id.all_friend);
+        FriendAdapter adapter = new FriendAdapter(FriendActivity.this, userInfosOld);
+        lv.setAdapter(adapter);
 
-		FriendAdapter adapter = new FriendAdapter(FriendActivity.this, message);
-		lv.setAdapter(adapter);
+        ListView lv2 = (ListView) findViewById(R.id.all_young_friend);
+        FriendAdapter adapter2 = new FriendAdapter(FriendActivity.this, userInfosYoung);
+        lv2.setAdapter(adapter2);
 	}
 
 	private void showDialog(String message) {

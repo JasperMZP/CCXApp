@@ -79,31 +79,62 @@
 		android:layout_marginRight="5dp"
 		android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/all_friend"
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:descendantFocusability="blocksDescendants"
-            android:orientation="vertical"></ListView>
+            android:layout_height="30.0dip"
+            android:clickable="true"
+            android:text="老人"
+            android:drawablePadding="1.0dip"
+            android:gravity="center_vertical"
+            android:paddingLeft="15.0dip"
+            android:paddingRight="10.0dip"
+            android:textColor="#666666"
+            android:textSize="22sp" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1.0dip"
             android:background="#e1e5ea" />
 
+        <ListView
+            android:id="@+id/all_friend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical"></ListView>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/showYoingFriendsAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:orientation="vertical">
         <TextView
-			android:id="@+id/myFriendText"
-			android:layout_width="match_parent"
-			android:layout_height="30.0dip"
-			android:paddingTop="35dp"
-			android:clickable="true"
-			android:text=""
-			android:drawablePadding="1.0dip"
-			android:gravity="center_vertical"
-			android:paddingLeft="35.0dip"
-			android:paddingRight="10.0dip"
-			android:textColor="#666666"
-			android:textSize="22sp" />
+            android:layout_width="match_parent"
+            android:layout_height="30.0dip"
+            android:clickable="true"
+            android:text="朋友"
+            android:drawablePadding="1.0dip"
+            android:gravity="center_vertical"
+            android:paddingLeft="15.0dip"
+            android:paddingRight="10.0dip"
+            android:textColor="#666666"
+            android:textSize="22sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1.0dip"
+            android:background="#e1e5ea" />
+
+        <ListView
+            android:id="@+id/all_young_friend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical"></ListView>
+
+
 
         <!--<View-->
 			<!--android:layout_width="match_parent"-->
