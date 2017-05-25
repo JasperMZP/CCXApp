@@ -32,6 +32,7 @@ import android.widget.AbsListView.LayoutParams;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +53,10 @@ import com.example.jasper.ccxapp.widget.PinnedHeaderExpandableListView;
 import com.example.jasper.ccxapp.widget.RecordButton;
 import com.example.jasper.ccxapp.widget.RecyclerItemClickListener;
 import com.example.jasper.ccxapp.widget.StickyLayout;
+import com.example.jasper.ccxapp.widget.spinner.AbstractSpinerAdapter;
+import com.example.jasper.ccxapp.widget.spinner.CustemObject;
+import com.example.jasper.ccxapp.widget.spinner.CustemSpinerAdapter;
+import com.example.jasper.ccxapp.widget.spinner.SpinerPopWindow;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,6 +85,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import me.iwf.photopicker.PhotoPreview;
 
 public class MainActivity extends AppCompatActivity implements
+        View.OnClickListener,
+        AbstractSpinerAdapter.IOnItemSelectListener,
         ExpandableListView.OnChildClickListener,
         ExpandableListView.OnGroupClickListener,
         PinnedHeaderExpandableListView.OnHeaderUpdateListener, StickyLayout.OnGiveUpTouchEventListener {
@@ -108,11 +115,17 @@ public class MainActivity extends AppCompatActivity implements
 
     private WriteAndReadMessageDB messageDB = new WriteAndReadMessageDB(MainActivity.this);
 
-
+    //下拉框相关
+    private View mRootView;
+    private TextView mTView;
+    private ImageButton mBtnDropDown;
+    private List<CustemObject> nameList = new ArrayList<CustemObject>();
+    private AbstractSpinerAdapter mAdapter;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         initView();
         initData();
@@ -147,6 +160,32 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initView() {
+
+        //切换群
+        //mRootView = findViewById(R.id.rootView);
+
+        mTView = (TextView) findViewById(R.id.tv_value);
+        mBtnDropDown = (ImageButton) findViewById(R.id.bt_dropdown);
+        mBtnDropDown.setOnClickListener(this);
+
+
+        String[] names = getResources().getStringArray(R.array.hero_name);
+        for(int i = 0; i < names.length; i++){
+            CustemObject object = new CustemObject();
+            object.data = names[i];
+            nameList.add(object);
+        }
+
+
+        mAdapter = new CustemSpinerAdapter(this);
+        mAdapter.refreshData(nameList, 0);
+
+        mSpinerPopWindow = new SpinerPopWindow(this);
+        mSpinerPopWindow.setAdatper(mAdapter);
+        mSpinerPopWindow.setItemListener(this);
+        //切换结束
+
+
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
         myAvatarCIV = (ImageView) findViewById(R.id.my_avatar_civ);
@@ -218,6 +257,40 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
     }
+//切换群
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case R.id.bt_dropdown:
+                showSpinWindow();
+                break;
+        }
+    }
+
+
+    private void setHero(int pos){
+        if (pos >= 0 && pos <= nameList.size()){
+            CustemObject value = nameList.get(pos);
+
+            mTView.setText(value.toString());
+        }
+    }
+
+
+    private SpinerPopWindow mSpinerPopWindow;
+    private void showSpinWindow(){
+        Log.e("", "showSpinWindow");
+        mSpinerPopWindow.setWidth(mTView.getWidth());
+        mSpinerPopWindow.showAsDropDown(mTView);
+    }
+
+
+    @Override
+    public void onItemClick(int pos) {
+        setHero(pos);
+    }
+
+    //切换结束
 
     private void initMediaPlayer(String voicePath) {
         try {
