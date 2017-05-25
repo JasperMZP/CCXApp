@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/appback2"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="fill_parent"
+        android:layout_height="150dp"
+        android:layout_weight="1"
+        android:src="@drawable/logo1"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/accountLayout"
+        android:layout_below="@+id/logo"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:id="@+id/act"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/logup_1"
+            android:layout_weight="1" />
+
+
+        <EditText
+            android:id="@+id/sing_up_userName"
+            android:digits="0123456789"
+            android:hint="请输入老人手机号码"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="5" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/psdLayout"
+        android:layout_below="@+id/accountLayout">
+
+        <ImageView
+            android:id="@+id/psd"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/logup_2"
+            android:layout_weight="1" />
+
+
+        <EditText
+            android:id="@+id/sing_up_password"
+            android:digits="0123456789abcdefghijklmnopqrstuvwxyz"
+            android:hint="请输入密码"
+            android:inputType="textPassword"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="5" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/repsdLayout"
+        android:layout_below="@+id/psdLayout">
+
+        <ImageView
+            android:id="@+id/repsd"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:src="@drawable/logup_2"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1" />
+
+
+        <EditText
+            android:id="@+id/sing_up_password2"
+            android:digits="0123456789abcdefghijklmnopqrstuvwxyz"
+            android:hint="请确认密码"
+            android:inputType="textPassword"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="5" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/sign_up"
+        android:onClick="sign up"
+        android:text="注册"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:background="@drawable/button_color"
+        android:layout_width="330dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/repsdLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp" />
+
+</RelativeLayout>

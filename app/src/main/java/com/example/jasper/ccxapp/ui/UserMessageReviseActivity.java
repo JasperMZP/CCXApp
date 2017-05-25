@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -84,7 +85,12 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         btn_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chooseDialog();
+                String[] permissions = {Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                if(checkPermision(permissions)){
+                    chooseDialog();
+                }
             }
         });
 
@@ -123,12 +129,48 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         message_explain.setText(oriExplain);
     }
 
-    private void chooseDialog() {
-        //获得读取本地数据权限
-        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+    public boolean checkPermision(String[] permissions) {
+        boolean flag = false;
+        for(String permission : permissions){
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
+                flag = true;
+                break;
+            }
         }
+        if(flag){
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        }else{
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1) {
+            boolean isAllGranted = true;
+
+            // 判断是否所有的权限都已经授予了
+            for (int grant : grantResults) {
+                if (grant != PackageManager.PERMISSION_GRANTED) {
+                    isAllGranted = false;
+                    break;
+                }
+            }
+
+            if (isAllGranted) {
+                //申请权限成功后需要调用的函数
+                chooseDialog();
+            } else {
+                new AlertDialog.Builder(this).setTitle("系统提示").setMessage("由于未赋予相应的权限，该功能无法正常使用！")
+                        .setPositiveButton("确定", null).show();
+            }
+        }
+    }
+
+    private void chooseDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("选择头像")
                 .setNegativeButton("相册", new DialogInterface.OnClickListener() {

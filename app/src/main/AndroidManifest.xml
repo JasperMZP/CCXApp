@@ -64,12 +64,14 @@
             android:name=".ui.ShowMsgEditActivity"
             android:label="编辑消息"
             android:theme="@style/AppTheme1" />
-        <activity android:name=".ui.ChatActivity"
+        <activity
+            android:name=".ui.ChatActivity"
             android:label="我的群组"
-            android:theme="@style/AppTheme1"/>
-        <activity android:name=".ui.ChatDetailActivity"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".ui.ChatDetailActivity"
             android:label="群成员"
-            android:theme="@style/AppTheme1"/>
+            android:theme="@style/AppTheme1" />
         <activity android:name=".ui.SendRequestActivity" />
         <activity android:name=".ui.MakeChatroomActivity" />
         <activity android:name=".ui.VideoRecordActivity" />
@@ -169,12 +171,15 @@
             android:name="JPUSH_APPKEY"
             android:value="d48387f328c8b77c59b4d99c" />
 
-        <activity android:name=".ui.UserMessageReviseActivity"
+        <activity
+            android:name=".ui.UserMessageReviseActivity"
             android:label="用户信息"
-            android:theme="@style/AppTheme1"/>
-        <activity android:name=".ui.ChatChangeMemberActivity"
+            android:theme="@style/AppTheme1" />
+        <activity
+            android:name=".ui.ChatChangeMemberActivity"
             android:label="群成员"
-            android:theme="@style/AppTheme1"></activity>
+            android:theme="@style/AppTheme1" />
+        <activity android:name=".ui.SignForOldActivity"></activity>
     </application>
 
 </manifest>
