@@ -134,29 +134,6 @@
         android:clickable="true">
 
         <TextView
-            android:id="@+id/sign_in_for_old"
-            android:layout_width="match_parent"
-            android:layout_height="50.0dip"
-            android:drawablePadding="1.0dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="5.0dip"
-            android:paddingRight="10.0dip"
-            android:text="替老人注册"
-            android:textColor="@color/white"
-            android:textSize="16.0sp" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2.0dip"
-        android:background="@drawable/biz_pc_account_line" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true">
-
-        <TextView
             android:id="@+id/loginout"
             android:layout_width="match_parent"
             android:layout_height="50.0dip"

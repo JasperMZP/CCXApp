@@ -179,7 +179,6 @@
             android:name=".ui.ChatChangeMemberActivity"
             android:label="群成员"
             android:theme="@style/AppTheme1" />
-        <activity android:name=".ui.SignForOldActivity"></activity>
     </application>
 
 </manifest>

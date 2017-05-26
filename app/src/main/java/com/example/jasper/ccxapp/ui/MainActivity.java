@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements
     private String checkShowKey = "";
     private String checkCommKey = "";
     private TextView toFriend;
-    private TextView toSignOld;
     private TextView myName;
     private TextView userName;
     private TextView loginout;
@@ -180,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements
         myName = (TextView) v1.findViewById(R.id.myName);
         loginout = (TextView) v1.findViewById(R.id.loginout);
         leftUserAvatarCIV = (CircleImageView) v1.findViewById(R.id.left_my_avatar_civ);
-        toSignOld = (TextView)v1.findViewById(R.id.sign_in_for_old);
         try {
             myName.setText(JMessageClient.getMyInfo().getNickname());
         } catch (Exception e) {
@@ -216,12 +214,6 @@ public class MainActivity extends AppCompatActivity implements
                                 loginOut();
                             }
                         }).show();
-            }
-        });
-        toSignOld.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
             }
         });
     }
