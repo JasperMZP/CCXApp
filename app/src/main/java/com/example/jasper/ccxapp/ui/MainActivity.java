@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity implements
             public void gotResult(int i, String s, Bitmap bitmap) {
                 if (i == 0) {
                     myAvatarCIV.setImageBitmap(bitmap);
+                    leftUserAvatarCIV.setImageBitmap(bitmap);
                 }
             }
         });
@@ -185,14 +186,6 @@ public class MainActivity extends AppCompatActivity implements
         } catch (Exception e) {
             myName.setText(JMessageClient.getMyInfo().getUserName());
         }
-        JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
-            @Override
-            public void gotResult(int i, String s, Bitmap bitmap) {
-                if (i == 0) {
-                    leftUserAvatarCIV.setImageBitmap(bitmap);
-                }
-            }
-        });
         leftUserAvatarCIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -417,6 +410,7 @@ public class MainActivity extends AppCompatActivity implements
             if (avatarFile != null) {
                 Log.i("test", "头像不为NULL ");
                 showHolder.showUserAvatarCIv.setImageBitmap(BitmapFactory.decodeFile(avatarFile.getPath()));
+                Log.i("test","列表中头像："+avatarFile.getPath());
             } else {
                 Log.i("test", "头像为NULL");
             }
@@ -756,35 +750,6 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
     }
-
-    /**
-     * 类似MessageEvent事件的接收，上层在需要的地方增加OfflineMessageEvent事件的接收
-     * 即可实现离线消息的接收。
-     **/
-    public void onEvent(OfflineMessageEvent event) {
-        //获取事件发生的会话对象
-        Conversation conversation = event.getConversation();
-        List<Message> newMessageList = event.getOfflineMessageList();//获取此次离线期间会话收到的新消息列表
-        System.out.println(String.format(Locale.SIMPLIFIED_CHINESE, "收到%d条来自%s的离线消息。\n", newMessageList.size(), conversation.getTargetId()));
-    }
-
-
-    /**
-     * 如果在JMessageClient.init时启用了消息漫游功能，则每当一个会话的漫游消息同步完成时
-     * sdk会发送此事件通知上层。
-     **/
-    public void onEvent(ConversationRefreshEvent event) {
-        //获取事件发生的会话对象
-        Conversation conversation = event.getConversation();
-        //获取事件发生的原因，对于漫游完成触发的事件，此处的reason应该是
-        //MSG_ROAMING_COMPLETE
-        ConversationRefreshEvent.Reason reason = event.getReason();
-        Log.i("test", String.format(Locale.SIMPLIFIED_CHINESE, "收到ConversationRefreshEvent事件,待刷新的会话是%s.\n", conversation.getTargetId()));
-        Log.i("test", "事件发生的原因 : " + reason);
-        System.out.println(String.format(Locale.SIMPLIFIED_CHINESE, "收到ConversationRefreshEvent事件,待刷新的会话是%s.\n", conversation.getTargetId()));
-        System.out.println("事件发生的原因 : " + reason);
-    }
-
 
     private long exitTime = 0;
 
