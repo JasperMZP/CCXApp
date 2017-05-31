@@ -17,7 +17,7 @@
             android:id="@+id/show_user_avatar_civ"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_launcher"
+            android:src="@drawable/logo"
             app:civ_border_color="@color/white"
             app:civ_border_width="1.5dp" />
 

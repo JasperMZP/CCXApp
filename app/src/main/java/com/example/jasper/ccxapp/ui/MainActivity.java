@@ -236,10 +236,10 @@ public class MainActivity extends AppCompatActivity implements
         //打开数据库
         messageDB.open();
 
-        List<ShowItemModel> dbShowItemList  = messageDB.readShowItemList();
-        if (dbShowItemList!=null){
-            for (ShowItemModel s : dbShowItemList){
-                Log.i("test","DBreadText"+s.getShowText());
+        List<ShowItemModel> dbShowItemList = messageDB.readShowItemList();
+        if (dbShowItemList != null) {
+            for (ShowItemModel s : dbShowItemList) {
+                Log.i("test", "DBreadText" + s.getShowText());
                 showList.add(s);
                 ArrayList<CommentItemModel> commentItemList3 = new ArrayList<CommentItemModel>();
                 CommentItemModel noneCommentItem3 = new CommentItemModel();
@@ -250,28 +250,28 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         List<CommentItemModel> dbCommentList = messageDB.readCommentItemList();
-        for (CommentItemModel dbComm:dbCommentList){
-            for (int i=0;i<showList.size();i++){
-                if (showList.get(i).getMsgKey().equals(dbComm.getMsgKey())){
+        for (CommentItemModel dbComm : dbCommentList) {
+            for (int i = 0; i < showList.size(); i++) {
+                if (showList.get(i).getMsgKey().equals(dbComm.getMsgKey())) {
                     int commIndex = childCommentList.get(i).size();
-                    childCommentList.get(i).add(commIndex-1,dbComm);
-                    Log.i("test","添加Comm"+dbComm.getCommentVoice());
+                    childCommentList.get(i).add(commIndex - 1, dbComm);
+                    Log.i("test", "添加Comm" + dbComm.getCommentVoice());
                 }
             }
         }
 
-        ShowItemModel showItem = null;
-        for (int i = 0; i < 2; i++) {
-            showItem = new ShowItemModel();
-            showItem.setMsgKey("" + i);
-            showItem.setShowUsername("user" + i);
-            showItem.setShowText("show text" + i);
-            showItem.setShowTime(GetCurrentTimeUtil.getCurrentTime(new Date()));
-            ArrayList<String> showImgs = new ArrayList<>();
-            showItem.setShowImagesList(showImgs);
-            showList.add(showItem);
-        }
-
+        ShowItemModel showItem = new ShowItemModel();
+        showItem.setMsgKey("0");
+        showItem.setShowUsername("寸草心官方");
+        showItem.setShowText("尊敬的用户：欢迎使用寸草心，\n" +
+                "这里是消息的浏览页，\n" +
+                "点击右上角的“+”发送消息，\n" +
+                "长按消息下方的按钮发送语音。\n" +
+                ":)");
+        showItem.setShowTime("官方消息");
+        ArrayList<String> showImgs = new ArrayList<>();
+        showItem.setShowImagesList(showImgs);
+        showList.add(showItem);
 
         ArrayList<CommentItemModel> commentItemList = new ArrayList<CommentItemModel>();
         CommentItemModel noneCommentItem1 = new CommentItemModel();
@@ -279,13 +279,6 @@ public class MainActivity extends AppCompatActivity implements
         commentItemList.add(noneCommentItem1);
 
         childCommentList.add(commentItemList);
-
-        ArrayList<CommentItemModel> commentItemList2 = new ArrayList<CommentItemModel>();
-        CommentItemModel noneCommentItem2 = new CommentItemModel();
-        noneCommentItem2.setMsgKey("-1");
-        commentItemList2.add(noneCommentItem2);
-
-        childCommentList.add(commentItemList2);
     }
 
     private boolean createConversation(long groupId) {
@@ -410,7 +403,7 @@ public class MainActivity extends AppCompatActivity implements
             if (avatarFile != null) {
                 Log.i("test", "头像不为NULL ");
                 showHolder.showUserAvatarCIv.setImageBitmap(BitmapFactory.decodeFile(avatarFile.getPath()));
-                Log.i("test","列表中头像："+avatarFile.getPath());
+                Log.i("test", "列表中头像：" + avatarFile.getPath());
             } else {
                 Log.i("test", "头像为NULL");
             }
