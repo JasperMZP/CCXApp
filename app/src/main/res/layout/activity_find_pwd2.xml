@@ -1,36 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@drawable/appback2"
     tools:context="com.example.jasper.ccxapp.ui.FindPwd2Activity">
 
     <TextView
         android:id="@+id/Q1"
+        android:layout_marginLeft="5dp"
+        android:textColor="#2c3474"
+        android:layout_marginTop="21dp"
+        android:textSize="24dp"
         android:layout_width="wrap_content"
-        android:layout_height="50dp" />
+        android:layout_height="70dp"
+        android:layout_alignParentTop="true"
+        />
     <EditText
         android:id="@+id/A1"
+        android:layout_marginLeft="5dp"
         android:layout_width="match_parent"
-        android:layout_height="50dp" />
+        android:background="#f5f2f2"
+        android:layout_height="80dp"
+        android:layout_below="@+id/Q1"
+        />
     <TextView
         android:id="@+id/Q2"
+        android:layout_marginLeft="5dp"
+        android:textColor="#2c3474"
+        android:textSize="24dp"
         android:layout_width="wrap_content"
-        android:layout_height="50dp" />
+        android:layout_height="70dp"
+        android:layout_above="@+id/A2"
+        android:layout_alignStart="@+id/A2" />
     <EditText
         android:id="@+id/A2"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:layout_width="match_parent"
-        android:layout_height="50dp" />
+        android:background="#f5f2f2"
+        android:layout_height="80dp"
+        android:layout_marginBottom="40dp"
+        android:layout_above="@+id/find_pwd_phone_OK"
+        android:layout_centerHorizontal="true" />
     <Button
         android:id="@+id/find_pwd_phone_OK"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="确定"/>
+        android:background="@drawable/button_color"
+        android:textColor="@color/white"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:text="确定"
+        android:layout_above="@+id/find_pwd_phone_cancel"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="14dp" />
     <Button
         android:id="@+id/find_pwd_phone_cancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="取消"/>
-</LinearLayout>
+        android:background="@drawable/button_color"
+        android:textColor="@color/white"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:text="取消"
+        android:layout_marginBottom="14dp"
+        android:layout_alignParentBottom="true"
+        />
+</RelativeLayout>

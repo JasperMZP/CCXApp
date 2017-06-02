@@ -537,6 +537,17 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 });
             } else {
+                int mywidth=0;
+                int time_temp=0;
+                time_temp=commentItem.getCommentLength();
+                if(time_temp>14) {
+                    mywidth=340;
+                }else{
+                    mywidth=120+(time_temp-1)*15;
+                }
+                android.view.ViewGroup.LayoutParams widthPar = commentHolder.playVoiceCommentBtn.getLayoutParams();
+                widthPar.width=mywidth;
+                commentHolder.playVoiceCommentBtn.setLayoutParams(widthPar);
                 commentHolder.commentUsernameTv.setVisibility(View.VISIBLE);
                 commentHolder.playVoiceCommentBtn.setVisibility(View.VISIBLE);
                 commentHolder.timeofvoice.setVisibility(View.VISIBLE);

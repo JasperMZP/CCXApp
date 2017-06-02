@@ -37,7 +37,8 @@
                 android:textStyle="bold"
                 android:layout_alignParentRight="true"
                 android:layout_above="@+id/my_avatar_civ"
-                android:layout_marginRight="5dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="10dp"
                 android:textSize="14.0sp"
                 android:textColor="#111055"
                 />
@@ -47,7 +48,7 @@
                 android:layout_width="70dp"
                 android:layout_height="70dp"
                 android:src="@drawable/ic_launcher"
-                android:layout_marginRight="3dp"
+                android:layout_marginRight="4dp"
                 android:layout_marginBottom="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true" />

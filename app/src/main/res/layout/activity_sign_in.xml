@@ -104,7 +104,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="                        还没有账号？"
+            android:layout_marginLeft="130dp"
+            android:text="还没有账号？"
             android:id="@+id/text" />
 
         <TextView
@@ -121,8 +122,9 @@
         android:id="@+id/findPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="100dp"
+        android:layout_marginLeft="130dp"
         android:layout_marginTop="20dp"
+        android:textColor="#B452CD"
         android:layout_below="@id/lastLayout"
         android:text="找回密码"/>
 
