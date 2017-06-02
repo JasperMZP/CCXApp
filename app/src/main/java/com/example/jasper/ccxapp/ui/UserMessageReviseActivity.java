@@ -1,6 +1,7 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,6 +9,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -15,10 +17,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
@@ -27,6 +31,9 @@ import com.example.jasper.ccxapp.interfaces.userBackListener;
 import com.example.jasper.ccxapp.util.ImageUtil;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
@@ -39,21 +46,16 @@ public class UserMessageReviseActivity extends AppCompatActivity {
 
 
     private ImageView message_image;
-    private Button btn_image;
-    private EditText userName;
+    private TextView btn_image;
+    private TextView userName;
     private EditText nickName;
     private RadioGroup message_sex;
     private RadioButton male;
     private RadioButton female;
-//    private EditText message_birthday;
+    private EditText message_birthday;
     private EditText message_address;
     private EditText message_explain;
     private Button add_message;
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
     private String oriNickName;
     private UserInfo.Gender oriSex;
     private Long oriBirthday;
@@ -61,17 +63,22 @@ public class UserMessageReviseActivity extends AppCompatActivity {
     private String oriExplain;
     private ImageUtil imageUtils;
 
+    private Calendar calendar; // 通过Calendar获取系统时间
+    private int mYear;
+    private int mMonth;
+    private int mDay = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_message_revise);
 
         message_image = (ImageView)findViewById(R.id.add_message_image);
-        btn_image = (Button)findViewById(R.id.add_message_image_btn);
-        userName = (EditText)findViewById(R.id.message_userName);
+        btn_image = (TextView) findViewById(R.id.add_message_image_btn);
+        userName = (TextView) findViewById(R.id.message_userName);
         nickName = (EditText)findViewById(R.id.message_nickname);
         message_sex = (RadioGroup)findViewById(R.id.message_sex);
-//        message_birthday = (EditText)findViewById(R.id.message_birthday);
+        message_birthday = (EditText)findViewById(R.id.showBirthday);
         message_address = (EditText)findViewById(R.id.message_address);
         message_explain = (EditText)findViewById(R.id.message_explain);
         add_message = (Button)findViewById(R.id.add_message_btn);
@@ -84,7 +91,12 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         btn_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                chooseDialog();
+                String[] permissions = {Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                if(checkPermision(permissions)){
+                    chooseDialog();
+                }
             }
         });
 
@@ -94,12 +106,38 @@ public class UserMessageReviseActivity extends AppCompatActivity {
                 showDialog("确认修改信息?");
             }
         });
+
+        calendar = Calendar.getInstance();
+        message_birthday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(UserMessageReviseActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int day) {
+                                mYear = year;
+                                mMonth = month;
+                                mDay = day;
+                                // 更新EditText控件日期 小于10加0
+                                message_birthday.setText(new StringBuilder()
+                                        .append(mYear)
+                                        .append("-")
+                                        .append((mMonth + 1) < 10 ? "0"
+                                                + (mMonth + 1) : (mMonth + 1))
+                                        .append("-")
+                                        .append((mDay < 10) ? "0" + mDay : mDay));
+                            }
+                        }, calendar.get(Calendar.YEAR), calendar
+                        .get(Calendar.MONTH), calendar
+                        .get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
     }
 
     private void initVariable() {
         oriNickName = JMessageClient.getMyInfo().getNickname();
         oriAddress = JMessageClient.getMyInfo().getAddress();
-//        oriBirthday = JMessageClient.getMyInfo().getBirthday();
+        oriBirthday = JMessageClient.getMyInfo().getBirthday();
         oriSex = JMessageClient.getMyInfo().getGender();
         oriExplain = JMessageClient.getMyInfo().getSignature();
 
@@ -114,7 +152,8 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         userName.setText(JMessageClient.getMyInfo().getUserName());
         nickName.setText(oriNickName);
         message_address.setText(oriAddress);
-//        message_birthday.setText(String.valueOf(oriBirthday));
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        message_birthday.setText(date.format(oriBirthday));
         if(oriSex.equals(UserInfo.Gender.male)){
             male.setChecked(true);
         }else{
@@ -123,12 +162,48 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         message_explain.setText(oriExplain);
     }
 
-    private void chooseDialog() {
-        //获得读取本地数据权限
-        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+    public boolean checkPermision(String[] permissions) {
+        boolean flag = false;
+        for(String permission : permissions){
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
+                flag = true;
+                break;
+            }
         }
+        if(flag){
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        }else{
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1) {
+            boolean isAllGranted = true;
+
+            // 判断是否所有的权限都已经授予了
+            for (int grant : grantResults) {
+                if (grant != PackageManager.PERMISSION_GRANTED) {
+                    isAllGranted = false;
+                    break;
+                }
+            }
+
+            if (isAllGranted) {
+                //申请权限成功后需要调用的函数
+                chooseDialog();
+            } else {
+                new AlertDialog.Builder(this).setTitle("系统提示").setMessage("由于未赋予相应的权限，该功能无法正常使用！")
+                        .setPositiveButton("确定", null).show();
+            }
+        }
+    }
+
+    private void chooseDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("选择头像")
                 .setNegativeButton("相册", new DialogInterface.OnClickListener() {
@@ -219,7 +294,14 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         }else{
             sex = UserInfo.Gender.male;
         }
-//        Long birthday = Long.valueOf(message_birthday.getText().toString().trim());
+        Long birthday = null;
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        try{
+            Date d = date.parse(message_birthday.getText().toString());
+            birthday = d.getTime();
+        }catch (Exception e){
+            birthday = null;
+        }
         String address = message_address.getText().toString().trim();
         String explain = message_explain.getText().toString().trim();
 
@@ -233,11 +315,11 @@ public class UserMessageReviseActivity extends AppCompatActivity {
         }else{
             flag = true;
         }
-//        if(birthday.equals(oriBirthday)){
-//            birthday = null;
-//        }else{
-//            flag = true;
-//        }
+        if(birthday.equals(oriBirthday)){
+            birthday = null;
+        }else{
+            flag = true;
+        }
         if(address.equals(oriAddress)){
             address = null;
         }else{
@@ -252,7 +334,7 @@ public class UserMessageReviseActivity extends AppCompatActivity {
             flag = true;
         }
         if(flag) {
-            userDB.addUserMessage(imagePath, nickname, sex, null, address, explain, new userBackListener() {
+            userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
                 @Override
                 public void showResult(boolean result, String message) {
                     if (result) {

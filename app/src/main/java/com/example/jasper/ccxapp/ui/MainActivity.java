@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements
     private TextView myName;
     private TextView userName;
     private TextView loginout;
+    private TextView openFlashlight;
     private CircleImageView leftUserAvatarCIV;
     private DrawerLayout drawerLayout;
     private ImageView myAvatarCIV;
@@ -180,6 +181,7 @@ public class MainActivity extends AppCompatActivity implements
         toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
         myName = (TextView) v1.findViewById(R.id.myName);
         loginout = (TextView) v1.findViewById(R.id.loginout);
+        openFlashlight = (TextView) v1.findViewById(R.id.flashlight);
         leftUserAvatarCIV = (CircleImageView) v1.findViewById(R.id.left_my_avatar_civ);
         try {
             myName.setText(JMessageClient.getMyInfo().getNickname());
@@ -196,6 +198,12 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, FriendActivity.class));
+            }
+        });
+        openFlashlight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, FlashlightActivity.class));
             }
         });
         loginout.setOnClickListener(new View.OnClickListener() {
@@ -403,7 +411,6 @@ public class MainActivity extends AppCompatActivity implements
             if (avatarFile != null) {
                 Log.i("test", "头像不为NULL ");
                 showHolder.showUserAvatarCIv.setImageBitmap(BitmapFactory.decodeFile(avatarFile.getPath()));
-                Log.i("test", "列表中头像：" + avatarFile.getPath());
             } else {
                 Log.i("test", "头像为NULL");
             }
