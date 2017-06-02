@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements
         drawerLayout = (DrawerLayout) super.findViewById(R.id.drawer_layout);
         drawerLayout.setScrimColor(Color.TRANSPARENT);
 
-        View v1 = (View) findViewById(R.id.left_drawer);
+        View v1 = findViewById(R.id.left_drawer);
         toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
         myName = (TextView) v1.findViewById(R.id.myName);
         loginout = (TextView) v1.findViewById(R.id.loginout);
