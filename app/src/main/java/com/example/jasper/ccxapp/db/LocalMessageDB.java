@@ -10,7 +10,8 @@ import android.util.Log;
 
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
-import com.example.jasper.ccxapp.interfaces.LocalMessageDao;
+import com.example.jasper.ccxapp.interfaces.MessageDBSQL;
+import com.example.jasper.ccxapp.interfaces.MessageType;
 import com.example.jasper.ccxapp.util.ListParseUtil;
 import com.example.jasper.ccxapp.util.ShowMsgListOrderUtil;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * Created by Jasper on 2017/5/20.
  */
 
-public class LocalShowMessageDaoImpl implements LocalMessageDao {
+public class LocalMessageDB implements MessageDBSQL, MessageType {
 
     private final Context context;
     private MsgDBHelper msgDBHelper;
@@ -31,7 +32,7 @@ public class LocalShowMessageDaoImpl implements LocalMessageDao {
     private List<ShowItemModel> showItemModelList = new ArrayList<ShowItemModel>();
     private List<CommentItemModel> commentItemModelList = new ArrayList<CommentItemModel>();
 
-    public LocalShowMessageDaoImpl(Context context) {
+    public LocalMessageDB(Context context) {
         this.context = context;
         this.msgDBHelper = new MsgDBHelper(this.context);
     }
@@ -53,7 +54,7 @@ public class LocalShowMessageDaoImpl implements LocalMessageDao {
         }
     }
 
-    public LocalShowMessageDaoImpl open() throws SQLException {
+    public LocalMessageDB open() throws SQLException {
         this.db = this.msgDBHelper.getWritableDatabase();
         return this;
     }

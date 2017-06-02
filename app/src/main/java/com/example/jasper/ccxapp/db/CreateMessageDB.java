@@ -6,13 +6,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import com.example.jasper.ccxapp.interfaces.MessageDBSQL;
-import com.example.jasper.ccxapp.interfaces.ShowType;
+import com.example.jasper.ccxapp.interfaces.MessageType;
 
 /**
  * Created by Jasper on 2017/5/20.
  */
 
-public class CreateMessageDB implements MessageDBSQL, ShowType {
+public class CreateMessageDB implements MessageDBSQL, MessageType {
 
     private final Context context;
     private MsgDBHelper msgDBHelper;

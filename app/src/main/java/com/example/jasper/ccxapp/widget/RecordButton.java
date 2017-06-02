@@ -20,14 +20,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
-import com.example.jasper.ccxapp.interfaces.ShowType;
+import com.example.jasper.ccxapp.interfaces.MessageType;
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 
 import java.io.File;
 import java.io.IOException;
 
 
-public class RecordButton extends android.support.v7.widget.AppCompatButton implements ShowType{
+public class RecordButton extends android.support.v7.widget.AppCompatButton implements MessageType{
     private final int Volume_What_100 = 100;
     private final int Time_What_101 = 101;
     private final int CancelRecordWhat_102 = 102;

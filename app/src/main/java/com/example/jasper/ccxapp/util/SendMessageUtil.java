@@ -27,96 +27,22 @@ import cn.jpush.im.api.BasicCallback;
 
 public class SendMessageUtil {
     public static void sendTextMsg(ShowItemModel showItemForSend, Conversation mConversation) {
-        TextContent textContent = new TextContent(showItemForSend.getShowText());
-        textContent.setStringExtra("showKey", showItemForSend.getMsgKey());
-        String groupIds = "";
-        for (long groupId : showItemForSend.getGroupBelongToList()) {
-            groupIds += groupId + ",";
-        }
-        textContent.setStringExtra("groupBelongTo", groupIds);
-        Message message = mConversation.createSendMessage(textContent);
-        message.setOnSendCompleteCallback(new BasicCallback() {
-            @Override
-            public void gotResult(int responseCode, String responseDesc) {
-                if (responseCode == 0) {
-                    //消息发送成功
-                    Log.i("test", "文本发送成功");
-                } else {
-                    //消息发送失败
-                    Log.e("test", "文本发送失败");
-                }
-            }
-        });
 
-        JMessageClient.sendMessage(message);
     }
 
     public static void sendImageMsg(ShowItemModel showItemForSend,Conversation mConversation) {
-        ArrayList<String> imgPaths = showItemForSend.getShowImagesList();
-        String recieveFlag = UUIDKeyUtil.getUUIDKey();
-        for (int i = 0; i < imgPaths.size(); i++) {
-            try {
-                ImageContent imageContent = new ImageContent(new File(imgPaths.get(i)));
-                Map extrasMap = new HashMap();
-                extrasMap.put("showKey", showItemForSend.getMsgKey());
-                if (i == 0 && showItemForSend.getShowText() != null) {
-                    extrasMap.put("showText", showItemForSend.getShowText());
-                }
-                String groupIds = "";
-                for (long groupId : showItemForSend.getGroupBelongToList()) {
-                    groupIds += groupId + ",";
-                }
-                Log.i("test", "传递groupIds" + groupIds);
-                //imageContent.setStringExtra("groupBelongTo",groupIds);
-                extrasMap.put("groupBelongTo", groupIds);
-                imageContent.setExtras(extrasMap);
-                imageContent.setNumberExtra("imageNum", imgPaths.size());
-                imageContent.setNumberExtra("imageCount", i + 1);
-                imageContent.setStringExtra("recieveFlag", recieveFlag);
-                Message message = mConversation.createSendMessage(imageContent);
-                message.setOnSendCompleteCallback(new BasicCallback() {
-                    @Override
-                    public void gotResult(int i, String s) {
-                        Log.i("test", "发送图片消息" + i + s);
-                    }
-                });
-                JMessageClient.sendMessage(message);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+
     }
 
 
     public static void sendVideoMsg(ShowItemModel showItemForSend,Conversation mConversation) {
-        try {
-            FileContent fileContent = new FileContent(new File(showItemForSend.getShowVideo()));
-            fileContent.setStringExtra("showKey", showItemForSend.getMsgKey());
-            fileContent.setStringExtra("showText", showItemForSend.getShowText());
-            String groupIds = "";
-            for (long groupId : showItemForSend.getGroupBelongToList()) {
-                groupIds += groupId + ",";
-            }
-            fileContent.setStringExtra("groupBelongTo", groupIds);
-            Message message = mConversation.createSendMessage(fileContent);
-            message.setOnSendCompleteCallback(new BasicCallback() {
-                @Override
-                public void gotResult(int i, String s) {
-                    Log.i("test", "视频发送" + i + s);
-                }
-            });
-            JMessageClient.sendMessage(message);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (JMFileSizeExceedException e) {
-            e.printStackTrace();
-        }
+
     }
 
     public static void sendVoice(CommentItemModel commentItemForSend,Conversation mConversation) {
         try {
             VoiceContent voiceContent = new VoiceContent(new File(commentItemForSend.getCommentVoice()), commentItemForSend.getCommentLength());
-            Map extrasMap = new HashMap();
+            Map<String,String> extrasMap = new HashMap<String,String>();
             extrasMap.put("showKey", commentItemForSend.getMsgKey());
             extrasMap.put("commKey", commentItemForSend.getCommKey());
             extrasMap.put("voiceLength", "" + commentItemForSend.getCommentLength());

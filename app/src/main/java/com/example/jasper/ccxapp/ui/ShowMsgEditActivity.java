@@ -29,7 +29,7 @@ import android.widget.Toast;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.PhotoAdapter;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
-import com.example.jasper.ccxapp.interfaces.ShowType;
+import com.example.jasper.ccxapp.interfaces.MessageType;
 import com.example.jasper.ccxapp.interfaces.SourceFolder;
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
 import com.example.jasper.ccxapp.widget.CustomVideoView;
@@ -58,7 +58,7 @@ import me.iwf.photopicker.PhotoPreview;
  * Created by Jasper on 2017/4/20.
  */
 
-public class ShowMsgEditActivity extends AppCompatActivity implements ShowType, SourceFolder{
+public class ShowMsgEditActivity extends AppCompatActivity implements MessageType, SourceFolder{
 
     public static final int RESULT_SEND_MSG_ITEM = 1;
     public static final int REQUSET_RECORD_VIDEO_PATH = 2;

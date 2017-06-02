@@ -38,10 +38,12 @@ import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
-import com.example.jasper.ccxapp.db.LocalShowMessageDaoImpl;
+import com.example.jasper.ccxapp.db.LocalMessageDB;
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
-import com.example.jasper.ccxapp.interfaces.ShowType;
+import com.example.jasper.ccxapp.interfaces.MessageType;
+import com.example.jasper.ccxapp.interfaces.ShowMsgSender;
+import com.example.jasper.ccxapp.service.factory.SendFactory;
 import com.example.jasper.ccxapp.util.GetCurrentTimeUtil;
 import com.example.jasper.ccxapp.util.SendMessageUtil;
 import com.example.jasper.ccxapp.util.UUIDKeyUtil;
@@ -78,7 +80,7 @@ import me.iwf.photopicker.PhotoPreview;
 public class MainActivity extends AppCompatActivity implements
         ExpandableListView.OnChildClickListener,
         ExpandableListView.OnGroupClickListener,
-        PinnedHeaderExpandableListView.OnHeaderUpdateListener, StickyLayout.OnGiveUpTouchEventListener {
+        PinnedHeaderExpandableListView.OnHeaderUpdateListener, StickyLayout.OnGiveUpTouchEventListener ,MessageType{
     private final int REQUEST_SEND_MSG_ITEM = 0;
     //View
     private PinnedHeaderExpandableListView expandableListView;
@@ -102,8 +104,9 @@ public class MainActivity extends AppCompatActivity implements
     private CircleImageView leftUserAvatarCIV;
     private DrawerLayout drawerLayout;
     private ImageView myAvatarCIV;
+    private SendFactory sendFactory = new SendFactory();
 
-    private LocalShowMessageDaoImpl messageDB = new LocalShowMessageDaoImpl(MainActivity.this);
+    private LocalMessageDB messageDB = new LocalMessageDB(MainActivity.this);
 
 
     @Override
@@ -305,18 +308,26 @@ public class MainActivity extends AppCompatActivity implements
         showItemForSend.setMsgKey(showItem.getMsgKey());
         showItemForSend.setGroupBelongToList(showItem.getGroupBelongToList());
 
+        ShowMsgSender showMsgSender;
         if (showItem.getShowImagesList() != null) {
             //有图片
             showItemForSend.setShowImagesList(showItem.getShowImagesList());
             //发送带图片的消息
-            SendMessageUtil.sendImageMsg(showItemForSend, mConversation);
+            showMsgSender = sendFactory.ShowMsgSenderProduce(SHOW_IMAGE);
+            showMsgSender.sendMsg(showItemForSend, mConversation);
+
+            //SendMessageUtil.sendImageMsg();
         } else if (showItem.getShowVideo() != null) {
             //有视频
             showItemForSend.setShowVideo(showItem.getShowVideo());
-            SendMessageUtil.sendVideoMsg(showItemForSend, mConversation);
+            showMsgSender = sendFactory.ShowMsgSenderProduce(SHOW_VIDEO);
+            showMsgSender.sendMsg(showItemForSend, mConversation);
+            //SendMessageUtil.sendVideoMsg(showItemForSend, mConversation);
         } else if (showItem.getShowImagesList() == null && showItem.getShowVideo() == null) {
             //发送文字信息
-            SendMessageUtil.sendTextMsg(showItemForSend, mConversation);
+            showMsgSender = sendFactory.ShowMsgSenderProduce(SHOW_TEXT);
+            showMsgSender.sendMsg(showItemForSend, mConversation);
+            //SendMessageUtil.sendTextMsg(showItemForSend, mConversation);
         }
     }
 
@@ -704,8 +715,6 @@ public class MainActivity extends AppCompatActivity implements
                 new RecieveTextTask().execute(msg);
                 break;
         }
-
-
     }
 
     public void onEvent(MessageEvent event) {
@@ -803,7 +812,7 @@ public class MainActivity extends AppCompatActivity implements
             childCommentList.add(0, commentItemModels);
             Log.i("test", "background");
 
-            messageDB.insertShow(textShowItem, ShowType.SHOW_TEXT);
+            messageDB.insertShow(textShowItem, SHOW_TEXT);
 
             return true;
         }
@@ -864,7 +873,7 @@ public class MainActivity extends AppCompatActivity implements
                         commentItemModels.add(noneComment);
                         childCommentList.add(0, commentItemModels);
 
-                        messageDB.insertShow(CheckRecievedShowItem, ShowType.SHOW_IMAGE);
+                        messageDB.insertShow(CheckRecievedShowItem, SHOW_IMAGE);
                     }
 
                     return true;
@@ -908,7 +917,7 @@ public class MainActivity extends AppCompatActivity implements
                 childCommentList.add(0, commentItemModels);
                 Log.i("test", "background");
 
-                messageDB.insertShow(CheckRecievedShowItem, ShowType.SHOW_IMAGE);
+                messageDB.insertShow(CheckRecievedShowItem, SHOW_IMAGE);
             }
             return true;
         }
@@ -977,7 +986,7 @@ public class MainActivity extends AppCompatActivity implements
                         Log.i("test", "background");
                         adapter.notifyDataSetChanged();
 
-                        messageDB.insertShow(videoShowItem, ShowType.SHOW_VIDEO);
+                        messageDB.insertShow(videoShowItem, SHOW_VIDEO);
                     }
                 }
             });
