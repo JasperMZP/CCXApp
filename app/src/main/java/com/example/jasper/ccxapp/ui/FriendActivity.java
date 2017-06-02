@@ -1,7 +1,9 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -9,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,7 +20,10 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.FriendAdapter;
 import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
+import com.example.jasper.ccxapp.interfaces.userBackListener;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,8 +118,8 @@ public class FriendActivity extends AppCompatActivity {
 	}
 
 	private void showFriends(List<UserInfo> message) {
-		List<UserInfo> userInfosOld = new ArrayList<>();
-		List<UserInfo> userInfosYoung = new ArrayList<>();
+		final List<UserInfo> userInfosOld = new ArrayList<>();
+		final List<UserInfo> userInfosYoung = new ArrayList<>();
 		for(UserInfo userInfo:message){
             try {
                 if (userInfo.getRegion().equals("old")) {
@@ -128,10 +134,70 @@ public class FriendActivity extends AppCompatActivity {
         ListView lv = (ListView) findViewById(R.id.all_friend);
         FriendAdapter adapter = new FriendAdapter(FriendActivity.this, userInfosOld);
         lv.setAdapter(adapter);
+		lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+				new AlertDialog.Builder(FriendActivity.this).setTitle("系统提示").setMessage("确认删除该老人？")
+						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								friendDB.deletefriend(userInfosOld.get(position), new userBackListener() {
+                                    @Override
+                                    public void showResult(boolean result, String message) {
+                                        if(result){
+                                            showDialog("删除成功！");
+                                            getFriends();
+                                        }else{
+                                            showDialog("删除失败！");
+                                        }
+                                    }
+                                });
+							}
+						}).setNegativeButton("取消", null).show();
+				return true;
+			}
+		});
+		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Intent i = getIntent(userInfosOld.get(position));
+				startActivity(i);
+			}
+		});
 
         ListView lv2 = (ListView) findViewById(R.id.all_young_friend);
         FriendAdapter adapter2 = new FriendAdapter(FriendActivity.this, userInfosYoung);
         lv2.setAdapter(adapter2);
+        lv2.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+                new AlertDialog.Builder(FriendActivity.this).setTitle("系统提示").setMessage("确认删除该好友？")
+                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                friendDB.deletefriend(userInfosYoung.get(position), new userBackListener() {
+                                    @Override
+                                    public void showResult(boolean result, String message) {
+                                        if(result){
+                                            showDialog("删除好友成功！");
+                                            getFriends();
+                                        }else{
+                                            showDialog("删除好友失败！");
+                                        }
+                                    }
+                                });
+                            }
+                        }).setNegativeButton("取消", null).show();
+                return true;
+            }
+        });
+		lv2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Intent i = getIntent(userInfosYoung.get(position));
+				startActivity(i);
+			}
+		});
 	}
 
 	private void showDialog(String message) {
@@ -146,5 +212,26 @@ public class FriendActivity extends AppCompatActivity {
 			this.finish();
 		}
 		return false;
+	}
+
+	private Intent getIntent(UserInfo userDetail){
+		Intent i = new Intent(FriendActivity.this, UserDetailActivity.class);
+		File avatarFile = userDetail.getAvatarFile();
+		i.putExtra("headImage", BitmapFactory.decodeFile(String.valueOf(avatarFile)));
+		i.putExtra("userName", userDetail.getUserName());
+		i.putExtra("nickName", userDetail.getNickname());
+		UserInfo.Gender sex2 = userDetail.getGender();
+		String sex;
+		if(sex2.equals("female")){
+			sex = "女";
+		}else {
+			sex = "男";
+		}
+		i.putExtra("sex", sex);
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		i.putExtra("birthday", date.format(userDetail.getBirthday()).toString());
+		i.putExtra("address", userDetail.getAddress());
+		i.putExtra("explain", userDetail.getSignature());
+		return i;
 	}
 }

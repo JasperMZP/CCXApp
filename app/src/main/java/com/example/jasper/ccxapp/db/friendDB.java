@@ -204,15 +204,14 @@ public class friendDB {
     }
 
     //删除已有好友输入值为好友双方
-    public static void deletefriend(String userName1, String userName2, final userBackListener userBackListener) {
-        com.example.jasper.ccxapp.entitiy.UserInfo userinfo = null;
-        userinfo.removeFromFriendList(new BasicCallback() {
+    public static void deletefriend(UserInfo userInfo, final userBackListener userBackListener) {
+        userInfo.removeFromFriendList(new BasicCallback() {
             @Override
             public void gotResult(int responseCode, String responseMessage) {
                 if (0 == responseCode) {
-                    //移出好友列表成功
+                    userBackListener.showResult(true, null);
                 } else {
-                    //移出好友列表失败
+                    userBackListener.showResult(false, responseMessage);
                 }
             }
         });

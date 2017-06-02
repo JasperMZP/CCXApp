@@ -1,6 +1,7 @@
 package com.example.jasper.ccxapp.ui;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,10 +16,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
@@ -27,6 +33,11 @@ import com.example.jasper.ccxapp.interfaces.userBackListener;
 import com.example.jasper.ccxapp.util.ImageUtil;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.model.UserInfo;
@@ -37,25 +48,32 @@ import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_IMAGE;
 public class AddUserMessageActivity extends AppCompatActivity {
 
     private ImageView message_image;
-    private Button btn_image;
-    private EditText userName;
+    private TextView btn_image;
+    private TextView userName;
     private EditText nickName;
     private RadioGroup message_sex;
-//    private EditText message_birthday;
+    private EditText message_birthday;
     private EditText message_address;
     private EditText message_explain;
     private Button add_message;
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
     private String oriNickName;
     private UserInfo.Gender oriSex;
     private Long oriBirthday;
     private String oriAddress;
     private String oriExplain;
     private ImageUtil imageUtils;
+
+    private Spinner securityQ1;
+    private EditText answerQ1;
+    private EditText securityQ2;
+    private EditText answerQ2;
+
+    private Calendar calendar; // 通过Calendar获取系统时间
+    private int mYear;
+    private int mMonth;
+    private int mDay = -1;
+
+
 
 
     @Override
@@ -66,14 +84,18 @@ public class AddUserMessageActivity extends AppCompatActivity {
         Toast.makeText(this, "注册完成，请填写详细信息", Toast.LENGTH_SHORT).show();
 
         message_image = (ImageView)findViewById(R.id.add_message_image);
-        btn_image = (Button)findViewById(R.id.add_message_image_btn);
-        userName = (EditText)findViewById(R.id.message_userName);
+        btn_image = (TextView)findViewById(R.id.add_message_image_btn);
+        userName = (TextView)findViewById(R.id.message_userName);
         nickName = (EditText)findViewById(R.id.message_nickname);
         message_sex = (RadioGroup)findViewById(R.id.message_sex);
-//        message_birthday = (EditText)findViewById(R.id.message_birthday);
+        message_birthday = (EditText)findViewById(R.id.showBirthday);
         message_address = (EditText)findViewById(R.id.message_address);
         message_explain = (EditText)findViewById(R.id.message_explain);
         add_message = (Button)findViewById(R.id.add_message_btn);
+        securityQ1 = (Spinner)findViewById(R.id.securityQ1);
+        securityQ2 = (EditText)findViewById(R.id.securityQ2);
+        answerQ1 = (EditText)findViewById(R.id.securityA1);
+        answerQ2 = (EditText)findViewById(R.id.securityA2);
         imageUtils = new ImageUtil(AddUserMessageActivity.this);
 
         userName.setText(getIntent().getStringExtra("userName"));
@@ -95,6 +117,45 @@ public class AddUserMessageActivity extends AppCompatActivity {
                 showDialog("确认添加信息?");
             }
         });
+
+        calendar = Calendar.getInstance();
+        message_birthday.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(AddUserMessageActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int month, int day) {
+                                mYear = year;
+                                mMonth = month;
+                                mDay = day;
+                                // 更新EditText控件日期 小于10加0
+                                message_birthday.setText(new StringBuilder()
+                                        .append(mYear)
+                                        .append("-")
+                                        .append((mMonth + 1) < 10 ? "0"
+                                                + (mMonth + 1) : (mMonth + 1))
+                                        .append("-")
+                                        .append((mDay < 10) ? "0" + mDay : mDay));
+                            }
+                        }, calendar.get(Calendar.YEAR), calendar
+                        .get(Calendar.MONTH), calendar
+                        .get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        ArrayList<String> data_list = new ArrayList<String>();
+        data_list.add("您的名字是？");
+        data_list.add("您父亲的名字是？");
+        data_list.add("您的生日是？");
+        data_list.add("您最大的愿望是什么？");
+
+        //适配器
+        SpinnerAdapter arr_adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, data_list);
+//        //设置样式
+//        arr_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //加载适配器
+        securityQ1.setAdapter(arr_adapter);
 
         addOriMessage();
     }
@@ -224,7 +285,13 @@ public class AddUserMessageActivity extends AppCompatActivity {
     private void addOriMessage() {
         oriNickName = getIntent().getStringExtra("userName");
         oriSex = UserInfo.Gender.male;
-        oriBirthday = Long.valueOf(19900101);
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date d = date.parse("1990-01-01");
+            oriBirthday = d.getTime();
+        } catch (ParseException e) {
+
+        }
         oriAddress = "北京";
         oriExplain = "";
         String password = getIntent().getStringExtra("password");
@@ -258,7 +325,8 @@ public class AddUserMessageActivity extends AppCompatActivity {
     }
 
     private void saveUserMessage() {
-        boolean flag = false;
+        //前两个表示是否需要更新信息，中间两个表示是否已经更新信息得到结果，最后两个表示结果是否正确
+        final boolean flag[] = {false, false, false, false, false, false};
         File imagePath = imageUtils.picFile;
         String nickname = nickName.getText().toString().trim();
         int sexid = message_sex.getCheckedRadioButtonId();
@@ -268,55 +336,109 @@ public class AddUserMessageActivity extends AppCompatActivity {
         }else{
             sex = UserInfo.Gender.male;
         }
-//        Long birthday = Long.valueOf(message_birthday.getText().toString().trim());
+        Long birthday = null;
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        try{
+            Date d = date.parse(message_birthday.getText().toString());
+            birthday = d.getTime();
+        }catch (Exception e){
+            birthday = null;
+        }
         String address = message_address.getText().toString().trim();
         String explain = message_explain.getText().toString().trim();
 
         if(nickname.equals(oriNickName) || nickname.equals("")){
             nickname = null;
         }else{
-            flag = true;
+            flag[0] = true;
         }
         if(oriSex == sex){
             sex = null;
         }else{
-            flag = true;
+            flag[0] = true;
         }
-//        if(birthday.equals(oriBirthday)){
-//            birthday = null;
-//        }else{
-//            flag = true;
-//        }
+        if(birthday.equals(oriBirthday)){
+            birthday = null;
+        }else{
+            flag[0] = true;
+        }
         if(address.equals(oriAddress)){
             address = null;
         }else{
-            flag = true;
+            flag[0] = true;
         }
         if(explain.equals(oriExplain)){
             explain = null;
         }else{
-            flag = true;
+            flag[0] = true;
         }
         if(imagePath != null && imagePath.exists()){
-            flag = true;
+            flag[0] = true;
         }
-        if(flag) {
-            userDB.addUserMessage(imagePath, nickname, sex, null, address, explain, new userBackListener() {
+        String Q1 = securityQ1.getSelectedItem().toString();
+        String A1 = answerQ1.getText().toString();
+        String Q2 = securityQ2.getText().toString();
+        String A2 = answerQ2.getText().toString();
+        if(!(A1.equals("") && A2.equals(""))){
+            flag[1] = true;
+            userDB.addSecurityQA(Q1, A1, Q2, A2, new userBackListener() {
                 @Override
                 public void showResult(boolean result, String message) {
-                    if (result) {
-                        Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
-                        finish();
-                    } else {
-                        Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
+                    flag[3] = true;
+                    flag[5] = result;
+                    if(result){
+                        if(flag[0]){
+                            if(flag[2]){
+                                if(flag[4]) {
+                                    Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+                                    finish();
+                                }else{
+                                    Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }else{
+                            Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+                            finish();
+                        }
+                    }else {
+                        if(flag[2]){
+                            Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             });
-        }else{
-            Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
-            finish();
+        }
+        if(flag[0]) {
+            userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
+                @Override
+                public void showResult(boolean result, String message) {
+                    flag[2] = true;
+                    flag[4] = result;
+                    if (result) {
+                        if (flag[1]) {
+                            if (flag[3]) {
+                                if (flag[5]) {
+                                    Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+                                    finish();
+                                } else {
+                                    Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        } else {
+                            Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+                            finish();
+                        }
+                    } else {
+                        if (flag[3]) {
+                            Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            });
         }
     }
 

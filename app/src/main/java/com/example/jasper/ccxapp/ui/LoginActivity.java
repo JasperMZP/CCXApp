@@ -29,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView signUpBtn;
     private String username;
     private String password;
+    private TextView findPwd;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordET = (EditText) findViewById(R.id.login_password);
         signInBtn = (Button) findViewById(R.id.btn_sign_in);
         signUpBtn = (TextView) findViewById(R.id.btn_sign_up);
+        findPwd = (TextView)findViewById(R.id.findPassword);
 
         signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,6 +57,18 @@ public class LoginActivity extends AppCompatActivity {
                 toRegister();
             }
         });
+
+        findPwd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toFindPwd();
+            }
+        });
+    }
+
+    private void toFindPwd() {
+        startActivity(new Intent(LoginActivity.this, FindPwd1Activity.class));
+        this.finish();
     }
 
     private void ifLogin() {

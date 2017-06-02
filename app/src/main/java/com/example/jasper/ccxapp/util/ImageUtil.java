@@ -45,7 +45,7 @@ public class ImageUtil {
     public void byCamera() {
         int permission = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
         if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
+            // We don't have permission so prompt the User
             ActivityCompat.requestPermissions(context, new String[]{android.Manifest.permission.CAMERA}, 1);
         }
         try {

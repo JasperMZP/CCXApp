@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.jasper.ccxapp.ui.FindPwd3Activity">
+
+    <EditText
+        android:id="@+id/pwd1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入新的密码"/>
+    <EditText
+        android:id="@+id/pwd2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请再次输入新的密码"/>
+    <Button
+        android:id="@+id/find_pwd_phone_OK"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="确定"/>
+    <Button
+        android:id="@+id/find_pwd_phone_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="取消"/>
+</LinearLayout>
