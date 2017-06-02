@@ -38,8 +38,7 @@ import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ShowPhotoAdapter;
-import com.example.jasper.ccxapp.db.CreateMessageDB;
-import com.example.jasper.ccxapp.db.WriteAndReadMessageDB;
+import com.example.jasper.ccxapp.db.LocalShowMessageDaoImpl;
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
 import com.example.jasper.ccxapp.interfaces.ShowType;
@@ -58,7 +57,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import cn.jpush.im.android.api.JMessageClient;
@@ -69,9 +67,7 @@ import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
 import cn.jpush.im.android.api.content.VoiceContent;
 import cn.jpush.im.android.api.event.ContactNotifyEvent;
-import cn.jpush.im.android.api.event.ConversationRefreshEvent;
 import cn.jpush.im.android.api.event.MessageEvent;
-import cn.jpush.im.android.api.event.OfflineMessageEvent;
 import cn.jpush.im.android.api.model.Conversation;
 import cn.jpush.im.android.api.model.GroupInfo;
 import cn.jpush.im.android.api.model.Message;
@@ -107,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
     private DrawerLayout drawerLayout;
     private ImageView myAvatarCIV;
 
-    private WriteAndReadMessageDB messageDB = new WriteAndReadMessageDB(MainActivity.this);
+    private LocalShowMessageDaoImpl messageDB = new LocalShowMessageDaoImpl(MainActivity.this);
 
 
     @Override

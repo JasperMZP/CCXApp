@@ -10,8 +10,7 @@ import android.util.Log;
 
 import com.example.jasper.ccxapp.entitiy.CommentItemModel;
 import com.example.jasper.ccxapp.entitiy.ShowItemModel;
-import com.example.jasper.ccxapp.interfaces.MessageDBSQL;
-import com.example.jasper.ccxapp.interfaces.ShowType;
+import com.example.jasper.ccxapp.interfaces.LocalMessageDao;
 import com.example.jasper.ccxapp.util.ListParseUtil;
 import com.example.jasper.ccxapp.util.ShowMsgListOrderUtil;
 
@@ -23,7 +22,7 @@ import java.util.List;
  * Created by Jasper on 2017/5/20.
  */
 
-public class WriteAndReadMessageDB implements MessageDBSQL, ShowType {
+public class LocalShowMessageDaoImpl implements LocalMessageDao {
 
     private final Context context;
     private MsgDBHelper msgDBHelper;
@@ -32,7 +31,7 @@ public class WriteAndReadMessageDB implements MessageDBSQL, ShowType {
     private List<ShowItemModel> showItemModelList = new ArrayList<ShowItemModel>();
     private List<CommentItemModel> commentItemModelList = new ArrayList<CommentItemModel>();
 
-    public WriteAndReadMessageDB(Context context) {
+    public LocalShowMessageDaoImpl(Context context) {
         this.context = context;
         this.msgDBHelper = new MsgDBHelper(this.context);
     }
@@ -54,7 +53,7 @@ public class WriteAndReadMessageDB implements MessageDBSQL, ShowType {
         }
     }
 
-    public WriteAndReadMessageDB open() throws SQLException {
+    public LocalShowMessageDaoImpl open() throws SQLException {
         this.db = this.msgDBHelper.getWritableDatabase();
         return this;
     }
@@ -101,14 +100,6 @@ public class WriteAndReadMessageDB implements MessageDBSQL, ShowType {
         return ShowMsgListOrderUtil.showMsgListOrder(showItemModelList);
     }
 
-    /**
-     * private String msgKey;
-     * private String commKey;
-     * private String commentUsername;
-     * private String commentVoice;
-     * private int commentLength;
-     * private String commentTime;
-     */
     public List<CommentItemModel> readCommentItemList() {
         Cursor cursor = db.query(commentTableName, null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
@@ -128,7 +119,7 @@ public class WriteAndReadMessageDB implements MessageDBSQL, ShowType {
     }
 
 
-    private void readShowTextList() {
+    public void readShowTextList() {
         Cursor cursor = db.query(showTextTableName, null, null, null, null, null, null);
         Log.i("test", "Textnum" + cursor.getCount());
         if (cursor.getCount() != 0) {
@@ -149,7 +140,7 @@ public class WriteAndReadMessageDB implements MessageDBSQL, ShowType {
         cursor.close();
     }
 
-    private void readShowImageList() {
+    public void readShowImageList() {
         Cursor cursor = db.query(showImageTableName, null, null, null, null, null, null);
         Log.i("test", "Imagenum" + cursor.getCount());
         if (cursor.getCount() != 0) {
@@ -171,7 +162,7 @@ public class WriteAndReadMessageDB implements MessageDBSQL, ShowType {
 
     }
 
-    private void readShowVideoList() {
+    public void readShowVideoList() {
         Cursor cursor = db.query(showVideoTableName, null, null, null, null, null, null);
         Log.i("test", "Videonum" + cursor.getCount());
         if (cursor.getCount() != 0) {
