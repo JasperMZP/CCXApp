@@ -28,7 +28,7 @@ public class UserDetailActivity extends AppCompatActivity {
         userName = (TextView)findViewById(R.id.message_userName);
         nickName = (TextView)findViewById(R.id.message_nickname);
         sex = (TextView)findViewById(R.id.message_sex);
-        birthday = (TextView)findViewById(R.id.showBirthday);
+        birthday = (TextView)findViewById(R.id.show_birthday);
         address = (TextView)findViewById(R.id.message_address);
         explain = (TextView)findViewById(R.id.message_explain);
 

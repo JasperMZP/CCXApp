@@ -117,7 +117,7 @@
                 android:textSize="17dp" />
 
             <TextView
-                android:id="@+id/showBirthday"
+                android:id="@+id/show_birthday"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_marginLeft="57dp"
