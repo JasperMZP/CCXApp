@@ -1,6 +1,8 @@
 package com.example.jasper.ccxapp.ui;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
@@ -8,7 +10,11 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.OrientationHelper;
@@ -58,16 +64,14 @@ import me.iwf.photopicker.PhotoPreview;
  * Created by Jasper on 2017/4/20.
  */
 
-public class ShowMsgEditActivity extends AppCompatActivity implements MessageType, SourceFolder{
+public class ShowMsgEditActivity extends AppCompatActivity implements MessageType, SourceFolder {
 
     public static final int RESULT_SEND_MSG_ITEM = 1;
-    public static final int REQUSET_RECORD_VIDEO_PATH = 2;
     static final int REQUEST_VIDEO_CAPTURE = 9;
 
     private MessageEvent messageEvent;
 
     private TextView textEditEt;
-    private Button msgSendBtn;
     private RecyclerView recyclerView;
     private ImageButton recordVideoIb;
     private CustomVideoView videoView;
@@ -99,25 +103,25 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
         recordVideo();
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.send_msg_menu, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_scan:
                 BackShowMsgItemToSend();
-                System.out.println("lalalallalal");
                 break;
         }
-            return true;
-            }
+        return true;
+    }
 
     private void initView() {
         textEditEt = (EditText) findViewById(R.id.text_edit_et);
-        //msgSendBtn = (Button) findViewById(R.id.msg_send_btn);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mFlowLayout = (TagFlowLayout) findViewById(R.id.id_flowlayout);
         recordVideoIb = (ImageButton) findViewById(R.id.record_video_ib);
@@ -159,7 +163,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
                                 }
                             });
                         }
-
                     }
                 }
             }
@@ -184,24 +187,17 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL));
         recyclerView.setAdapter(photoAdapter);
 
-//        msgSendBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                BackShowMsgItemToSend();
-//            }
-//        });
-
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this,
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
                         if (photoAdapter.getItemViewType(position) == PhotoAdapter.TYPE_ADD) {
-                            PhotoPicker.builder()
-                                    .setPhotoCount(PhotoAdapter.MAX)
-                                    .setShowCamera(true)
-                                    .setPreviewEnabled(false)
-                                    .setSelected(selectedPhotos)
-                                    .start(ShowMsgEditActivity.this);
+                            String[] permissions = {Manifest.permission.CAMERA,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                            if (checkPermision(permissions,1)) {
+                                choosePhoto();
+                            }
                         } else {
                             PhotoPreview.builder()
                                     .setPhotos(selectedPhotos)
@@ -212,22 +208,35 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
                 }));
     }
 
+    private void choosePhoto() {
+        PhotoPicker.builder()
+                .setPhotoCount(PhotoAdapter.MAX)
+                .setShowCamera(true)
+                .setPreviewEnabled(false)
+                .setSelected(selectedPhotos)
+                .start(ShowMsgEditActivity.this);
+    }
+
     private void recordVideo() {
         recordVideoIb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               /* Intent intent = new Intent(ShowMsgEditActivity.this, VideoRecordActivity.class);
-                startActivityForResult(intent, REQUSET_RECORD_VIDEO_PATH);*/
-
-                Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                // create a file Uri to save the video
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(videoFolder + File.separator + UUIDKeyUtil.getUUIDKey() + ".mp4")));
-                intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-                startActivityForResult(intent, REQUEST_VIDEO_CAPTURE);
+                String[] permissions = {Manifest.permission.CAMERA,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                if (checkPermision(permissions,2)) {
+                    intentToVideoCamera();
+                }
             }
         });
     }
 
+    private void intentToVideoCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(videoFolder + File.separator + UUIDKeyUtil.getUUIDKey() + ".mp4")));
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
+        startActivityForResult(intent, REQUEST_VIDEO_CAPTURE);
+    }
 
     private void BackShowMsgItemToSend() {
         if (selectedGroupId != null && selectedGroupId.size() > 0) {
@@ -238,13 +247,13 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
             showItem.setShowText(textEditEt.getText().toString().trim());
             if (photosPath != null) {//有图片
                 showItem.setShowImagesList(photosPath);
-                intent.putExtra("showType",SHOW_IMAGE);
+                intent.putExtra("showType", SHOW_IMAGE);
             } else if (videoPath != null) {//有视频
-                Log.i("test","有视频："+videoPath);
+                Log.i("test", "有视频：" + videoPath);
                 showItem.setShowVideo(videoPath);
-                intent.putExtra("showType",SHOW_VIDEO);
-            }else {
-                intent.putExtra("showType",SHOW_TEXT);
+                intent.putExtra("showType", SHOW_VIDEO);
+            } else {
+                intent.putExtra("showType", SHOW_TEXT);
             }
 
             intent.putExtra("showItem", showItem);
@@ -260,14 +269,10 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-
-
         if (resultCode == RESULT_OK &&
                 (requestCode == PhotoPicker.REQUEST_CODE || requestCode == PhotoPreview.REQUEST_CODE)) {
             recordVideoIb.setVisibility(View.GONE);
             lableVideoTv.setVisibility(View.GONE);
-
             if (data != null) {
                 photosPath = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
                 for (String photoPath : photosPath) {
@@ -278,42 +283,15 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
             if (photosPath != null) {
                 selectedPhotos.addAll(photosPath);
             }
-            if(requestCode == PhotoPreview.REQUEST_CODE){
-                if (selectedPhotos.isEmpty()){
-                    Log.i("test","把照片全都删了");
+            if (requestCode == PhotoPreview.REQUEST_CODE) {
+                if (selectedPhotos.isEmpty()) {
+                    Log.i("test", "把照片全都删了");
                     recordVideoIb.setVisibility(View.VISIBLE);
                     lableVideoTv.setVisibility(View.VISIBLE);
                 }
             }
             photoAdapter.notifyDataSetChanged();
-        } else if (requestCode == REQUSET_RECORD_VIDEO_PATH && resultCode == VideoRecordActivity.RESULT_RETUEN_VIDEO_PATH) {
-            if (data != null) {
-                videoPath = data.getStringExtra("videoPath");
-                recyclerView.setVisibility(View.GONE);
-                videoView.setVisibility(View.VISIBLE);
-                playVideoBtn.setVisibility(View.VISIBLE);
-                videoView.setVideoHeight(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
-                videoView.setVideoWidth(LinearLayoutCompat.LayoutParams.WRAP_CONTENT);
-                videoView.setVideoPath(videoPath);
-                Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
-                videoView.setBackgroundDrawable(new BitmapDrawable(bitmap));
-                playVideoBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        playVideoBtn.setVisibility(View.INVISIBLE);
-                        videoView.setBackgroundDrawable(null);
-                        videoView.start();
-                    }
-                });
-                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        playVideoBtn.setVisibility(View.VISIBLE);
-                    }
-                });
-
-            }
-        }else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+        } else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
             Log.i("test", "录像返回video :" + data.getData().getPath());
             videoPath = data.getData().getPath();
             recyclerView.setVisibility(View.GONE);
@@ -338,6 +316,61 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
                     playVideoBtn.setVisibility(View.VISIBLE);
                 }
             });
+        }
+    }
+
+    public boolean checkPermision(String[] permissions,int requestCode) {
+        boolean flag = false;
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                flag = true;
+                break;
+            }
+        }
+        if (flag) {
+            ActivityCompat.requestPermissions(this, permissions, requestCode);
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == 1) {
+            boolean isPhotoGranted = true;
+            // 判断是否所有的权限都已经授予了
+            for (int grant : grantResults) {
+                if (grant != PackageManager.PERMISSION_GRANTED) {
+                    isPhotoGranted = false;
+                    break;
+                }
+            }
+            if (isPhotoGranted) {
+                //申请权限成功后需要调用的函数
+                choosePhoto();
+            } else {
+                new AlertDialog.Builder(this).setTitle("系统提示").setMessage("由于未赋予相应的权限，该功能无法正常使用！")
+                        .setPositiveButton("确定", null).show();
+            }
+        }else if (requestCode == 2) {
+            boolean isVideoGranted = true;
+            // 判断是否所有的权限都已经授予了
+            for (int grant : grantResults) {
+                if (grant != PackageManager.PERMISSION_GRANTED) {
+                    isVideoGranted = false;
+                    break;
+                }
+            }
+            if (isVideoGranted) {
+                //申请权限成功后需要调用的函数
+                intentToVideoCamera();
+            } else {
+                new AlertDialog.Builder(this).setTitle("系统提示").setMessage("由于未赋予相应的权限，该功能无法正常使用！")
+                        .setPositiveButton("确定", null).show();
+            }
         }
     }
 
@@ -370,8 +403,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
                 messageEvent = event;
                 break;
         }
-
-
     }
 
     public void onEvent(MessageEvent event) {

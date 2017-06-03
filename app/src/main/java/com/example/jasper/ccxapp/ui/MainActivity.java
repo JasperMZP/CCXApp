@@ -1,8 +1,10 @@
 package com.example.jasper.ccxapp.ui;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -12,6 +14,9 @@ import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -80,7 +85,7 @@ import me.iwf.photopicker.PhotoPreview;
 public class MainActivity extends AppCompatActivity implements
         ExpandableListView.OnChildClickListener,
         ExpandableListView.OnGroupClickListener,
-        PinnedHeaderExpandableListView.OnHeaderUpdateListener, StickyLayout.OnGiveUpTouchEventListener ,MessageType{
+        PinnedHeaderExpandableListView.OnHeaderUpdateListener, StickyLayout.OnGiveUpTouchEventListener, MessageType {
     private final int REQUEST_SEND_MSG_ITEM = 0;
     //View
     private PinnedHeaderExpandableListView expandableListView;
@@ -127,6 +132,9 @@ public class MainActivity extends AppCompatActivity implements
         expandableListView.setOnChildClickListener(this);
         expandableListView.setOnGroupClickListener(this);
         stickyLayout.setOnGiveUpTouchEventListener(this);
+
+        checkPermision(new String[]{Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE});
     }
 
     @Override
@@ -737,19 +745,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onEvent(ContactNotifyEvent event) {
-        String reason = event.getReason();
         String fromUsername = event.getFromUsername();
-        String appkey = event.getfromUserAppKey();
 
         switch (event.getType()) {
             case invite_received://收到好友邀请
                 showMessage.showNewFriend(MainActivity.this, fromUsername + "请求添加您为好友", "点击查看详细信息");
-                break;
-            case invite_accepted://对方接收了你的好友邀请
-                break;
-            case invite_declined://对方拒绝了你的好友邀请
-                break;
-            case contact_deleted://对方将你从好友中删除
                 break;
             default:
                 break;
@@ -771,6 +771,22 @@ public class MainActivity extends AppCompatActivity implements
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public boolean checkPermision(String[] permissions) {
+        boolean flag = false;
+        for (String permission : permissions) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                flag = true;
+                break;
+            }
+        }
+        if (flag) {
+            ActivityCompat.requestPermissions(this, permissions, 1);
+        } else {
+            return true;
+        }
+        return false;
     }
 
 
