@@ -1,6 +1,5 @@
 package com.example.jasper.ccxapp.db;
 
-import android.util.Log;
 
 import com.example.jasper.ccxapp.entitiy.SecurityData;
 import com.example.jasper.ccxapp.entitiy.User;
@@ -164,7 +163,6 @@ public class userDB {
             JMessageClient.updateUserAvatar(image, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("User", "aaaaaaaaaaaafile" + i + "    " + s);
                     if (i != 0) {
                         ubl.showResult(false, s);
                         a[1]++;
@@ -187,7 +185,6 @@ public class userDB {
             JMessageClient.updateMyInfo(UserInfo.Field.nickname, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("User", "aaaaaaaaaaaanickname" + i + "    " + s);
                     if (i != 0) {
                         if (a[1] == 0) {
                             ubl.showResult(false, s);
@@ -207,7 +204,6 @@ public class userDB {
             JMessageClient.updateMyInfo(UserInfo.Field.gender, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("User", "aaaaaaaaaaaagender" + i + "    " + s);
                     if (i != 0) {
                         if (a[1] == 0) {
                             ubl.showResult(false, s);
@@ -228,7 +224,6 @@ public class userDB {
             JMessageClient.updateMyInfo(UserInfo.Field.birthday, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("User", "aaaaaaaaaaaabirthday" + i + "    " + s);
                     if (i != 0) {
                         if (a[1] == 0) {
                             ubl.showResult(false, s);
@@ -248,7 +243,6 @@ public class userDB {
             JMessageClient.updateMyInfo(UserInfo.Field.address, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("User", "aaaaaaaaaaaaaddress" + i + "    " + s);
                     if (i != 0) {
                         if (a[1] == 0) {
                             ubl.showResult(false, s);
@@ -269,7 +263,6 @@ public class userDB {
             JMessageClient.updateMyInfo(UserInfo.Field.signature, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("User", "aaaaaaaaaaaasignture" + i + "    " + s);
                     if (i != 0) {
                         if (a[1] == 0) {
                             ubl.showResult(false, s);
@@ -293,7 +286,6 @@ public class userDB {
         JMessageClient.updateMyInfo(UserInfo.Field.region, userInfo, new BasicCallback() {
                 @Override
                 public void gotResult(int i, String s) {
-                    Log.i("User", "aaaaaaaaaaaaidentity" + i + "    " + s);
                     if (i != 0) {
                         ubl.showResult(false, s);
                     } else {

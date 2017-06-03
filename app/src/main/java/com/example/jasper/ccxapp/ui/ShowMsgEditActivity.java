@@ -149,7 +149,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
             public void gotResult(int i, String s, List<Long> list) {
                 if (i == 0) {
                     if (!list.isEmpty()) {
-                        Log.i("test", "有群");
                         for (long groupId : list) {
                             JMessageClient.getGroupInfo(groupId, new GetGroupInfoCallback() {
                                 @Override
@@ -172,7 +171,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
 
             @Override
             public void onSelected(Set<Integer> selectPosSet) {
-                Toast.makeText(ShowMsgEditActivity.this, "选择群：" + selectPosSet.toString(), Toast.LENGTH_SHORT).show();
                 selectedGroupId.clear();
                 for (int pos : selectPosSet) {
                     selectedGroupId.add(groupInfoList.get(pos).getGroupID());
@@ -249,7 +247,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
                 showItem.setShowImagesList(photosPath);
                 intent.putExtra("showType", SHOW_IMAGE);
             } else if (videoPath != null) {//有视频
-                Log.i("test", "有视频：" + videoPath);
                 showItem.setShowVideo(videoPath);
                 intent.putExtra("showType", SHOW_VIDEO);
             } else {
@@ -275,9 +272,6 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
             lableVideoTv.setVisibility(View.GONE);
             if (data != null) {
                 photosPath = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
-                for (String photoPath : photosPath) {
-                    Log.i("test", photoPath);
-                }
             }
             selectedPhotos.clear();
             if (photosPath != null) {
@@ -285,14 +279,12 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
             }
             if (requestCode == PhotoPreview.REQUEST_CODE) {
                 if (selectedPhotos.isEmpty()) {
-                    Log.i("test", "把照片全都删了");
                     recordVideoIb.setVisibility(View.VISIBLE);
                     lableVideoTv.setVisibility(View.VISIBLE);
                 }
             }
             photoAdapter.notifyDataSetChanged();
         } else if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-            Log.i("test", "录像返回video :" + data.getData().getPath());
             videoPath = data.getData().getPath();
             recyclerView.setVisibility(View.GONE);
             videoView.setVisibility(View.VISIBLE);

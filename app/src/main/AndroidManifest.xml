@@ -75,7 +75,6 @@
             android:theme="@style/AppTheme1" />
         <activity android:name=".ui.SendRequestActivity" />
         <activity android:name=".ui.MakeChatroomActivity" />
-        <activity android:name=".ui.VideoRecordActivity" />
         <activity android:name=".ui.AddUserMessageActivity" />
         <activity
             android:name=".ui.NewFriendActivity"

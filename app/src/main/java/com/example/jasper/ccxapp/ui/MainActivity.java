@@ -301,7 +301,6 @@ public class MainActivity extends AppCompatActivity implements
         GroupInfo groupInfo = (GroupInfo) mConversation.getTargetInfo();
         List<UserInfo> userInfos = groupInfo.getGroupMembers();
         for (UserInfo userInfo : userInfos) {
-            Log.i("test", "群成员" + userInfo.getNickname());
             if (userInfo.getUserName().equals(JMessageClient.getMyInfo().getUserName())) {
                 return true;
             }
@@ -323,19 +322,15 @@ public class MainActivity extends AppCompatActivity implements
             //发送带图片的消息
             showMsgSender = sendFactory.ShowMsgSenderProduce(SHOW_IMAGE);
             showMsgSender.sendMsg(showItemForSend, mConversation);
-
-            //SendMessageUtil.sendImageMsg();
         } else if (showItem.getShowVideo() != null) {
             //有视频
             showItemForSend.setShowVideo(showItem.getShowVideo());
             showMsgSender = sendFactory.ShowMsgSenderProduce(SHOW_VIDEO);
             showMsgSender.sendMsg(showItemForSend, mConversation);
-            //SendMessageUtil.sendVideoMsg(showItemForSend, mConversation);
         } else if (showItem.getShowImagesList() == null && showItem.getShowVideo() == null) {
             //发送文字信息
             showMsgSender = sendFactory.ShowMsgSenderProduce(SHOW_TEXT);
             showMsgSender.sendMsg(showItemForSend, mConversation);
-            //SendMessageUtil.sendTextMsg(showItemForSend, mConversation);
         }
     }
 
@@ -346,11 +341,9 @@ public class MainActivity extends AppCompatActivity implements
      *
      */
     class MyexpandableListAdapter extends BaseExpandableListAdapter {
-        private Context context;
         private LayoutInflater inflater;
 
         public MyexpandableListAdapter(Context context) {
-            this.context = context;
             inflater = LayoutInflater.from(context);
         }
 
@@ -499,7 +492,7 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         public View getChildView(final int groupPosition, final int childPosition,
                                  boolean isLastChild, View convertView, ViewGroup parent) {
-            CommentHolder commentHolder = null;
+            CommentHolder commentHolder;
             if (convertView == null) {
                 commentHolder = new CommentHolder();
                 convertView = inflater.inflate(R.layout.comment_item, null);
@@ -838,9 +831,7 @@ public class MainActivity extends AppCompatActivity implements
             commentItemModels.add(noneComment);
             childCommentList.add(0, commentItemModels);
             Log.i("test", "background");
-
             messageDB.insertShow(textShowItem, SHOW_TEXT);
-
             return true;
         }
 
@@ -863,7 +854,6 @@ public class MainActivity extends AppCompatActivity implements
             ImageContent imageContent = (ImageContent) msg.getContent();
             UserInfo iUserInfo = msg.getFromUser();
             Map iMsgMap = imageContent.getStringExtras();
-
             //如果收到的图片key和上一次的一样说明是一个showItem
             if (CheckRecievedShowItem.getMsgKey() != null) {
                 if ((iMsgMap.get("showKey")).equals(CheckRecievedShowItem.getMsgKey())) {
@@ -877,13 +867,7 @@ public class MainActivity extends AppCompatActivity implements
                     }
                     ArrayList<String> imgPaths = CheckRecievedShowItem.getShowImagesList();
                     imgPaths.add(imageContent.getLocalThumbnailPath());
-
-                    Log.i("test", "图片path:" + imageContent.getLocalThumbnailPath());
-
                     if (imageContent.getNumberExtra("imageNum").equals(imageContent.getNumberExtra("imageCount"))) {
-
-                        Log.i("test", "多图片添加到ListView");
-
                         String[] iGroupIds = ((String) iMsgMap.get("groupBelongTo")).split(",");
                         Log.i("test", "解析出群");
                         List<Long> iGroupIdBelongTo = new ArrayList<Long>();
@@ -923,11 +907,8 @@ public class MainActivity extends AppCompatActivity implements
             Log.i("test", "图片path:" + imageContent.getLocalThumbnailPath());
 
             if (imageContent.getNumberExtra("imageNum").equals(imageContent.getNumberExtra("imageCount"))) {
-
                 Log.i("test", "新图片添加到ListView 只有一张图片");
-
                 String[] iGroupIds = ((String) iMsgMap.get("groupBelongTo")).split(",");
-                Log.i("test", "解析出群");
                 List<Long> iGroupIdBelongTo = new ArrayList<Long>();
                 for (int i = 0; i < iGroupIds.length; i++) {
                     iGroupIdBelongTo.add(Long.parseLong(iGroupIds[i]));
@@ -942,7 +923,6 @@ public class MainActivity extends AppCompatActivity implements
                 noneComment.setMsgKey("-1");
                 commentItemModels.add(noneComment);
                 childCommentList.add(0, commentItemModels);
-                Log.i("test", "background");
 
                 messageDB.insertShow(CheckRecievedShowItem, SHOW_IMAGE);
             }
@@ -954,7 +934,6 @@ public class MainActivity extends AppCompatActivity implements
             super.onPostExecute(aBoolean);
             if (aBoolean) {
                 adapter.notifyDataSetChanged();
-                Log.i("test", "post");
             }
         }
     }
@@ -1039,7 +1018,6 @@ public class MainActivity extends AppCompatActivity implements
             VoiceContent voiceContent = (VoiceContent) msg.getContent();
             UserInfo vUserInfo = msg.getFromUser();
             Map vMsgMap = voiceContent.getStringExtras();
-
             //跳过群重复消息
             String vCommKey = (String) vMsgMap.get("commKey");
             if (vCommKey.equals(checkCommKey)) {
@@ -1063,7 +1041,6 @@ public class MainActivity extends AppCompatActivity implements
                     childCommentList.remove(j);
                     childCommentList.add(j, commentItemModels);
                     Log.i("test", "添加一条语音消息");
-
                     messageDB.insertComment(commentItem);
                     return true;
                 }
@@ -1076,7 +1053,6 @@ public class MainActivity extends AppCompatActivity implements
             super.onPostExecute(aBoolean);
             if (aBoolean) {
                 adapter.notifyDataSetChanged();
-                Log.i("test", "post");
             }
         }
     }

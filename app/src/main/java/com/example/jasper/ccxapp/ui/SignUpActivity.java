@@ -119,17 +119,6 @@ public class SignUpActivity extends AppCompatActivity {
                 .setPositiveButton("确定", null).show();
     }
 
-//    private void showDialog2(String message) {
-//        new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
-//                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        startActivity(new Intent(SignUpActivity.this,LoginActivity.class));
-//                        finish();
-//                    }
-//                }).show();
-//    }
-
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if (keyCode==KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0){

@@ -230,7 +230,6 @@ public class UserMessageReviseActivity extends AppCompatActivity {
     // 这里需要注意resultCode，正常情况返回值为 -1 没有任何操作直接后退则返回 0
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("-->requestCode:" + requestCode + "-->resultCode:" + resultCode);
 
         switch (requestCode) {
             case ImageUtil.ACTIVITY_RESULT_CAMERA: // 拍照
@@ -276,7 +275,6 @@ public class UserMessageReviseActivity extends AppCompatActivity {
                         if (imageUtils.picFile != null) {
                             imageUtils.picFile.delete();
                         }
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
