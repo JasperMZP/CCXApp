@@ -23,7 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawablePadding="10.0dip"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="30dp"
             android:padding="12sp"
             android:textSize="20sp"
             android:text="用户名"/>
@@ -62,7 +62,7 @@
         android:layout_below="@id/word"
         android:layout_marginLeft="18dp"
         android:layout_marginTop="10dp"
-        android:background="@drawable/button"
+        android:background="@drawable/button_color"
         android:text="发送添加好友请求"
         android:textColor="@color/white" />
 
