@@ -21,6 +21,9 @@ import java.util.List;
 
 import cn.jpush.im.android.api.model.UserInfo;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 public class MakeChatroomActivity extends AppCompatActivity {
 
     private ListView showFriendsChat;
@@ -57,9 +60,11 @@ public class MakeChatroomActivity extends AppCompatActivity {
             showDialog("请选择加入群聊的人！");
             return;
         }
+        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
         chatDB.addnewchatroom(null, chatName, adapter.getUserNameList(), new userBackListener() {
             @Override
             public void showResult(boolean result, String message) {
+                hideProgressDialog();
                 if(result){
                     showDialog2("添加新群聊成功");
                 }else{
@@ -82,7 +87,7 @@ public class MakeChatroomActivity extends AppCompatActivity {
         });
     }
 
-    private void showFriends(List<UserInfo> message) {
+    private void showFriends(final List<UserInfo> message) {
         adapter = new FriendChatAdapter(MakeChatroomActivity.this, message);
         showFriendsChat.setAdapter(adapter);
     }

@@ -44,6 +44,8 @@ import cn.jpush.im.android.api.model.UserInfo;
 
 import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_ALBUM;
 import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_IMAGE;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
 
 public class AddUserMessageActivity extends AppCompatActivity {
 
@@ -379,6 +381,8 @@ public class AddUserMessageActivity extends AppCompatActivity {
         String A1 = answerQ1.getText().toString();
         String Q2 = securityQ2.getText().toString();
         String A2 = answerQ2.getText().toString();
+
+        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
         if(!(A1.equals("") && A2.equals(""))){
             flag[1] = true;
             userDB.addSecurityQA(Q1, A1, Q2, A2, new userBackListener() {
@@ -390,20 +394,24 @@ public class AddUserMessageActivity extends AppCompatActivity {
                         if(flag[0]){
                             if(flag[2]){
                                 if(flag[4]) {
+                                    hideProgressDialog();
                                     Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
                                     finish();
                                 }else{
+                                    hideProgressDialog();
                                     Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }else{
+                            hideProgressDialog();
                             Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
                             finish();
                         }
                     }else {
                         if(flag[2]){
+                            hideProgressDialog();
                             Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -420,25 +428,35 @@ public class AddUserMessageActivity extends AppCompatActivity {
                         if (flag[1]) {
                             if (flag[3]) {
                                 if (flag[5]) {
+                                    hideProgressDialog();
                                     Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
                                     finish();
                                 } else {
+                                    hideProgressDialog();
                                     Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         } else {
+                            hideProgressDialog();
                             Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
                             finish();
                         }
                     } else {
                         if (flag[3]) {
+                            hideProgressDialog();
                             Toast.makeText(AddUserMessageActivity.this, "添加信息失败", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
             });
+        }
+        if(!flag[0] && !flag[1]){
+            hideProgressDialog();
+            Toast.makeText(AddUserMessageActivity.this, "添加信息成功", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(AddUserMessageActivity.this, LoginActivity.class));
+            finish();
         }
     }
 

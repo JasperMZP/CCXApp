@@ -144,7 +144,7 @@ public class FriendActivity extends AppCompatActivity {
 								friendDB.deletefriend(userInfosOld.get(position), new userBackListener() {
                                     @Override
                                     public void showResult(boolean result, String message) {
-                                        if(result){
+										if(result){
                                             showDialog("删除成功！");
                                             getFriends();
                                         }else{
@@ -222,7 +222,7 @@ public class FriendActivity extends AppCompatActivity {
 		i.putExtra("nickName", userDetail.getNickname());
 		UserInfo.Gender sex2 = userDetail.getGender();
 		String sex;
-		if(sex2.equals("female")){
+		if(sex2 == UserInfo.Gender.female){
 			sex = "女";
 		}else {
 			sex = "男";

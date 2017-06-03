@@ -245,6 +245,9 @@ public class friendDB {
                             }
                         });
                     }
+                    if(list.size() == 0){
+                        userBackListListener.showResult(true, messages, userInfos);
+                    }
                 }else {
                     Log.e("friend", "查询信息失败" + e.getMessage());
                     messages.add(e.getMessage());

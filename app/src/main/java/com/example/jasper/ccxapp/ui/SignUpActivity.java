@@ -17,6 +17,9 @@ import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.util.regex.Pattern;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 /**
  * Created by Jasper on 2017/4/7.
  */
@@ -76,9 +79,11 @@ public class SignUpActivity extends AppCompatActivity {
             showDialog("请输入相同的密码");
             return;
         }
+        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
         userDB.addNewUser(username, pwd, new userBackListener(){
                     @Override
                     public void showResult(boolean result, String message) {
+                        hideProgressDialog();
                         if(result){
                             Intent myIntent = new Intent(SignUpActivity.this,AddUserMessageActivity.class);
                             myIntent.putExtra("userName", userName.getText().toString().trim());

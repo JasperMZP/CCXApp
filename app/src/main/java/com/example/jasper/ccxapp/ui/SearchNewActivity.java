@@ -21,6 +21,9 @@ import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
 import cn.jpush.im.android.api.model.UserInfo;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 /**
  * Created by DPC on 2017/4/6.
  */
@@ -64,9 +67,11 @@ public class SearchNewActivity extends AppCompatActivity {
                 showDialog("不能添加自身为好友！");
             }
         }
+        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
         friendDB.searchnewfriend(NameNeedSearch, new userBackUserInfo() {
             @Override
             public void showResult(boolean result, String s, UserInfo message) {
+                hideProgressDialog();
                 if (result) {
                     search_new_friend.setText("搜索结果");
                     showNewFriends(message);

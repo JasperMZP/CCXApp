@@ -18,6 +18,9 @@ import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import cn.jpush.im.android.api.JMessageClient;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 /**
  * Created by Jasper on 2017/4/6.
  */
@@ -97,9 +100,11 @@ public class LoginActivity extends AppCompatActivity {
         } else if (!checkpassword(password)) {
             return;
         }
+        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
         userDB.forUserLogin(username, password, new userBackListener() {
             @Override
             public void showResult(boolean result, String message) {
+                hideProgressDialog();
                 if (result) {
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();

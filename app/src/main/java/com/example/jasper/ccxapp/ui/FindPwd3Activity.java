@@ -14,6 +14,9 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.userDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 public class FindPwd3Activity extends AppCompatActivity {
 
     private Button findPwdOK;
@@ -61,14 +64,18 @@ public class FindPwd3Activity extends AppCompatActivity {
             showDialog("请输入相同的密码！");
             return;
         }
+        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
         userDB.changeUserPwd(getIntent().getStringExtra("phone"), pwd11, new userBackListener() {
             @Override
             public void showResult(boolean result, String message) {
+                hideProgressDialog();
                 if(result){
                     Toast.makeText(FindPwd3Activity.this, "密码已修改完成，已为您自动登录", Toast.LENGTH_SHORT).show();
                     Intent i = new Intent(FindPwd3Activity.this, LoginActivity.class);
                     startActivity(i);
                     finish();
+                }else{
+                    showDialog("修改密码错误！");
                 }
             }
         });

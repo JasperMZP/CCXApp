@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -20,6 +21,7 @@ import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import cn.jpush.im.android.api.JMessageClient;
@@ -133,11 +135,18 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
     }
 
-    private void showChatMember(List<UserInfo> groupMembers) {
+    private void showChatMember(final List<UserInfo> groupMembers) {
         ListView lv = (ListView)findViewById(R.id.show_chat_member);
 
         ChatMemberAdapter adaptar = new ChatMemberAdapter(ChatDetailActivity.this, groupMembers);
         lv.setAdapter(adaptar);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = getIntent(groupMembers.get(position));
+                startActivity(i);
+            }
+        });
     }
 
     private void showDialog(String message) {
@@ -152,5 +161,26 @@ public class ChatDetailActivity extends AppCompatActivity {
             this.finish();
         }
         return false;
+    }
+
+    private Intent getIntent(UserInfo userDetail){
+        Intent i = new Intent(this, UserDetailActivity.class);
+        File avatarFile = userDetail.getAvatarFile();
+        i.putExtra("headImage", BitmapFactory.decodeFile(String.valueOf(avatarFile)));
+        i.putExtra("userName", userDetail.getUserName());
+        i.putExtra("nickName", userDetail.getNickname());
+        UserInfo.Gender sex2 = userDetail.getGender();
+        String sex;
+        if(sex2 == UserInfo.Gender.female){
+            sex = "女";
+        }else {
+            sex = "男";
+        }
+        i.putExtra("sex", sex);
+        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+        i.putExtra("birthday", date.format(userDetail.getBirthday()).toString());
+        i.putExtra("address", userDetail.getAddress());
+        i.putExtra("explain", userDetail.getSignature());
+        return i;
     }
 }
