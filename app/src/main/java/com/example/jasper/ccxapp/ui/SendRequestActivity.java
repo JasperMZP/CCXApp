@@ -18,6 +18,9 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.friendDB;
 import com.example.jasper.ccxapp.interfaces.userBackListener;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 /**
  * Created by DPC on 2017/4/6.
  */
@@ -53,10 +56,12 @@ public class SendRequestActivity extends AppCompatActivity{
         Log.i("test",userName2);
         String message = add_friend_reason.getText().toString().trim();
 
+        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
         friendDB.sendfriendrequest(userName2, message,
                 new userBackListener(){
                     @Override
                     public void showResult(boolean result, String message) {
+                        hideProgressDialog();
                         if(result){
                             showDialog2("发送好友请求成功");
                         }else{

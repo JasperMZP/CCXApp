@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.NewFriendAdapter;
@@ -24,11 +23,11 @@ import java.util.List;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.model.UserInfo;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 
 public class NewFriendActivity extends AppCompatActivity implements OnClickListener {
-
-	private TextView toNewFriend;
-	private TextView searchNewFriend;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +64,12 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
+								showProgressDialog(NewFriendActivity.this, "系统提示", "信息加载中，请稍后");
 								friendDB.disagreefriend(JMessageClient.getMyInfo().getUserName(), userInfos.get(position).getUserName(), new userBackListener(){
 									@Override
 									public void showResult(boolean result, String message) {
-										if(result){
+										hideProgressDialog();
+                                        if(result){
 											getFriendRequest();
 										}else{
                                             showDialog("删除信息失败");

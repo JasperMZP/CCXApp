@@ -41,6 +41,8 @@ import cn.jpush.im.android.api.model.UserInfo;
 
 import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_ALBUM;
 import static com.example.jasper.ccxapp.util.ImageUtil.ACTIVITY_RESULT_IMAGE;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
 
 public class UserMessageReviseActivity extends AppCompatActivity {
 
@@ -334,9 +336,11 @@ public class UserMessageReviseActivity extends AppCompatActivity {
             flag = true;
         }
         if(flag) {
+            showProgressDialog(this, "系统提示", "信息加载中，请稍后");
             userDB.addUserMessage(imagePath, nickname, sex, birthday, address, explain, new userBackListener() {
                 @Override
                 public void showResult(boolean result, String message) {
+                    hideProgressDialog();
                     if (result) {
                         if (imageUtils.picFile != null || !oriNickName.equals(JMessageClient.getMyInfo().getNickname())) {
                             setResult(666, getIntent());
