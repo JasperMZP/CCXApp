@@ -74,6 +74,8 @@ import java.util.Map;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.DownloadCompletionCallback;
 import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
+import cn.jpush.im.android.api.callback.GetGroupIDListCallback;
+import cn.jpush.im.android.api.callback.GetGroupInfoCallback;
 import cn.jpush.im.android.api.content.FileContent;
 import cn.jpush.im.android.api.content.ImageContent;
 import cn.jpush.im.android.api.content.TextContent;
@@ -100,6 +102,9 @@ public class MainActivity extends AppCompatActivity implements
     //变量
     private ArrayList<ShowItemModel> showList = new ArrayList<ShowItemModel>();
     private ArrayList<List<CommentItemModel>> childCommentList = new ArrayList<List<CommentItemModel>>();
+    private ArrayList<ShowItemModel> showListCopy = new ArrayList<ShowItemModel>();
+    private ArrayList<List<CommentItemModel>> childCommentListCopy = new ArrayList<List<CommentItemModel>>();
+    private long currentGroupId=0;
     private MyexpandableListAdapter adapter;
     private Conversation mConversation;
     private MediaPlayer mediaPlayer;
@@ -121,16 +126,15 @@ public class MainActivity extends AppCompatActivity implements
     private LocalMessageDB messageDB = new LocalMessageDB(MainActivity.this);
 
     //下拉框相关
-    private View mRootView;
     private TextView mTView;
     private ImageButton mBtnDropDown;
     private List<CustemObject> nameList = new ArrayList<CustemObject>();
     private AbstractSpinerAdapter mAdapter;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         initView();
         initData();
@@ -170,20 +174,35 @@ public class MainActivity extends AppCompatActivity implements
     private void initView() {
 
         //切换群
-        //mRootView = findViewById(R.id.rootView);
-
         mTView = (TextView) findViewById(R.id.tv_value);
         mBtnDropDown = (ImageButton) findViewById(R.id.bt_dropdown);
         mBtnDropDown.setOnClickListener(this);
 
+        nameList.add(new CustemObject("全部", 0));
+        mTView.setText(nameList.get(0).toString());
 
-        String[] names = getResources().getStringArray(R.array.hero_name);
-        for(int i = 0; i < names.length; i++){
-            CustemObject object = new CustemObject();
-            object.data = names[i];
-            nameList.add(object);
-        }
-
+        JMessageClient.getGroupIDList(new GetGroupIDListCallback() {
+            @Override
+            public void gotResult(int i, String s, List<Long> list) {
+                if (i == 0) {
+                    if (!list.isEmpty()) {
+                        for (long groupId : list) {
+                            final long id = groupId;
+                            JMessageClient.getGroupInfo(groupId, new GetGroupInfoCallback() {
+                                @Override
+                                public void gotResult(int i, String s, GroupInfo groupInfo) {
+                                    if (i == 0) {
+                                        CustemObject group = new CustemObject(groupInfo.getGroupName(), id);
+                                        nameList.add(group);
+                                        Log.i("test", "获取群" + i + s + groupInfo.getGroupName());
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
 
         mAdapter = new CustemSpinerAdapter(this);
         mAdapter.refreshData(nameList, 0);
@@ -192,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements
         mSpinerPopWindow.setAdatper(mAdapter);
         mSpinerPopWindow.setItemListener(this);
         //切换结束
-
 
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
@@ -265,10 +283,11 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
     }
-//切换群
+
+    //切换群
     @Override
     public void onClick(View view) {
-        switch(view.getId()){
+        switch (view.getId()) {
             case R.id.bt_dropdown:
                 showSpinWindow();
                 break;
@@ -276,18 +295,20 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void setHero(int pos){
-        if (pos >= 0 && pos <= nameList.size()){
+    private void setChatGroup(int pos) {
+        if (pos >= 0 && pos <= nameList.size()) {
             CustemObject value = nameList.get(pos);
-
+            Log.i("test", value.toString() + "," + value.gid);
             mTView.setText(value.toString());
+            currentGroupId=value.gid;
+            setChatShows(value.gid,pos);
         }
     }
 
 
     private SpinerPopWindow mSpinerPopWindow;
-    private void showSpinWindow(){
-        Log.e("", "showSpinWindow");
+
+    private void showSpinWindow() {
         mSpinerPopWindow.setWidth(mTView.getWidth());
         mSpinerPopWindow.showAsDropDown(mTView);
     }
@@ -295,9 +316,39 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onItemClick(int pos) {
-        setHero(pos);
+        setChatGroup(pos);
     }
 
+    private void setChatShows(long gId,int pos) {
+        showList.clear();
+        childCommentList.clear();
+
+        if (pos>0){
+            for (int i =0;i<showListCopy.size();i++){
+                Log.i("test2","---------------"+i);
+                boolean flag = false;
+                for (long groupId: showListCopy.get(i).getGroupBelongToList()){
+                    Log.i("test2",groupId+"_"+gId);
+                    if (groupId==gId){
+                        Log.i("test2","true");
+                        flag=true;
+                        break;
+                    }
+                }
+                if (flag==false){
+                    showList.add(showListCopy.get(i));
+                    childCommentList.add(childCommentListCopy.get(i));
+                }
+            }
+        }else {
+            for (int i=0;i<showListCopy.size();i++){
+                showList.add(showListCopy.get(i));
+                childCommentList.add(childCommentListCopy.get(i));
+            }
+        }
+        adapter.notifyDataSetChanged();
+        Log.i("test2","after"+showList.size());
+    }
     //切换结束
 
     private void initMediaPlayer(String voicePath) {
@@ -319,8 +370,6 @@ public class MainActivity extends AppCompatActivity implements
      * InitData
      */
     void initData() {
-        showList = new ArrayList<ShowItemModel>();
-        childCommentList = new ArrayList<List<CommentItemModel>>();
         //打开数据库
         messageDB.open();
 
@@ -329,11 +378,13 @@ public class MainActivity extends AppCompatActivity implements
             for (ShowItemModel s : dbShowItemList) {
                 Log.i("test", "DBreadText" + s.getShowText());
                 showList.add(s);
+                showListCopy.add(s);
                 ArrayList<CommentItemModel> commentItemList3 = new ArrayList<CommentItemModel>();
                 CommentItemModel noneCommentItem3 = new CommentItemModel();
                 noneCommentItem3.setMsgKey("-1");
                 commentItemList3.add(noneCommentItem3);
                 childCommentList.add(commentItemList3);
+                childCommentListCopy.add(commentItemList3);
             }
         }
 
@@ -348,7 +399,10 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        ShowItemModel showItem = new ShowItemModel();
+        /*showListCopy = showList;
+        childCommentListCopy =childCommentList;*/
+
+        /*ShowItemModel showItem = new ShowItemModel();
         showItem.setMsgKey("0");
         showItem.setShowUsername("寸草心官方");
         showItem.setShowText("尊敬的用户：欢迎使用寸草心，\n" +
@@ -365,8 +419,26 @@ public class MainActivity extends AppCompatActivity implements
         CommentItemModel noneCommentItem1 = new CommentItemModel();
         noneCommentItem1.setMsgKey("-1");
         commentItemList.add(noneCommentItem1);
-
         childCommentList.add(commentItemList);
+
+        ShowItemModel showItem2 = new ShowItemModel();
+        showItem2.setMsgKey("0");
+        showItem2.setShowUsername("寸草心官方");
+        showItem2.setShowText("尊敬的用户：欢迎使用寸草心，\n" +
+                "这里是消息的浏览页，\n" +
+                "点击右上角的“+”发送消息，\n" +
+                "长按消息下方的按钮发送语音。\n" +
+                ":)");
+        showItem2.setShowTime("官方消息");
+        ArrayList<String> showImgs2 = new ArrayList<>();
+        showItem2.setShowImagesList(showImgs2);
+        showList.add(showItem2);
+
+        ArrayList<CommentItemModel> commentItemList2 = new ArrayList<CommentItemModel>();
+        CommentItemModel noneCommentItem2 = new CommentItemModel();
+        noneCommentItem2.setMsgKey("-1");
+        commentItemList2.add(noneCommentItem2);
+        childCommentList.add(commentItemList2);*/
     }
 
     private boolean createConversation(long groupId) {
@@ -618,16 +690,16 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 });
             } else {
-                int mywidth=0;
-                int time_temp=0;
-                time_temp=commentItem.getCommentLength();
-                if(time_temp>14) {
-                    mywidth=340;
-                }else{
-                    mywidth=120+(time_temp-1)*15;
+                int mywidth = 0;
+                int time_temp = 0;
+                time_temp = commentItem.getCommentLength();
+                if (time_temp > 14) {
+                    mywidth = 340;
+                } else {
+                    mywidth = 120 + (time_temp - 1) * 15;
                 }
                 android.view.ViewGroup.LayoutParams widthPar = commentHolder.playVoiceCommentBtn.getLayoutParams();
-                widthPar.width=mywidth;
+                widthPar.width = mywidth;
                 commentHolder.playVoiceCommentBtn.setLayoutParams(widthPar);
                 commentHolder.commentUsernameTv.setVisibility(View.VISIBLE);
                 commentHolder.playVoiceCommentBtn.setVisibility(View.VISIBLE);
@@ -693,30 +765,11 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public View getPinnedHeader() {
-        View headerView = (ViewGroup) getLayoutInflater().inflate(R.layout.show_item, null);
-        headerView.setLayoutParams(new LayoutParams(
-                LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        return headerView;
+        return null;
     }
 
     @Override
     public void updatePinnedHeader(View headerView, int firstVisibleGroupPos) {
-        ShowItemModel firstVisibleShowItem = (ShowItemModel) adapter.getGroup(firstVisibleGroupPos);
-        TextView showUsernameTv = (TextView) headerView.findViewById(R.id.show_username_tv);
-        TextView showTextTv = (TextView) headerView.findViewById(R.id.show_text_content_tv);
-        TextView showTimeTv = (TextView) headerView.findViewById(R.id.show_time_tv);
-        CircleImageView showAvatarIv = (CircleImageView) headerView.findViewById(R.id.show_user_avatar_civ);
-        showUsernameTv.setText(firstVisibleShowItem.getShowUsername());
-        showTextTv.setText(firstVisibleShowItem.getShowText());
-        showTimeTv.setText(firstVisibleShowItem.getShowTime());
-
-        File avatarFile = firstVisibleShowItem.getShowAvatar();
-        if (avatarFile != null) {
-            Log.i("test", "头像不为NULL ");
-            showAvatarIv.setImageBitmap(BitmapFactory.decodeFile(avatarFile.getPath()));
-        } else {
-            Log.i("test", "头像为NULL");
-        }
     }
 
     @Override
@@ -753,24 +806,31 @@ public class MainActivity extends AppCompatActivity implements
         if (requestCode == REQUEST_SEND_MSG_ITEM && resultCode == ShowMsgEditActivity.RESULT_SEND_MSG_ITEM) {
             ShowItemModel showItem = (ShowItemModel) data.getSerializableExtra("showItem");
             List<Long> groupBelongtoList = showItem.getGroupBelongToList();
-
+            boolean gFlag =false;
             for (int i = 0; i < groupBelongtoList.size(); i++) {
-                Log.i("test", "要发送的群id：" + groupBelongtoList.get(i));
                 createConversation(groupBelongtoList.get(i));
                 sendToGroup(showItem);
+                if (currentGroupId==groupBelongtoList.get(i)&&gFlag==false){
+                    gFlag=true;
+                }
             }
 
             UserInfo myInfo = JMessageClient.getMyInfo();
             showItem.setShowUsername(myInfo.getNickname());
             showItem.setShowAvatar(myInfo.getAvatarFile());
             showItem.setShowTime(GetCurrentTimeUtil.getCurrentTime(new Date()));
-            showList.add(0, showItem);
+            showListCopy.add(0, showItem);
 
             ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
             CommentItemModel noneComment = new CommentItemModel();
             noneComment.setMsgKey("-1");
             commentItemModels.add(noneComment);
-            childCommentList.add(0, commentItemModels);
+            childCommentListCopy.add(0, commentItemModels);
+
+            if (gFlag||currentGroupId==0){
+                showList.add(0,showItem);
+                childCommentList.add(0, commentItemModels);
+            }
 
             adapter.notifyDataSetChanged();
             Log.i("test", "show内容" + showItem.getShowText());
@@ -889,20 +949,26 @@ public class MainActivity extends AppCompatActivity implements
             textShowItem.setMsgKey(tShowKey);
             String[] groupIds = textContent.getStringExtra("groupBelongTo").split(",");
             List<Long> groupIdBelongTo = new ArrayList<Long>();
+            boolean gFlag = false;
             for (int i = 0; i < groupIds.length; i++) {
                 groupIdBelongTo.add(Long.parseLong(groupIds[i]));
-                Log.i("test", "解析出群:" + groupIds[i]);
+                if (currentGroupId==Long.parseLong(groupIds[i])&&gFlag==false){
+                    gFlag=true;
+                }
             }
             textShowItem.setGroupBelongToList(groupIdBelongTo);
             textShowItem.setShowAvatar(tUserInfo.getAvatarFile());
             textShowItem.setShowTime(GetCurrentTimeUtil.getCurrentTime(new Date()));
-            showList.add(0, textShowItem);
-
+            showListCopy.add(0, textShowItem);
             ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
             CommentItemModel noneComment = new CommentItemModel();
             noneComment.setMsgKey("-1");
             commentItemModels.add(noneComment);
-            childCommentList.add(0, commentItemModels);
+            childCommentListCopy.add(0, commentItemModels);
+            if (gFlag==true||currentGroupId==0){
+                showList.add(0, textShowItem);
+                childCommentList.add(0, commentItemModels);
+            }
             Log.i("test", "background");
             messageDB.insertShow(textShowItem, SHOW_TEXT);
             return true;
@@ -944,18 +1010,25 @@ public class MainActivity extends AppCompatActivity implements
                         String[] iGroupIds = ((String) iMsgMap.get("groupBelongTo")).split(",");
                         Log.i("test", "解析出群");
                         List<Long> iGroupIdBelongTo = new ArrayList<Long>();
+                        boolean flag = false;
                         for (int i = 0; i < iGroupIds.length; i++) {
                             iGroupIdBelongTo.add(Long.parseLong(iGroupIds[i]));
-                            Log.i("test", "解析出群:" + iGroupIds[i]);
+                            if (currentGroupId==Long.parseLong(iGroupIds[i])&&flag==false){
+                                flag=true;
+                            }
                         }
                         CheckRecievedShowItem.setGroupBelongToList(iGroupIdBelongTo);
-                        showList.add(0, CheckRecievedShowItem);
+                        showListCopy.add(0, CheckRecievedShowItem);
 
                         ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
                         CommentItemModel noneComment = new CommentItemModel();
                         noneComment.setMsgKey("-1");
                         commentItemModels.add(noneComment);
-                        childCommentList.add(0, commentItemModels);
+                        childCommentListCopy.add(0, commentItemModels);
+                        if (flag||currentGroupId==0){
+                            showList.add(0, CheckRecievedShowItem);
+                            childCommentList.add(0, commentItemModels);
+                        }
 
                         messageDB.insertShow(CheckRecievedShowItem, SHOW_IMAGE);
                     }
@@ -983,20 +1056,27 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i("test", "新图片添加到ListView 只有一张图片");
                 String[] iGroupIds = ((String) iMsgMap.get("groupBelongTo")).split(",");
                 List<Long> iGroupIdBelongTo = new ArrayList<Long>();
+                boolean gFlag = false;
                 for (int i = 0; i < iGroupIds.length; i++) {
                     iGroupIdBelongTo.add(Long.parseLong(iGroupIds[i]));
                     Log.i("test", "解析出群:" + iGroupIds[i]);
+                    if (currentGroupId==Long.parseLong(iGroupIds[i])&&gFlag==false){
+                        gFlag=true;
+                    }
                 }
                 CheckRecievedShowItem.setGroupBelongToList(iGroupIdBelongTo);
                 CheckRecievedShowItem.setShowAvatar(iUserInfo.getAvatarFile());
-                showList.add(0, CheckRecievedShowItem);
+                showListCopy.add(0, CheckRecievedShowItem);
 
                 ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
                 CommentItemModel noneComment = new CommentItemModel();
                 noneComment.setMsgKey("-1");
                 commentItemModels.add(noneComment);
-                childCommentList.add(0, commentItemModels);
-
+                childCommentListCopy.add(0, commentItemModels);
+                if (gFlag||currentGroupId==0){
+                    showList.add(0, CheckRecievedShowItem);
+                    childCommentList.add(0, commentItemModels);
+                }
                 messageDB.insertShow(CheckRecievedShowItem, SHOW_IMAGE);
             }
             return true;
@@ -1040,9 +1120,12 @@ public class MainActivity extends AppCompatActivity implements
                         videoShowItem.setShowVideo(file.getPath());
                         String[] groupIds = fileContent.getStringExtra("groupBelongTo").split(",");
                         List<Long> groupIdBelongTo = new ArrayList<Long>();
+                        boolean gFlag = false;
                         for (int j = 0; j < groupIds.length; j++) {
                             groupIdBelongTo.add(Long.parseLong(groupIds[j]));
-                            Log.i("test", "解析出群:" + groupIds[j]);
+                            if (currentGroupId==Long.parseLong(groupIds[j])&&gFlag==false){
+                                gFlag=true;
+                            }
                         }
                         videoShowItem.setGroupBelongToList(groupIdBelongTo);
                         final Bitmap[] avatarBitmap = new Bitmap[1];
@@ -1055,14 +1138,17 @@ public class MainActivity extends AppCompatActivity implements
                             }
                         });
                         videoShowItem.setShowAvatar(fUserInfo.getAvatarFile());
-                        showList.add(0, videoShowItem);
+                        showListCopy.add(0, videoShowItem);
 
                         ArrayList<CommentItemModel> commentItemModels = new ArrayList<CommentItemModel>();
                         CommentItemModel noneComment = new CommentItemModel();
                         noneComment.setMsgKey("-1");
                         commentItemModels.add(noneComment);
-                        childCommentList.add(0, commentItemModels);
-                        Log.i("test", "background");
+                        childCommentListCopy.add(0, commentItemModels);
+                        if(gFlag||currentGroupId==0){
+                            showList.add(0, videoShowItem);
+                            childCommentList.add(0, commentItemModels);
+                        }
                         adapter.notifyDataSetChanged();
 
                         messageDB.insertShow(videoShowItem, SHOW_VIDEO);
@@ -1107,12 +1193,24 @@ public class MainActivity extends AppCompatActivity implements
             Log.i("test", "voiceContent.getLocalPath" + voiceContent.getLocalPath());
             commentItem.setCommentVoice(voiceContent.getLocalPath());
 
-            for (int j = 0; j < showList.size(); j++) {
-                if (showList.get(j).getMsgKey().equals(commentItem.getMsgKey())) {
-                    List<CommentItemModel> commentItemModels = childCommentList.get(j);
+            for (int j = 0; j < showListCopy.size(); j++) {
+                ShowItemModel s = showListCopy.get(j);
+                if (s.getMsgKey().equals(commentItem.getMsgKey())) {
+                    boolean flag = false;
+                    for (long gId:s.getGroupBelongToList()){
+                        if (currentGroupId==gId&&flag==false){
+                            flag=true;
+                        }
+                    }
+
+                    List<CommentItemModel> commentItemModels = childCommentListCopy.get(j);
                     commentItemModels.add(commentItemModels.size() - 1, commentItem);
-                    childCommentList.remove(j);
-                    childCommentList.add(j, commentItemModels);
+                    childCommentListCopy.remove(j);
+                    childCommentListCopy.add(j, commentItemModels);
+                    if (flag||currentGroupId==0){
+                        childCommentList.remove(j);
+                        childCommentList.add(j, commentItemModels);
+                    }
                     Log.i("test", "添加一条语音消息");
                     messageDB.insertComment(commentItem);
                     return true;
