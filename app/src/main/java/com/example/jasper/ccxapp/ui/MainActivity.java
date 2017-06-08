@@ -173,44 +173,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initView() {
 
-        //切换群
-        mTView = (TextView) findViewById(R.id.tv_value);
-        mBtnDropDown = (ImageButton) findViewById(R.id.bt_dropdown);
-        mBtnDropDown.setOnClickListener(this);
 
-        nameList.add(new CustemObject("全部", 0));
-        mTView.setText(nameList.get(0).toString());
-
-        JMessageClient.getGroupIDList(new GetGroupIDListCallback() {
-            @Override
-            public void gotResult(int i, String s, List<Long> list) {
-                if (i == 0) {
-                    if (!list.isEmpty()) {
-                        for (long groupId : list) {
-                            final long id = groupId;
-                            JMessageClient.getGroupInfo(groupId, new GetGroupInfoCallback() {
-                                @Override
-                                public void gotResult(int i, String s, GroupInfo groupInfo) {
-                                    if (i == 0) {
-                                        CustemObject group = new CustemObject(groupInfo.getGroupName(), id);
-                                        nameList.add(group);
-                                        Log.i("test", "获取群" + i + s + groupInfo.getGroupName());
-                                    }
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-        });
-
-        mAdapter = new CustemSpinerAdapter(this);
-        mAdapter.refreshData(nameList, 0);
-
-        mSpinerPopWindow = new SpinerPopWindow(this);
-        mSpinerPopWindow.setAdatper(mAdapter);
-        mSpinerPopWindow.setItemListener(this);
-        //切换结束
 
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
@@ -236,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements
         initDrawerLayout();
         drawerLayout.setScrimColor(Color.GRAY);
     }
+
 
     private void initDrawerLayout() {
         drawerLayout = (DrawerLayout) super.findViewById(R.id.drawer_layout);
@@ -843,6 +807,48 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         JMessageClient.registerEventReceiver(this);
+
+        //更新群
+        nameList.clear();
+        //切换群
+        mTView = (TextView) findViewById(R.id.tv_value);
+        mBtnDropDown = (ImageButton) findViewById(R.id.bt_dropdown);
+        mBtnDropDown.setOnClickListener(this);
+
+        nameList.add(new CustemObject("全部", 0));
+        mTView.setText(nameList.get(0).toString());
+
+        JMessageClient.getGroupIDList(new GetGroupIDListCallback() {
+            @Override
+            public void gotResult(int i, String s, List<Long> list) {
+                if (i == 0) {
+                    if (!list.isEmpty()) {
+                        for (long groupId : list) {
+                            final long id = groupId;
+                            JMessageClient.getGroupInfo(groupId, new GetGroupInfoCallback() {
+                                @Override
+                                public void gotResult(int i, String s, GroupInfo groupInfo) {
+                                    if (i == 0) {
+                                        CustemObject group = new CustemObject(groupInfo.getGroupName(), id);
+                                        nameList.add(group);
+                                        Log.i("test", "获取群" + i + s + groupInfo.getGroupName());
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+        });
+
+        mAdapter = new CustemSpinerAdapter(this);
+        mAdapter.refreshData(nameList, 0);
+
+        mSpinerPopWindow = new SpinerPopWindow(this);
+        mSpinerPopWindow.setAdatper(mAdapter);
+        mSpinerPopWindow.setItemListener(this);
+        //切换结束
+
     }
 
     @Override
