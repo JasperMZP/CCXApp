@@ -30,7 +30,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/currentUserName"
+                android:id="@+id/currentUserName_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="用户1"
@@ -43,7 +43,7 @@
                 android:textColor="#111055"
                 />
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/my_avatar_civ"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
@@ -52,8 +52,6 @@
                 android:layout_marginBottom="1dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true" />
-
-
         </RelativeLayout>
 
         <LinearLayout
@@ -84,7 +82,7 @@
                     android:background="@drawable/singleline_item_bg" >
 
                     <TextView
-                        android:id="@+id/tv_pre"
+                        android:id="@+id/pre_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
@@ -96,12 +94,12 @@
                     </TextView>
 
                     <TextView
-                        android:id="@+id/tv_value"
+                        android:id="@+id/value_tv"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:minHeight="40dp"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@id/tv_pre"
+                        android:layout_toRightOf="@id/pre_tv"
                         android:layout_marginRight="10dp"
                         android:background="@drawable/edittext1"
                         android:textSize="20sp"
@@ -112,7 +110,7 @@
 
 
                     <ImageButton
-                        android:id="@+id/bt_dropdown"
+                        android:id="@+id/dropdown_ib"
                         android:layout_width="36px"
                         android:layout_height="20px"
                         android:layout_alignParentRight="true"

@@ -179,8 +179,6 @@
             android:name=".ui.ChatChangeMemberActivity"
             android:label="群成员"
             android:theme="@style/AppTheme1" />
-        <activity android:name=".ui.ShowFriendDetailMessageActivity" />
-        <activity android:name=".ui.FlashlightActivity" />
         <activity android:name=".ui.FindPwd1Activity" />
         <activity android:name=".ui.FindPwd2Activity" />
         <activity android:name=".ui.FindPwd3Activity" />

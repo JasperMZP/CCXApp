@@ -11,14 +11,14 @@
 		android:orientation="horizontal">
 
 		<ImageView
-			android:id="@+id/a_friend_image"
+			android:id="@+id/a_friend_image_iv"
 			android:layout_marginTop="5dp"
 			android:layout_width="50dp"
 			android:layout_height="50dp"
 			android:src="@mipmap/ic_launcher"/>
 
 		<TextView
-			android:id="@+id/a_friend_name"
+			android:id="@+id/a_friend_name_tv"
 			android:layout_height="40dp"
 			android:layout_width="wrap_content"
 			android:drawablePadding="10.0dip"

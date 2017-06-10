@@ -24,13 +24,13 @@ public class UserDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail);
 
-        headImage = (ImageView)findViewById(R.id.add_message_image);
-        userName = (TextView)findViewById(R.id.message_userName);
-        nickName = (TextView)findViewById(R.id.message_nickname);
-        sex = (TextView)findViewById(R.id.message_sex);
-        birthday = (TextView)findViewById(R.id.show_birthday);
-        address = (TextView)findViewById(R.id.message_address);
-        explain = (TextView)findViewById(R.id.message_explain);
+        headImage = (ImageView)findViewById(R.id.add_message_image_civ);
+        userName = (TextView)findViewById(R.id.message_userName_tv);
+        nickName = (TextView)findViewById(R.id.message_nickname_tv);
+        sex = (TextView)findViewById(R.id.message_sex_tv);
+        birthday = (TextView)findViewById(R.id.show_birthday_tv);
+        address = (TextView)findViewById(R.id.message_address_tv);
+        explain = (TextView)findViewById(R.id.message_explain_tv);
 
         headImage.setImageBitmap((Bitmap) getIntent().getParcelableExtra("headImage"));
         userName.setText(getIntent().getStringExtra("userName"));

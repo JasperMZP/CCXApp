@@ -7,17 +7,17 @@
     android:layout_width="50dp"
     android:layout_height="50dp"
     android:src="@mipmap/ic_launcher_round"
-    android:id="@+id/a_friend_chat_imageView" />
+    android:id="@+id/a_friend_chat_iv" />
     <TextView
-        android:id="@+id/a_friend_chat_name"
+        android:id="@+id/a_friend_chat_name_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="llalalal"
-        android:layout_alignBottom="@+id/a_friend_chat_checkbox"
-        android:layout_toEndOf="@+id/a_friend_chat_imageView"
+        android:layout_alignBottom="@+id/a_friend_chat_cb"
+        android:layout_toEndOf="@+id/a_friend_chat_iv"
         android:layout_marginStart="11dp" />
     <CheckBox
-        android:id="@+id/a_friend_chat_checkbox"
+        android:id="@+id/a_friend_chat_cb"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="200dp"

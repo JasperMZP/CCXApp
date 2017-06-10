@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,9 +70,9 @@ public class NewFriendAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.a_friend_request, null);
             holder =new ViewHolder();
     		/*得到各个控件的对象*/
-            holder.a_friend_image = (ImageView) convertView.findViewById(R.id.a_friend_image);
-            holder.a_friend_name = (TextView) convertView.findViewById(R.id.a_friend_name);
-            holder.a_friend_request = (TextView)convertView.findViewById(R.id.a_friend_request);
+            holder.a_friend_image = (ImageView) convertView.findViewById(R.id.a_friend_image_iv);
+            holder.a_friend_name = (TextView) convertView.findViewById(R.id.a_friend_name_tv);
+            holder.a_friend_request = (TextView)convertView.findViewById(R.id.a_friend_request_tv);
             holder.btn_agree = (Button)convertView.findViewById(R.id.a_new_friend_agree);
             convertView.setTag(holder);//绑定ViewHolder对象
         }
@@ -88,7 +88,7 @@ public class NewFriendAdapter extends BaseAdapter {
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                friendDB.agreenewfriend(JMessageClient.getMyInfo().getUserName(), userInfos.get(position).getUserName(), new userBackListener(){
+                                friendDB.agreenewfriend(JMessageClient.getMyInfo().getUserName(), userInfos.get(position).getUserName(), new UserBackListener(){
                                     @Override
                                     public void showResult(boolean result, String message) {
                                         if(result) {

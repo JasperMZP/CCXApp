@@ -56,7 +56,7 @@ public class ChatAdapter extends BaseAdapter {
     		convertView = mInflater.inflate(R.layout.a_chatroom, null);
     		holder =new ViewHolder();
     		/*得到各个控件的对象*/
-    		holder.chatroom_name = (TextView) convertView.findViewById(R.id.chatroom_name);
+    		holder.chatroom_name = (TextView) convertView.findViewById(R.id.chatroom_name_tv);
     		convertView.setTag(holder);//绑定ViewHolder对象
     	}
 		holder = (ViewHolder)convertView.getTag();

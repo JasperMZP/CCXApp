@@ -17,8 +17,8 @@ import android.widget.Toast;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ChatMemberAdapter;
 import com.example.jasper.ccxapp.db.chatDB;
-import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -26,6 +26,9 @@ import java.util.List;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.model.UserInfo;
+
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
 
 public class ChatDetailActivity extends AppCompatActivity {
 
@@ -40,9 +43,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_detail);
 
-        add_new_member = (Button)findViewById(R.id.add_new_member);
-        delete_some_member = (Button)findViewById(R.id.delete_some_member);
-        quit_chat = (Button)findViewById(R.id.quit_chat);
+        add_new_member = (Button)findViewById(R.id.add_new_member_btn);
+        delete_some_member = (Button)findViewById(R.id.delete_some_member_btn);
+        quit_chat = (Button)findViewById(R.id.quit_chat_btn);
 
         groupId = getIntent().getLongExtra("groupId", groupId);
         boolean ifOwn = getIntent().getBooleanExtra("ifOwn", false);
@@ -103,7 +106,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                chatDB.quitChat(groupId, new userBackListener() {
+                                chatDB.quitChat(groupId, new UserBackListener() {
                                     @Override
                                     public void showResult(boolean result, String message) {
                                         if(result){
@@ -122,9 +125,13 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private void getChatMember(long groupId) {
-        chatDB.getChatMember(groupId, new userBackListUserInfo() {
+        if(!showProgressDialog(this, "系统提示", "信息加载中，请稍后")){
+            return;
+        }
+        chatDB.getChatMember(groupId, new UserBackListUserInfo() {
             @Override
             public void showResult(boolean result, List<UserInfo> message) {
+                hideProgressDialog();
                 if(result){
                     userInfos = message;
                     showChatMember(message);

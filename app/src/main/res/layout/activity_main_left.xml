@@ -11,7 +11,8 @@
         android:paddingLeft="10dp"
         android:paddingTop="10dp">
 
-        <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+        <de.hdodenhof.circleimageview.CircleImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/left_my_avatar_civ"
             android:layout_width="60dp"
             android:layout_height="60dp"
@@ -21,7 +22,7 @@
             app:civ_border_width="2dp" />
 
         <TextView
-            android:id="@+id/myName"
+            android:id="@+id/myName_tv"
             android:layout_width="match_parent"
             android:layout_height="28.0dip"
             android:layout_centerVertical="true"
@@ -39,7 +40,7 @@
         android:clickable="true">
 
         <ImageView
-            android:id="@+id/imageViewRing"
+            android:id="@+id/imageViewRing_iv"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="5dp"
@@ -47,7 +48,7 @@
             android:src="@drawable/ring" />
 
         <TextView
-            android:id="@+id/tvMyFavorite"
+            android:id="@+id/tvMyFavorite_tv"
             android:layout_width="match_parent"
             android:layout_height="50.0dip"
             android:clickable="true"
@@ -119,29 +120,6 @@
             android:paddingLeft="5.0dip"
             android:paddingRight="10.0dip"
             android:text="设置"
-            android:textColor="@color/white"
-            android:textSize="16.0sp" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2.0dip"
-        android:background="@drawable/biz_pc_account_line" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true">
-
-        <TextView
-            android:id="@+id/flashlight"
-            android:layout_width="match_parent"
-            android:layout_height="50.0dip"
-            android:drawablePadding="1.0dip"
-            android:gravity="center_vertical"
-            android:paddingLeft="5.0dip"
-            android:paddingRight="10.0dip"
-            android:text="手电筒"
             android:textColor="@color/white"
             android:textSize="16.0sp" />
     </LinearLayout>

@@ -19,8 +19,8 @@ import android.widget.TextView;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.FriendAdapter;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.jpush.im.android.api.model.UserInfo;
+
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
 
 
 public class FriendActivity extends AppCompatActivity {
@@ -44,10 +47,10 @@ public class FriendActivity extends AppCompatActivity {
 
 		getFriends();
 
-		img_toNewFriend= (ImageView)findViewById(R.id.image_to_new_friend);
-		img_toGroup= (ImageView)findViewById(R.id.to_group);
-		toMyChat = (TextView)findViewById(R.id.to_my_chat);
-		toNewFriend = (TextView)findViewById(R.id.to_new_friend);
+		img_toNewFriend= (ImageView)findViewById(R.id.image_to_new_friend_iv);
+		img_toGroup= (ImageView)findViewById(R.id.to_group_iv);
+		toMyChat = (TextView)findViewById(R.id.to_my_chat_tv);
+		toNewFriend = (TextView)findViewById(R.id.to_new_friend_tv);
 		toMyChat.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -97,10 +100,14 @@ public class FriendActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	private void getFriends() {
-		friendDB.searchfriend(new userBackListUserInfo() {
+		if(!showProgressDialog(this, "系统提示", "信息加载中，请稍后")){
+			return;
+		}
+		friendDB.searchfriend(new UserBackListUserInfo() {
 			@Override
 			public void showResult(boolean result, List<UserInfo> message) {
-				if(result){
+				hideProgressDialog();
+                if(result){
 					showFriends(message);
 				}else{
 					showDialog("查询好友出错");
@@ -123,7 +130,7 @@ public class FriendActivity extends AppCompatActivity {
                 userInfosYoung.add(userInfo);
             }
 		}
-        ListView lv = (ListView) findViewById(R.id.all_friend);
+        ListView lv = (ListView) findViewById(R.id.all_friend_lv);
         FriendAdapter adapter = new FriendAdapter(FriendActivity.this, userInfosOld);
         lv.setAdapter(adapter);
 		lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
@@ -133,7 +140,7 @@ public class FriendActivity extends AppCompatActivity {
 						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
-								friendDB.deletefriend(userInfosOld.get(position), new userBackListener() {
+								friendDB.deletefriend(userInfosOld.get(position), new UserBackListener() {
                                     @Override
                                     public void showResult(boolean result, String message) {
 										if(result){
@@ -157,7 +164,7 @@ public class FriendActivity extends AppCompatActivity {
 			}
 		});
 
-        ListView lv2 = (ListView) findViewById(R.id.all_young_friend);
+        ListView lv2 = (ListView) findViewById(R.id.all_young_friend_lv);
         FriendAdapter adapter2 = new FriendAdapter(FriendActivity.this, userInfosYoung);
         lv2.setAdapter(adapter2);
         lv2.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
@@ -167,7 +174,7 @@ public class FriendActivity extends AppCompatActivity {
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                friendDB.deletefriend(userInfosYoung.get(position), new userBackListener() {
+                                friendDB.deletefriend(userInfosYoung.get(position), new UserBackListener() {
                                     @Override
                                     public void showResult(boolean result, String message) {
                                         if(result){

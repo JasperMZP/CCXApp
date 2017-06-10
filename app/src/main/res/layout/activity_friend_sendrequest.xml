@@ -12,14 +12,14 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/add_friend_image"
+            android:id="@+id/add_friend_image_iv"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:src="@drawable/noheadimage"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="30dp"/>
         <TextView
-            android:id="@+id/add_friend_name"
+            android:id="@+id/add_friend_name_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:drawablePadding="10.0dip"
@@ -32,7 +32,7 @@
 
 
     <EditText
-        android:id="@+id/add_friend_reason"
+        android:id="@+id/add_friend_reason_et"
         android:layout_width="330dp"
         android:layout_height="60.0dip"
         android:layout_marginLeft="18dp"
@@ -44,11 +44,11 @@
         android:textAlignment="center" />
 
     <TextView
-        android:id="@+id/word"
+        android:id="@+id/word_tv"
         android:layout_width="fill_parent"
         android:layout_height="60.0dip"
-        android:layout_alignStart="@+id/grass"
-        android:layout_below="@+id/add_friend_reason"
+        android:layout_alignStart="@+id/grass_iv"
+        android:layout_below="@+id/add_friend_reason_et"
         android:autoLink="all"
         android:padding="8sp"
         android:text=" 发送验证申请，等待对方通过"
@@ -56,10 +56,10 @@
 
 
     <Button
-        android:id="@+id/btn_send_request_to_add"
+        android:id="@+id/send_request_to_add_btn"
         android:layout_width="330dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/word"
+        android:layout_below="@id/word_tv"
         android:layout_marginLeft="18dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/button_color"

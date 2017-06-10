@@ -3,10 +3,10 @@ package com.example.jasper.ccxapp.db;
 import android.util.Log;
 
 import com.example.jasper.ccxapp.entitiy.NewFriend;
-import com.example.jasper.ccxapp.interfaces.userBackListListener;
-import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
-import com.example.jasper.ccxapp.interfaces.userBackUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackListListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackUserInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import cn.jpush.im.api.BasicCallback;
 
 public class friendDB {
     //拒绝好友申请，删除后台中对应好友申请的部分
-    public static void disagreefriend(String userName1, final String userName2, final userBackListener userBackListener) {
+    public static void disagreefriend(String userName1, final String userName2, final UserBackListener userBackListener) {
         BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
         query.addWhereEqualTo("requestFriend", userName2);
         query.addWhereEqualTo("responseFriend", userName1);
@@ -68,7 +68,7 @@ public class friendDB {
     }
 
     //同意好友申请，删去申请表中的对应信息，在好友表中添加相应好友信息
-    public static void agreenewfriend(final  String userName1,final String userName2,final userBackListener userBackListener) {
+    public static void agreenewfriend(final  String userName1,final String userName2,final UserBackListener userBackListener) {
         BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
         query.addWhereEqualTo("requestFriend", userName2);
         query.addWhereEqualTo("responseFriend", userName1);
@@ -107,7 +107,7 @@ public class friendDB {
     }
 
     //发送好友请求,userName2为接受请求人
-    public static void sendfriendrequest(final String userName2, final String message, final userBackListener userBackListener) {
+    public static void sendfriendrequest(final String userName2, final String message, final UserBackListener userBackListener) {
         BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
         query.addWhereEqualTo("requestFriend", userName2);
         query.addWhereEqualTo("responseFriend", JMessageClient.getMyInfo().getUserName());
@@ -171,7 +171,7 @@ public class friendDB {
     }
 
     //查询当前好友
-    public static void searchfriend(final userBackListUserInfo userBackListUserInfo) {
+    public static void searchfriend(final UserBackListUserInfo userBackListUserInfo) {
         ContactManager.getFriendList(new GetUserInfoListCallback() {
             @Override
             public void gotResult(int responseCode, String responseMessage, List<UserInfo> userInfoList) {
@@ -185,7 +185,7 @@ public class friendDB {
     }
 
     //查询新好友
-    public static void searchnewfriend(final String userName2, final userBackUserInfo userBackUserInfo) {
+    public static void searchnewfriend(final String userName2, final UserBackUserInfo userBackUserInfo) {
         JMessageClient.getUserInfo(userName2,new GetUserInfoCallback(){
             @Override
             public void gotResult(int i, String s, UserInfo userInfo) {
@@ -204,7 +204,7 @@ public class friendDB {
     }
 
     //删除已有好友输入值为好友双方
-    public static void deletefriend(UserInfo userInfo, final userBackListener userBackListener) {
+    public static void deletefriend(UserInfo userInfo, final UserBackListener userBackListener) {
         userInfo.removeFromFriendList(new BasicCallback() {
             @Override
             public void gotResult(int responseCode, String responseMessage) {
@@ -218,7 +218,7 @@ public class friendDB {
     }
 
     //得到该用户被请求为好友的信息
-    public static void searchRequestList(String userName, final userBackListListener userBackListListener) {
+    public static void searchRequestList(String userName, final UserBackListListener userBackListListener) {
         final List<UserInfo> userInfos = new ArrayList<UserInfo>();
         BmobQuery<NewFriend> query = new BmobQuery<NewFriend>();
         query.addWhereEqualTo("responseFriend", userName);
