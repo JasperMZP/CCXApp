@@ -6,5 +6,8 @@
     <color name="red">#FF0000</color>
     <color name="white">#FFFFFF</color>
     <color name="Grey">#BEBEBE</color>
+    <color name="green">#1BF507</color>
     <color name="LightGray">#D3D3D3</color>
+    <color name="dark_green">#23C769</color>
+    <color name="dark_blue">#da2a6f24</color>
 </resources>

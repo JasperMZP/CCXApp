@@ -542,10 +542,10 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(View v) {
                         if (expandableListView.isGroupExpanded(groupPosition)) {
-                            showHolder.expandedIv.setImageResource(R.drawable.angle1);
+                            showHolder.expandedIv.setImageResource(R.drawable.ic_angle_up);
                             expandableListView.collapseGroup(groupPosition);
                         } else {
-                            showHolder.expandedIv.setImageResource(R.drawable.angle);
+                            showHolder.expandedIv.setImageResource(R.drawable.ic_angle_down);
                             expandableListView.expandGroup(groupPosition);
                         }
                     }

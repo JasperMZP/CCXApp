@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/appback2"
+    android:background="@drawable/app_bg"
     android:orientation="vertical"
     android:weightSum="1">
 
@@ -15,7 +15,7 @@
             android:id="@+id/add_friend_image_iv"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/noheadimage"
+            android:src="@drawable/img_no_head"
             android:layout_marginLeft="20dp"
             android:layout_marginTop="30dp"/>
         <TextView
