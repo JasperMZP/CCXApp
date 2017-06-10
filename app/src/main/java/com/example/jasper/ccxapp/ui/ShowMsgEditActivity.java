@@ -25,12 +25,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.PhotoAdapter;
@@ -126,7 +124,7 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
         mFlowLayout = (TagFlowLayout) findViewById(R.id.id_flowlayout);
         recordVideoIb = (ImageButton) findViewById(R.id.record_video_ib);
         videoView = (CustomVideoView) findViewById(R.id.video_view);
-        playVideoBtn = (ImageView) findViewById(R.id.play_video_btn);
+        playVideoBtn = (ImageView) findViewById(R.id.play_video_iv);
         lableVideoTv = (TextView) findViewById(R.id.labal_video_tv);
     }
 
@@ -311,17 +309,23 @@ public class ShowMsgEditActivity extends AppCompatActivity implements MessageTyp
         }
     }
 
-    public boolean checkPermision(String[] permissions,int requestCode) {
+
+    public boolean checkPermision(String[] permissions2, int code) {
         boolean flag = false;
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+        List<String> permissions3 = new ArrayList<String>();
+        for(String permission : permissions2){
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
                 flag = true;
-                break;
+                permissions3.add(permission);
             }
         }
-        if (flag) {
-            ActivityCompat.requestPermissions(this, permissions, requestCode);
-        } else {
+        String[] permissions = new String[permissions3.size()];
+        for(int i = 0; i < permissions3.size(); i++){
+            permissions[i] = permissions3.get(i);
+        }
+        if(flag){
+            ActivityCompat.requestPermissions(this, permissions, code);
+        }else{
             return true;
         }
         return false;

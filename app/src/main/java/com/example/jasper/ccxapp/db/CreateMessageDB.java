@@ -25,7 +25,6 @@ public class CreateMessageDB implements MessageDBSQL, MessageType {
 
     public static class MsgDBHelper extends SQLiteOpenHelper {
 
-
         public MsgDBHelper(Context context) {
             super(context, MESSAGE_DB_NAME, null, DATABASE_VERSION);
         }

@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -19,8 +21,9 @@ import android.widget.TextView;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.FriendAdapter;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.fragment.FriendFragment;
+import com.example.jasper.ccxapp.interfaces.UserBackListUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -29,6 +32,9 @@ import java.util.List;
 
 import cn.jpush.im.android.api.model.UserInfo;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 
 public class FriendActivity extends AppCompatActivity {
 
@@ -36,18 +42,19 @@ public class FriendActivity extends AppCompatActivity {
 	private TextView toMyChat;
 	private ImageView img_toNewFriend;
 	private ImageView img_toGroup;
-
+	FragmentManager fragmentManager = getSupportFragmentManager();
+	FriendFragment friendFragment = (FriendFragment) FriendFragment.getInstance();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_friend);
 
-		getFriends();
-
-		img_toNewFriend= (ImageView)findViewById(R.id.image_to_new_friend);
-		img_toGroup= (ImageView)findViewById(R.id.to_group);
-		toMyChat = (TextView)findViewById(R.id.to_my_chat);
-		toNewFriend = (TextView)findViewById(R.id.to_new_friend);
+		//getFriends();
+		showDefaultFragment();
+		img_toNewFriend= (ImageView)findViewById(R.id.image_to_new_friend_iv);
+		img_toGroup= (ImageView)findViewById(R.id.to_group_iv);
+		toMyChat = (TextView)findViewById(R.id.to_my_chat_tv);
+		toNewFriend = (TextView)findViewById(R.id.to_new_friend_tv);
 		toMyChat.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -77,6 +84,17 @@ public class FriendActivity extends AppCompatActivity {
 			}
 		});
 	}
+	private void showDefaultFragment() {
+
+		switchFragment(R.id.fragment_container_FriendActivity,
+				friendFragment, FriendFragment.TAG);
+
+	}
+	private void switchFragment(int id, Fragment fragment, String tag) {
+		fragmentManager.beginTransaction().
+				replace(id, fragment, tag).commit();
+
+	}
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.friend_actions, menu);
@@ -96,106 +114,6 @@ public class FriendActivity extends AppCompatActivity {
 
 		return super.onOptionsItemSelected(item);
 	}
-	private void getFriends() {
-		friendDB.searchfriend(new userBackListUserInfo() {
-			@Override
-			public void showResult(boolean result, List<UserInfo> message) {
-				if(result){
-					showFriends(message);
-				}else{
-					showDialog("查询好友出错");
-				}
-		}
-		});
-	}
-
-	private void showFriends(List<UserInfo> message) {
-		final List<UserInfo> userInfosOld = new ArrayList<>();
-		final List<UserInfo> userInfosYoung = new ArrayList<>();
-		for(UserInfo userInfo:message){
-            try {
-                if (userInfo.getRegion().equals("old")) {
-                    userInfosOld.add(userInfo);
-                } else {
-                    userInfosYoung.add(userInfo);
-                }
-            }catch (Exception e){
-                userInfosYoung.add(userInfo);
-            }
-		}
-        ListView lv = (ListView) findViewById(R.id.all_friend);
-        FriendAdapter adapter = new FriendAdapter(FriendActivity.this, userInfosOld);
-        lv.setAdapter(adapter);
-		lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-				new AlertDialog.Builder(FriendActivity.this).setTitle("系统提示").setMessage("确认删除该老人？")
-						.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								friendDB.deletefriend(userInfosOld.get(position), new userBackListener() {
-                                    @Override
-                                    public void showResult(boolean result, String message) {
-										if(result){
-                                            showDialog("删除成功！");
-                                            getFriends();
-                                        }else{
-                                            showDialog("删除失败！");
-                                        }
-                                    }
-                                });
-							}
-						}).setNegativeButton("取消", null).show();
-				return true;
-			}
-		});
-		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Intent i = getIntent(userInfosOld.get(position));
-				startActivity(i);
-			}
-		});
-
-        ListView lv2 = (ListView) findViewById(R.id.all_young_friend);
-        FriendAdapter adapter2 = new FriendAdapter(FriendActivity.this, userInfosYoung);
-        lv2.setAdapter(adapter2);
-        lv2.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
-                new AlertDialog.Builder(FriendActivity.this).setTitle("系统提示").setMessage("确认删除该好友？")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                friendDB.deletefriend(userInfosYoung.get(position), new userBackListener() {
-                                    @Override
-                                    public void showResult(boolean result, String message) {
-                                        if(result){
-                                            showDialog("删除好友成功！");
-                                            getFriends();
-                                        }else{
-                                            showDialog("删除好友失败！");
-                                        }
-                                    }
-                                });
-                            }
-                        }).setNegativeButton("取消", null).show();
-                return true;
-            }
-        });
-		lv2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Intent i = getIntent(userInfosYoung.get(position));
-				startActivity(i);
-			}
-		});
-	}
-
-	private void showDialog(String message) {
-		new AlertDialog.Builder(this).setTitle("系统提示").setMessage(message)
-				.setPositiveButton("确定", null).show();
-	}
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
@@ -206,24 +124,4 @@ public class FriendActivity extends AppCompatActivity {
 		return false;
 	}
 
-	private Intent getIntent(UserInfo userDetail){
-		Intent i = new Intent(FriendActivity.this, UserDetailActivity.class);
-		File avatarFile = userDetail.getAvatarFile();
-		i.putExtra("headImage", BitmapFactory.decodeFile(String.valueOf(avatarFile)));
-		i.putExtra("userName", userDetail.getUserName());
-		i.putExtra("nickName", userDetail.getNickname());
-		UserInfo.Gender sex2 = userDetail.getGender();
-		String sex;
-		if(sex2 == UserInfo.Gender.female){
-			sex = "女";
-		}else {
-			sex = "男";
-		}
-		i.putExtra("sex", sex);
-		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-		i.putExtra("birthday", date.format(userDetail.getBirthday()).toString());
-		i.putExtra("address", userDetail.getAddress());
-		i.putExtra("explain", userDetail.getSignature());
-		return i;
-	}
 }

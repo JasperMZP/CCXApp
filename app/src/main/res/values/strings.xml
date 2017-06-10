@@ -5,4 +5,7 @@
     <string name="zeffect_recordbutton_time_too_short">时间太短</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_main">群聊名称</string>
+    <string name="my_old">我的老人</string>
+    <string name="my_friend">我的好友</string>
+    <string name="my_group">我的群组</string>
 </resources>

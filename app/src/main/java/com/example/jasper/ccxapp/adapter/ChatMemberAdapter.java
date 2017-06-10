@@ -57,8 +57,8 @@ public class ChatMemberAdapter extends BaseAdapter {
     		convertView = mInflater.inflate(R.layout.a_friend, null);
     		holder =new ViewHolder();
     		/*得到各个控件的对象*/
-    		holder.a_friend_image = (ImageView) convertView.findViewById(R.id.a_friend_image);
-    		holder.a_friend_name = (TextView) convertView.findViewById(R.id.a_friend_name);
+    		holder.a_friend_image = (ImageView) convertView.findViewById(R.id.a_friend_image_iv);
+    		holder.a_friend_name = (TextView) convertView.findViewById(R.id.a_friend_name_tv);
     		convertView.setTag(holder);//绑定ViewHolder对象
     	}
 		holder = (ViewHolder)convertView.getTag();

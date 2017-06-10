@@ -14,8 +14,8 @@ import android.widget.ListView;
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.NewFriendAdapter;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListListener;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +40,13 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 
 	private void getFriendRequest() {
 		String userName = JMessageClient.getMyInfo().getUserName();
-		friendDB.searchRequestList(userName, new userBackListListener() {
+		if(!showProgressDialog(this, "系统提示", "信息加载中，请稍后")){
+			return;
+		}
+		friendDB.searchRequestList(userName, new UserBackListListener() {
 			@Override
 			public void showResult(boolean result, ArrayList<String> message, List<cn.jpush.im.android.api.model.UserInfo> userInfos) {
+				hideProgressDialog();
 				if(result){
 					showFriendRequest(userInfos, message);
 				}else{
@@ -53,7 +57,7 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 	}
 
 	private void showFriendRequest(final List<UserInfo> userInfos, final ArrayList<String> message) {
-		ListView lv = (ListView) findViewById(R.id.all_friend_request);
+		ListView lv = (ListView) findViewById(R.id.all_friend_request_lv);
 
 		NewFriendAdapter adapter = new NewFriendAdapter(NewFriendActivity.this, NewFriendActivity.this, userInfos, message);
 		lv.setAdapter(adapter);
@@ -65,7 +69,7 @@ public class NewFriendActivity extends AppCompatActivity implements OnClickListe
 							@Override
 							public void onClick(DialogInterface dialog, int which) {
 								showProgressDialog(NewFriendActivity.this, "系统提示", "信息加载中，请稍后");
-								friendDB.disagreefriend(JMessageClient.getMyInfo().getUserName(), userInfos.get(position).getUserName(), new userBackListener(){
+								friendDB.disagreefriend(JMessageClient.getMyInfo().getUserName(), userInfos.get(position).getUserName(), new UserBackListener(){
 									@Override
 									public void showResult(boolean result, String message) {
 										hideProgressDialog();

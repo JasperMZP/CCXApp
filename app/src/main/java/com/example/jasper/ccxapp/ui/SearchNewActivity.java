@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackUserInfo;
 
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.callback.GetAvatarBitmapCallback;
@@ -41,13 +41,13 @@ public class SearchNewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_newfriend);
 
-        name_need_search=(EditText)findViewById(R.id.name_need_search);
-        btn_search_new_friend=(ImageView)findViewById(R.id.btn_search_new_friend);
-        search_new_friend = (TextView)findViewById(R.id.Search_New_Friend);
+        name_need_search=(EditText)findViewById(R.id.name_need_search_et);
+        btn_search_new_friend=(ImageView)findViewById(R.id.search_new_friend_iv);
+        search_new_friend = (TextView)findViewById(R.id.search_new_friend_tv);
         all_new_friend = (LinearLayout)findViewById(R.id.all_new_friend);
-        a_line = (View)findViewById(R.id.a_line);
-        a_friend_image = (ImageView)findViewById(R.id.a_friend_image);
-        a_friend_name = (TextView)findViewById(R.id.a_friend_name);
+        a_line = findViewById(R.id.a_line);
+        a_friend_image = (ImageView)findViewById(R.id.a_friend_image_iv);
+        a_friend_name = (TextView)findViewById(R.id.a_friend_name_tv);
 
         btn_search_new_friend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -67,8 +67,10 @@ public class SearchNewActivity extends AppCompatActivity {
                 showDialog("不能添加自身为好友！");
             }
         }
-        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
-        friendDB.searchnewfriend(NameNeedSearch, new userBackUserInfo() {
+        if(!showProgressDialog(this, "系统提示", "信息加载中，请稍后")){
+            return;
+        }
+        friendDB.searchnewfriend(NameNeedSearch, new UserBackUserInfo() {
             @Override
             public void showResult(boolean result, String s, UserInfo message) {
                 hideProgressDialog();

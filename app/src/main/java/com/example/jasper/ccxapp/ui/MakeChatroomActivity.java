@@ -14,8 +14,8 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.FriendChatAdapter;
 import com.example.jasper.ccxapp.db.chatDB;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import java.util.List;
 
@@ -36,9 +36,9 @@ public class MakeChatroomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_make_chatroom);
 
-        showFriendsChat = (ListView)findViewById(R.id.all_friend_for_chat);
-        addNewChat = (Button)findViewById(R.id.add_new_chatroom);
-        chatroomName = (EditText)findViewById(R.id.add_new_chatroom_name);
+        showFriendsChat = (ListView)findViewById(R.id.all_friend_for_chat_lv);
+        addNewChat = (Button)findViewById(R.id.add_new_chatroom_btn);
+        chatroomName = (EditText)findViewById(R.id.add_new_chatroom_name_et);
 
         getFriendList();
 
@@ -60,8 +60,10 @@ public class MakeChatroomActivity extends AppCompatActivity {
             showDialog("请选择加入群聊的人！");
             return;
         }
-        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
-        chatDB.addnewchatroom(null, chatName, adapter.getUserNameList(), new userBackListener() {
+        if(!showProgressDialog(this, "系统提示", "信息加载中，请稍后")){
+            return;
+        }
+        chatDB.addnewchatroom(null, chatName, adapter.getUserNameList(), new UserBackListener() {
             @Override
             public void showResult(boolean result, String message) {
                 hideProgressDialog();
@@ -75,7 +77,7 @@ public class MakeChatroomActivity extends AppCompatActivity {
     }
 
     private void getFriendList() {
-        friendDB.searchfriend(new userBackListUserInfo() {
+        friendDB.searchfriend(new UserBackListUserInfo() {
             @Override
             public void showResult(boolean result, List<UserInfo> message) {
                 if(result){

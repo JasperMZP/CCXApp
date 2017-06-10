@@ -3,8 +3,8 @@ package com.example.jasper.ccxapp.db;
 import android.util.Log;
 
 import com.example.jasper.ccxapp.interfaces.GroupInfos;
-import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ import cn.jpush.im.api.BasicCallback;
 
 public class chatDB {
     //添加新聊天室
-    public static void addnewchatroom(String userName, String chatroom, final ArrayList<String> otherusers, final userBackListener userBackListener) {
+    public static void addnewchatroom(String userName, String chatroom, final ArrayList<String> otherusers, final UserBackListener userBackListener) {
         JMessageClient.createGroup(chatroom, "咱一家人的描述", new CreateGroupCallback() {
             @Override
             public void gotResult(int i, String s, final long l) {
@@ -46,6 +46,7 @@ public class chatDB {
         });
     }
 
+    //获得聊天室列表
     public static void getChatroom(final GroupInfos backgroupInfos){
         final ArrayList<GroupInfo> groupInfos = new ArrayList<GroupInfo>();
         final boolean[] flag = {true};
@@ -79,7 +80,8 @@ public class chatDB {
         });
     }
 
-    public static void getChatMember(long groupID, final userBackListUserInfo userBackListUserInfo){
+    //获得相应的聊天室成员
+    public static void getChatMember(long groupID, final UserBackListUserInfo userBackListUserInfo){
         JMessageClient.getGroupMembers(groupID, new GetGroupMembersCallback() {
             @Override
             public void gotResult(int i, String s, List<UserInfo> list) {
@@ -92,7 +94,8 @@ public class chatDB {
         });
     }
 
-    public static void addNewMember(long groupID, List<String> userNames, final userBackListener userBackListener){
+    //为聊天室添加新成员
+    public static void addNewMember(long groupID, List<String> userNames, final UserBackListener userBackListener){
         JMessageClient.addGroupMembers(groupID, userNames, new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
@@ -105,7 +108,8 @@ public class chatDB {
         });
     }
 
-    public static void deleteSomeMember(long groupID, List<String> userNames, final userBackListener userBackListener){
+    //删除部分聊天室成员
+    public static void deleteSomeMember(long groupID, List<String> userNames, final UserBackListener userBackListener){
         JMessageClient.removeGroupMembers(groupID, userNames, new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {
@@ -118,7 +122,8 @@ public class chatDB {
         });
     }
 
-    public static void quitChat(long groupID, final userBackListener userBackListener){
+    //退出群聊
+    public static void quitChat(long groupID, final UserBackListener userBackListener){
         JMessageClient.exitGroup(groupID, new BasicCallback() {
             @Override
             public void gotResult(int i, String s) {

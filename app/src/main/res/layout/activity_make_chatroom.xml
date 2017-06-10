@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"     android:background="@drawable/appback2"
+    android:layout_width="fill_parent"     android:background="@drawable/app_bg"
     android:layout_height="fill_parent">
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp">
         <EditText
-            android:id="@+id/add_new_chatroom_name"
+            android:id="@+id/add_new_chatroom_name_et"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="请输入群聊名称"
             />
         <Button
-            android:id="@+id/add_new_chatroom"
+            android:id="@+id/add_new_chatroom_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -22,13 +22,13 @@
             android:textColor="@color/white"
             android:background="@drawable/button_color"
             android:text="确定"
-            android:layout_alignBottom="@+id/add_new_chatroom_name"
+            android:layout_alignBottom="@+id/add_new_chatroom_name_et"
             android:layout_alignParentTop="true" />
 
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/showFriendChat"
+        android:id="@+id/showFriendChat_lt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
@@ -37,7 +37,7 @@
         android:layout_marginRight="5dp">
 
         <ListView
-            android:id="@+id/all_friend_for_chat"
+            android:id="@+id/all_friend_for_chat_lv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
