@@ -173,8 +173,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initView() {
 
-
-
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
         myAvatarCIV = (ImageView) findViewById(R.id.my_avatar_civ);
@@ -265,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements
             Log.i("test", value.toString() + "," + value.gid);
             mTView.setText(value.toString());
             currentGroupId=value.gid;
+            Log.i("test2","currentGroup "+value.data);
             setChatShows(value.gid,pos);
         }
     }
@@ -289,19 +288,12 @@ public class MainActivity extends AppCompatActivity implements
 
         if (pos>0){
             for (int i =0;i<showListCopy.size();i++){
-                Log.i("test2","---------------"+i);
-                boolean flag = false;
-                for (long groupId: showListCopy.get(i).getGroupBelongToList()){
-                    Log.i("test2",groupId+"_"+gId);
-                    if (groupId==gId){
-                        Log.i("test2","true");
-                        flag=true;
-                        break;
+                List<Long> tmpGList=showListCopy.get(i).getGroupBelongToList();
+                for (long id : tmpGList){
+                    if (id==currentGroupId){
+                        showList.add(showListCopy.get(i));
+                        childCommentList.add(childCommentListCopy.get(i));
                     }
-                }
-                if (flag==false){
-                    showList.add(showListCopy.get(i));
-                    childCommentList.add(childCommentListCopy.get(i));
                 }
             }
         }else {
@@ -362,47 +354,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         }
-
-        /*showListCopy = showList;
-        childCommentListCopy =childCommentList;*/
-
-        /*ShowItemModel showItem = new ShowItemModel();
-        showItem.setMsgKey("0");
-        showItem.setShowUsername("寸草心官方");
-        showItem.setShowText("尊敬的用户：欢迎使用寸草心，\n" +
-                "这里是消息的浏览页，\n" +
-                "点击右上角的“+”发送消息，\n" +
-                "长按消息下方的按钮发送语音。\n" +
-                ":)");
-        showItem.setShowTime("官方消息");
-        ArrayList<String> showImgs = new ArrayList<>();
-        showItem.setShowImagesList(showImgs);
-        showList.add(showItem);
-
-        ArrayList<CommentItemModel> commentItemList = new ArrayList<CommentItemModel>();
-        CommentItemModel noneCommentItem1 = new CommentItemModel();
-        noneCommentItem1.setMsgKey("-1");
-        commentItemList.add(noneCommentItem1);
-        childCommentList.add(commentItemList);
-
-        ShowItemModel showItem2 = new ShowItemModel();
-        showItem2.setMsgKey("0");
-        showItem2.setShowUsername("寸草心官方");
-        showItem2.setShowText("尊敬的用户：欢迎使用寸草心，\n" +
-                "这里是消息的浏览页，\n" +
-                "点击右上角的“+”发送消息，\n" +
-                "长按消息下方的按钮发送语音。\n" +
-                ":)");
-        showItem2.setShowTime("官方消息");
-        ArrayList<String> showImgs2 = new ArrayList<>();
-        showItem2.setShowImagesList(showImgs2);
-        showList.add(showItem2);
-
-        ArrayList<CommentItemModel> commentItemList2 = new ArrayList<CommentItemModel>();
-        CommentItemModel noneCommentItem2 = new CommentItemModel();
-        noneCommentItem2.setMsgKey("-1");
-        commentItemList2.add(noneCommentItem2);
-        childCommentList.add(commentItemList2);*/
     }
 
     private boolean createConversation(long groupId) {
@@ -971,11 +922,10 @@ public class MainActivity extends AppCompatActivity implements
             noneComment.setMsgKey("-1");
             commentItemModels.add(noneComment);
             childCommentListCopy.add(0, commentItemModels);
-            if (gFlag==true||currentGroupId==0){
+            if (gFlag||currentGroupId==0){
                 showList.add(0, textShowItem);
                 childCommentList.add(0, commentItemModels);
             }
-            Log.i("test", "background");
             messageDB.insertShow(textShowItem, SHOW_TEXT);
             return true;
         }
