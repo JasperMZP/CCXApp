@@ -21,23 +21,19 @@ import me.iwf.photopicker.utils.AndroidLifecycleUtils;
  */
 public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHolder> {
 
-    private ArrayList<String> photoPaths = new ArrayList<String>();
-    private LayoutInflater inflater;
-
-    private Context mContext;
-
     public final static int TYPE_ADD = 1;
     public final static int TYPE_PHOTO = 2;
-
     public final static int MAX = 9;
+
+    private ArrayList<String> photoPaths = new ArrayList<String>();
+    private LayoutInflater inflater;
+    private Context mContext;
 
     public PhotoAdapter(Context mContext, ArrayList<String> photoPaths) {
         this.photoPaths = photoPaths;
         this.mContext = mContext;
         inflater = LayoutInflater.from(mContext);
-
     }
-
 
     @Override
     public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -52,7 +48,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
         }
         return new PhotoViewHolder(itemView);
     }
-
 
     @Override
     public void onBindViewHolder(final PhotoViewHolder holder, final int position) {
@@ -73,7 +68,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.PhotoViewHol
             }
         }
     }
-
 
     @Override
     public int getItemCount() {

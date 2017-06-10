@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/viewpager">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/title_old"
+            android:text="@string/my_old"
+            style="@style/MessageTitleStyle"/>
+
+        <TextView
+            android:id="@+id/title_friend"
+            android:text="@string/my_friend"
+            style="@style/MessageTitleStyle"/>
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/dark_green"
+        android:orientation="horizontal">
+        <View
+            android:id="@+id/cursor_FriendFragment"
+            android:layout_width="10dp"
+            android:layout_height="8dp"
+            android:background="@color/green"/>
+    </LinearLayout>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager_FriendFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+    </android.support.v4.view.ViewPager>
+</LinearLayout>

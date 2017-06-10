@@ -18,13 +18,16 @@ import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.adapter.ChatChangeMemberAdapter;
 import com.example.jasper.ccxapp.db.chatDB;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListUserInfo;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListUserInfo;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.jpush.im.android.api.model.UserInfo;
+
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
 
 public class ChatChangeMemberActivity extends AppCompatActivity {
 
@@ -39,9 +42,9 @@ public class ChatChangeMemberActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_change_member);
 
-        add_new_member = (Button)findViewById(R.id.add_new_member);
-        delete_some_member = (Button)findViewById(R.id.delete_some_member);
-        a_word = (TextView)findViewById(R.id.a_word);
+        add_new_member = (Button)findViewById(R.id.add_new_member_btn);
+        delete_some_member = (Button)findViewById(R.id.delete_some_member_btn);
+        a_word = (TextView)findViewById(R.id.a_word_tv);
 
         groupId = getIntent().getLongExtra("groupId", groupId);
         String type = getIntent().getStringExtra("type");
@@ -71,10 +74,14 @@ public class ChatChangeMemberActivity extends AppCompatActivity {
     }
 
     private void showOtherFriends(final List<String> userNames) {
-        friendDB.searchfriend(new userBackListUserInfo() {
+        if(!showProgressDialog(this, "系统提示", "信息加载中，请稍后")){
+            return;
+        }
+        friendDB.searchfriend(new UserBackListUserInfo() {
             @Override
 
             public void showResult(boolean result, List<UserInfo> message) {
+                hideProgressDialog();
                 if (result) {
                     List<String> otherUser = new ArrayList<String>();
                     List<Bitmap> otherBimaps = new ArrayList<Bitmap>();
@@ -106,7 +113,7 @@ public class ChatChangeMemberActivity extends AppCompatActivity {
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                chatDB.addNewMember(groupId, adaptar.getUserNameList(), new userBackListener() {
+                                chatDB.addNewMember(groupId, adaptar.getUserNameList(), new UserBackListener() {
                                     @Override
                                     public void showResult(boolean result, String message) {
                                         if(result){
@@ -131,7 +138,7 @@ public class ChatChangeMemberActivity extends AppCompatActivity {
                         .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                chatDB.deleteSomeMember(groupId, adaptar.getUserNameList(), new userBackListener() {
+                                chatDB.deleteSomeMember(groupId, adaptar.getUserNameList(), new UserBackListener() {
                                     @Override
                                     public void showResult(boolean result, String message) {
                                         if(result){

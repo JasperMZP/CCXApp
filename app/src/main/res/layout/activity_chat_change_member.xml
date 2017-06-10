@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@drawable/appback2"
+    android:background="@drawable/app_bg"
     android:layout_height="match_parent"
     tools:context="com.example.jasper.ccxapp.ui.ChatChangeMemberActivity">
 
     <TextView
-        android:id="@+id/a_word"
+        android:id="@+id/a_word_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="当前群聊成员"
@@ -16,13 +16,13 @@
         android:padding="10dp" />
     <ListView
         android:layout_marginLeft="5dp"
-        android:id="@+id/show_chat_member"
-        android:layout_below="@id/a_word"
+        android:id="@+id/show_chat_member_lv"
+        android:layout_below="@id/a_word_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
     </ListView>
     <Button
-        android:id="@+id/add_new_member"
+        android:id="@+id/add_new_member_btn"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,7 +34,7 @@
         android:layout_marginRight="5dp"
         android:text="添加新成员"/>
     <Button
-        android:id="@+id/delete_some_member"
+        android:id="@+id/delete_some_member_btn"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

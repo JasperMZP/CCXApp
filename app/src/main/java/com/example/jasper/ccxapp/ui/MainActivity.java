@@ -14,7 +14,6 @@ import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,7 +32,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView.LayoutParams;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -117,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements
     private TextView myName;
     private TextView userName;
     private TextView loginout;
-    private TextView openFlashlight;
     private CircleImageView leftUserAvatarCIV;
     private DrawerLayout drawerLayout;
     private ImageView myAvatarCIV;
@@ -176,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements
         expandableListView = (PinnedHeaderExpandableListView) findViewById(R.id.expandablelist);
         stickyLayout = (StickyLayout) findViewById(R.id.sticky_layout);
         myAvatarCIV = (ImageView) findViewById(R.id.my_avatar_civ);
-        userName = (TextView) findViewById(R.id.currentUserName);
+        userName = (TextView) findViewById(R.id.currentUserName_tv);
         TextPaint tp = userName.getPaint();
         tp.setFakeBoldText(true);
         JMessageClient.getMyInfo().getAvatarBitmap(new GetAvatarBitmapCallback() {
@@ -205,9 +202,8 @@ public class MainActivity extends AppCompatActivity implements
 
         View v1 = findViewById(R.id.left_drawer);
         toFriend = (TextView) v1.findViewById(R.id.tvMyFriend);
-        myName = (TextView) v1.findViewById(R.id.myName);
+        myName = (TextView) v1.findViewById(R.id.myName_tv);
         loginout = (TextView) v1.findViewById(R.id.loginout);
-        openFlashlight = (TextView) v1.findViewById(R.id.flashlight);
         leftUserAvatarCIV = (CircleImageView) v1.findViewById(R.id.left_my_avatar_civ);
         try {
             myName.setText(JMessageClient.getMyInfo().getNickname());
@@ -224,12 +220,6 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, FriendActivity.class));
-            }
-        });
-        openFlashlight.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, FlashlightActivity.class));
             }
         });
         loginout.setOnClickListener(new View.OnClickListener() {
@@ -250,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.bt_dropdown:
+            case R.id.dropdown_ib:
                 showSpinWindow();
                 break;
         }
@@ -460,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements
                 showHolder.showUserAvatarCIv = (CircleImageView) convertView.findViewById(R.id.show_user_avatar_civ);
                 showHolder.showTextTv = (TextView) convertView.findViewById(R.id.show_text_content_tv);
                 showHolder.showTimeTv = (TextView) convertView.findViewById(R.id.show_time_tv);
-                showHolder.expandedIv = (ImageView) convertView.findViewById(R.id.expanded_img);
+                showHolder.expandedIv = (ImageView) convertView.findViewById(R.id.expanded_iv);
                 showHolder.showImageRv = (RecyclerView) convertView.findViewById(R.id.show_recycler_view);
                 convertView.setTag(showHolder);
             } else {
@@ -468,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             showVideoView = (CustomVideoView) convertView.findViewById(R.id.show_video_view);
-            showVideoPlayBtn = (ImageView) convertView.findViewById(R.id.show_video_play_video_btn);
+            showVideoPlayBtn = (ImageView) convertView.findViewById(R.id.show_video_play_video_iv);
 
             final ShowItemModel showItem = (ShowItemModel) getGroup(groupPosition);
             showHolder.showUsernameTv.setText(showItem.getShowUsername());
@@ -505,10 +495,10 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void onClick(View v) {
                         if (expandableListView.isGroupExpanded(groupPosition)) {
-                            showHolder.expandedIv.setImageResource(R.drawable.angle1);
+                            showHolder.expandedIv.setImageResource(R.drawable.ic_angle_up);
                             expandableListView.collapseGroup(groupPosition);
                         } else {
-                            showHolder.expandedIv.setImageResource(R.drawable.angle);
+                            showHolder.expandedIv.setImageResource(R.drawable.ic_angle_down);
                             expandableListView.expandGroup(groupPosition);
                         }
                     }
@@ -558,7 +548,7 @@ public class MainActivity extends AppCompatActivity implements
                 convertView = inflater.inflate(R.layout.comment_item, null);
                 commentHolder.commentUsernameTv = (TextView) convertView.findViewById(R.id.comment_username_tv);
                 commentHolder.playVoiceCommentBtn = (Button) convertView.findViewById(R.id.play_comment_audio_btn);
-                commentHolder.timeofvoice = (TextView) convertView.findViewById(R.id.time_of_voice);
+                commentHolder.timeofvoice = (TextView) convertView.findViewById(R.id.time_of_voice_tv);
                 commentHolder.sendVoiceCommentBtn = (RecordButton) convertView.findViewById(R.id.send_comment_audio_btn);
                 commentHolder.commentTimeTv = (TextView) convertView.findViewById(R.id.comment_time_tv);
                 convertView.setTag(commentHolder);
@@ -762,8 +752,8 @@ public class MainActivity extends AppCompatActivity implements
         //更新群
         nameList.clear();
         //切换群
-        mTView = (TextView) findViewById(R.id.tv_value);
-        mBtnDropDown = (ImageButton) findViewById(R.id.bt_dropdown);
+        mTView = (TextView) findViewById(R.id.value_tv);
+        mBtnDropDown = (ImageButton) findViewById(R.id.dropdown_ib);
         mBtnDropDown.setOnClickListener(this);
 
         nameList.add(new CustemObject("全部", 0));
@@ -867,22 +857,26 @@ public class MainActivity extends AppCompatActivity implements
         return super.onKeyDown(keyCode, event);
     }
 
-    public boolean checkPermision(String[] permissions) {
+    public boolean checkPermision(String[] permissions2) {
         boolean flag = false;
-        for (String permission : permissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+        List<String> permissions3 = new ArrayList<String>();
+        for(String permission : permissions2){
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED){
                 flag = true;
-                break;
+                permissions3.add(permission);
             }
         }
-        if (flag) {
+        String[] permissions = new String[permissions3.size()];
+        for(int i = 0; i < permissions3.size(); i++){
+            permissions[i] = permissions3.get(i);
+        }
+        if(flag){
             ActivityCompat.requestPermissions(this, permissions, 1);
-        } else {
+        }else{
             return true;
         }
         return false;
     }
-
 
     class RecieveTextTask extends AsyncTask<Message, Integer, Boolean> {
 

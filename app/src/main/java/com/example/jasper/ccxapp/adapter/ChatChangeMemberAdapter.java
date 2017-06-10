@@ -65,9 +65,9 @@ public class ChatChangeMemberAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.a_friend_chat, null);
             holder = new ViewHolder();
     		/*得到各个控件的对象*/
-            holder.a_friend_chat_imageview = (ImageView) convertView.findViewById(R.id.a_friend_chat_imageView);
-            holder.a_friend_chat_name = (TextView) convertView.findViewById(R.id.a_friend_chat_name);
-            holder.a_friend_chat_checkbox = (CheckBox) convertView.findViewById(R.id.a_friend_chat_checkbox);
+            holder.a_friend_chat_imageview = (ImageView) convertView.findViewById(R.id.a_friend_chat_iv);
+            holder.a_friend_chat_name = (TextView) convertView.findViewById(R.id.a_friend_chat_name_tv);
+            holder.a_friend_chat_checkbox = (CheckBox) convertView.findViewById(R.id.a_friend_chat_cb);
             convertView.setTag(holder);//绑定ViewHolder对象
         }
         holder.a_friend_chat_imageview.setImageBitmap(bitmaps.get(position));

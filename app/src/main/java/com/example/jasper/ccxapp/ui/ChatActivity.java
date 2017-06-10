@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import cn.jpush.im.android.api.JMessageClient;
 import cn.jpush.im.android.api.model.GroupInfo;
 
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
+import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
+
 public class ChatActivity extends AppCompatActivity {
 
     @Override
@@ -30,9 +33,13 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void getChats() {
+        if(!showProgressDialog(this, "系统提示", "信息加载中，请稍后")){
+            return;
+        }
         chatDB.getChatroom(new GroupInfos() {
             @Override
             public void showResult(boolean result, ArrayList<GroupInfo> groupInfos) {
+                hideProgressDialog();
                 if(result){
                     showChatrooms(groupInfos);
                 }else{
@@ -43,7 +50,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void showChatrooms(final ArrayList<GroupInfo> groupInfos) {
-        ListView lv = (ListView) findViewById(R.id.show_all_chatroom);
+        ListView lv = (ListView) findViewById(R.id.show_all_chatroom_lv);
 
         ChatAdapter adapter = new ChatAdapter(ChatActivity.this, groupInfos);
         lv.setAdapter(adapter);

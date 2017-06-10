@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.example.jasper.ccxapp.R;
 import com.example.jasper.ccxapp.db.friendDB;
-import com.example.jasper.ccxapp.interfaces.userBackListener;
+import com.example.jasper.ccxapp.interfaces.UserBackListener;
 
 import static com.example.jasper.ccxapp.util.ShowProcessUtil.hideProgressDialog;
 import static com.example.jasper.ccxapp.util.ShowProcessUtil.showProgressDialog;
@@ -36,10 +36,10 @@ public class SendRequestActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_sendrequest);
 
-        add_friend_name = (TextView) findViewById(R.id.add_friend_name);
-        add_friend_reason = (EditText) findViewById(R.id.add_friend_reason);
-        add_friend_image = (ImageView)findViewById(R.id.add_friend_image);
-        btn_send_request_to_add = (Button) findViewById(R.id.btn_send_request_to_add);
+        add_friend_name = (TextView) findViewById(R.id.add_friend_name_tv);
+        add_friend_reason = (EditText) findViewById(R.id.add_friend_reason_et);
+        add_friend_image = (ImageView)findViewById(R.id.add_friend_image_iv);
+        btn_send_request_to_add = (Button) findViewById(R.id.send_request_to_add_btn);
 
         add_friend_name.setText(getIntent().getStringExtra("newFriendName"));
         add_friend_image.setImageBitmap((Bitmap)getIntent().getParcelableExtra("userImage"));
@@ -56,9 +56,11 @@ public class SendRequestActivity extends AppCompatActivity{
         Log.i("test",userName2);
         String message = add_friend_reason.getText().toString().trim();
 
-        showProgressDialog(this, "系统提示", "信息加载中，请稍后");
+        if(!showProgressDialog(this, "系统提示", "信息加载中，请稍后")){
+            return;
+        }
         friendDB.sendfriendrequest(userName2, message,
-                new userBackListener(){
+                new UserBackListener(){
                     @Override
                     public void showResult(boolean result, String message) {
                         hideProgressDialog();

@@ -20,20 +20,16 @@ import me.iwf.photopicker.utils.AndroidLifecycleUtils;
  */
 public class ShowPhotoAdapter extends RecyclerView.Adapter<ShowPhotoAdapter.PhotoViewHolder> {
 
+    private final static int TYPE_PHOTO = 2;
+    private final static int MAX = 9;
     private ArrayList<String> photoPaths = new ArrayList<String>();
     private LayoutInflater inflater;
-
     private Context mContext;
-
-    final static int TYPE_PHOTO = 2;
-
-    final static int MAX = 9;
 
     public ShowPhotoAdapter(Context mContext, ArrayList<String> photoPaths) {
         this.photoPaths = photoPaths;
         this.mContext = mContext;
         inflater = LayoutInflater.from(mContext);
-
     }
 
 

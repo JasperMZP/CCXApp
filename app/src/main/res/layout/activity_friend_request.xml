@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"     android:background="@drawable/appback2"
+    android:layout_width="fill_parent"
+	android:background="@drawable/app_bg"
     android:layout_height="fill_parent">
 
 	<TextView
-		android:id="@+id/no_friend_request"
+		android:id="@+id/no_friend_request_tv"
 		android:layout_width="match_parent"
 		android:layout_height="80.0dip"
 		android:paddingTop="35dp"
@@ -20,7 +21,7 @@
 		android:textSize="22sp" />
 
 	<LinearLayout
-		android:id="@+id/showFriendsAll"
+		android:id="@+id/showFriendsAll_lt"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:layout_marginTop="20dp"
@@ -32,7 +33,7 @@
 			android:background="#CCCCCC" />
 
 		<ListView
-			android:id="@+id/all_friend_request"
+			android:id="@+id/all_friend_request_lv"
 			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
 			android:orientation="vertical"
