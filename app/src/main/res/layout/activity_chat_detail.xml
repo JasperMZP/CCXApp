@@ -33,7 +33,7 @@
         android:layout_marginRight="5dp"
         android:textColor="@color/white"
         android:textStyle="bold"
-        android:id="@+id/add_new_member"
+        android:id="@+id/add_new_member_btn"
         android:layout_above="@+id/delete_some_member_btn"
         android:layout_width="match_parent"
         android:background="@drawable/button_color"

@@ -160,7 +160,7 @@ public class ChatChangeMemberActivity extends AppCompatActivity {
     }
 
     private void showChatMember(List<String> userNames, List<Bitmap> bitmaps) {
-        ListView lv = (ListView)findViewById(R.id.show_chat_member);
+        ListView lv = (ListView)findViewById(R.id.show_chat_member_lv);
 
         adaptar = new ChatChangeMemberAdapter(ChatChangeMemberActivity.this, userNames, bitmaps);
         lv.setAdapter(adaptar);
