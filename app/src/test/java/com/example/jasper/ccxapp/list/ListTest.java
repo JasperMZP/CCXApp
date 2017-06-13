@@ -1,27 +1,27 @@
-package com.example.jasper.ccxapp.list;
+// package com.example.jasper.ccxapp.list;
 
-import android.util.Log;
+// import android.util.Log;
 
-import org.junit.Test;
+// import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+// import java.util.ArrayList;
+// import java.util.List;
 
-/**
- * Created by Jasper on 2017/6/10.
- */
+// /**
+//  * Created by Jasper on 2017/6/10.
+//  */
 
-public class ListTest {
+// public class ListTest {
 
-    @Test
-    public void listTest(){
-        List<String> list = new ArrayList<String>();
-        list.add("aaa");
-        List<String> list2 ;//=new ArrayList<String>();
-        list2=list;
-        System.out.println(list.get(0));
-       // list2.add(list.get(0));
-        list.clear();
-        //System.out.println(list2.get(0));
-    }
-}
+//     @Test
+//     public void listTest(){
+//         List<String> list = new ArrayList<String>();
+//         list.add("aaa");
+//         List<String> list2 ;//=new ArrayList<String>();
+//         list2=list;
+//         System.out.println(list.get(0));
+//        // list2.add(list.get(0));
+//         list.clear();
+//         //System.out.println(list2.get(0));
+//     }
+// }
